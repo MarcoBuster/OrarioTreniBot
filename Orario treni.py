@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 0.3
+Versione: 0.4
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
@@ -10,6 +10,7 @@ Supporto: @MarcoBuster
 import botogram
 import json
 import urllib.request
+from datetime import datetime
 import datetime
 import time
 bot = botogram.create("TOKEN")
@@ -21,7 +22,10 @@ bot.lang = "it"
 #Utilizzo: /info
 @bot.command("info")
 def info(chat, message, args):
-    chat.send("*Orario treni*\n_Con questo bot potrai cercare il tuo treno e averne le informazioni principali._\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
+    chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
+    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.")
+    chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
+    chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
     chat.send("_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
 #Comando: /treno
 #Cerca un treno e restituisce le informazioni principali
@@ -45,9 +49,7 @@ def treno(chat, message, args, shared):
     orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
     oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
     chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")")
-    if (data['subTitle'])=="":
-        asd = 1
-    else:
+    if (data['subTitle']) != None:
         chat.send("*Informazioni cancellazione*: "+data['subTitle'])
 #Comando: /fermata
 #Visualizza le informazioni di un treno rispetto a una fermata specifica
@@ -90,7 +92,12 @@ def fermata(chat, message, args):
             b+="\n"
         chat.send(b)
     else:
-        chat.send("*Informazioni di un treno rispetto a una fermata specifica*:_ "+data['fermate'][s]['stazione']+"_\n*Arrivo programmato: *"+str(sOrarioArrivoP)+"\n*Arrivo reale: *"+str(sOrarioArrivoR)+"\n*Ritardo arrivo: *"+str(data['fermate'][s]['ritardoArrivo'])+"\n*Partenza programmata: *"+str(sOrarioPartenzaP)+"\n*Partenza reale: *"+str(sOrarioPartenzaR)+"\n*Ritardo partenza: *"+str(data['fermate'][s]['ritardoPartenza'])+"\n*Binario: *"+str(data['fermate'][s]['binarioEffettivoPartenzaDescrizione']))
+        binario = data['fermate'][s]['binarioProgrammatoArrivoDescrizione']
+        if (binario=="None"):
+            binario = "Errore di Trenitalia/Trenord."
+        else:
+            binario = str(binario)
+        chat.send("*Informazioni di un treno rispetto a una fermata specifica*:_ "+data['fermate'][s]['stazione']+"_\n*Arrivo programmato: *"+str(sOrarioArrivoP)+"\n*Arrivo reale: *"+str(sOrarioArrivoR)+"\n*Ritardo arrivo: *"+str(data['fermate'][s]['ritardoArrivo'])+"m\n*Partenza programmata: *"+str(sOrarioPartenzaP)+"\n*Partenza reale: *"+str(sOrarioPartenzaR)+"\n*Ritardo partenza: *"+str(data['fermate'][s]['ritardoPartenza'])+"m\n*Binario: *"+binario)
 #Comando: /statistiche
 #Visualizza curiose statistiche sui treni italiani in tempo reale
 #Utilizzo: /statistiche
@@ -101,6 +108,52 @@ def statistiche(chat, message, args):
     content = response.read()
     data = json.loads(content.decode("utf8"))
     chat.send("_Statistiche dei treni italiani in tempo reale_"+"\n*Treni circolanti*: "+str(data['treniCircolanti'])+"\n*Treni totali di oggi*: "+str(data['treniGiorno']))
+#Comando: /arrivi
+#Visualizza gli arrivi di una stazione
+#Utilizzo: /arrivi <nome stazione>
+@bot.command("arrivi")
+def arrivi(chat, message, args):
+    stazione = str((args[0]))
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
+    response = urllib.request.urlopen(content)
+    content = response.read()
+    data = json.loads(content.decode("utf8"))
+    id_stazione = (str(data[0]['id']))
+    datatempo = (datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S GMT+0100'))
+    datatempo = datatempo.replace(" ","%20")
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/arrivi/"+id_stazione+"/"+datatempo
+    response = urllib.request.urlopen(content)
+    content = response.read()
+    data = json.loads(content.decode("utf8"))
+    for k in range(0,5):
+        sOrarioArrivoP = datetime.datetime.fromtimestamp(data[k]['orarioArrivo'] / 1000).strftime('%H:%M')
+        binario = data[k]['binarioProgrammatoArrivoDescrizione']
+        if (binario=="None"):
+            binario = "Errore di Trenitalia/Trenord."
+        chat.send("*Informazioni degli arrivi nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Provenienza*: "+data[k]['origine']+"\n*Orario di arrivo*: "+str(sOrarioArrivoP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
+#Comando /partenze
+#Visualizza le partenze di una stazione
+#Utilizzo: /partenze <nome stazione>
+@bot.command("partenze")
+def partenze(chat, message, args):
+    stazione = str((args[0]))
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
+    response = urllib.request.urlopen(content)
+    content = response.read()
+    data = json.loads(content.decode("utf8"))
+    id_stazione = (str(data[0]['id']))
+    datatempo = (datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S GMT+0100'))
+    datatempo = datatempo.replace(" ","%20")
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/partenze/"+id_stazione+"/"+datatempo
+    response = urllib.request.urlopen(content)
+    content = response.read()
+    data = json.loads(content.decode("utf8"))
+    for k in range(0,5):
+        sOrarioPartenzaP = datetime.datetime.fromtimestamp(data[k]['orarioPartenza'] / 1000).strftime('%H:%M')
+        binario = data[k]['binarioProgrammatoPartenzaDescrizione']
+        if (binario=="None"):
+            binario = "Errore di Trenitalia/Trenord."
+        chat.send("*Informazioni delle partenze nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Destinazione*: "+data[k]['destinazione']+"\n*Orario di partenza*: "+str(sOrarioPartenzaP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
 #Avvio del bot
 if __name__ == "__main__":
     bot.run()
