@@ -244,7 +244,14 @@ def itinerario(chat, message, args):
     stazione1 = stazione1.replace(".","%20")
     stazione2 = str((args[1]))
     stazione2 = stazione2.replace(".","%20")
-    tempo = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    if len(args)>= 3:
+        tempogrezzo = args[2]
+        tempogrezzo = tempogrezzo + datetime.datetime.now().strftime(' %Y-%m-%d')
+        tempo = datetime.datetime.strptime(tempogrezzo, '%H:%M %Y-%m-%d')
+        tempo = tempo.strftime('%Y-%m-%dT%H:%M:%S')
+    else:
+        tempo = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+    print("Qualcuno ha cercato un itinerario tra la stazione di "+str(args[0])+" e la stazione di "+str(args[1]))
     #Cerca ID stazione 1
     try:
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione1
