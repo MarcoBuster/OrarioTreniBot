@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 1.1
+Versione: 1.2
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
@@ -21,31 +21,33 @@ bot.lang = "it"
 #Visualizza le informazioni sul bot
 #Utilizzo: /info
 @bot.command("info")
-def info(chat, message, args):
+def infocommand(chat, message, args):
     chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
-    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.")
+    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
     chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
     chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
     chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
+    chat.send("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
     chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
-    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot). *Grazie per il supporto!*\n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
 #Comando: /help
 #Visualizza le informazioni sul bot
 #Utilizzo: /help
 @bot.command("help")
 def helpcommand(chat, message, args):
     chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
-    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.")
+    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
     chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
     chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
     chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
+    chat.send("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
     chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
-    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot). *Grazie per il supporto!*\n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+    print("Qualcuno ha utilizzato il comando /help senza problemi")
 #Comando: /treno
 #Cerca un treno e restituisce le informazioni principali
 #Utilizzo: /treno <numero di treno>
-@bot.command("treno")
-def treno(chat, message, args, shared):
+def treno(chat, message, args):
     id_treno = (args[0])
     print ("Qualcuno ha cercato il treno: ",(args[0]))
     content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
@@ -56,6 +58,7 @@ def treno(chat, message, args, shared):
         response = urllib.request.urlopen(info)
     except:
         chat.send("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+        editing = False
     content = response.read()
     data = json.loads(content.decode("utf8"))
     orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
@@ -64,7 +67,38 @@ def treno(chat, message, args, shared):
         oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
     except:
         oraUltimoRilevamento = "Il treno non è ancora partito"
-    chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")")
+    messaggio = chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Il messaggio dinamico è in caricamento...*")
+    fermati = 500
+    valore = 4
+    editing = True
+    while editing is True and fermati > 0:
+        valore = valore +1
+        try:
+            orario = datetime.datetime.now().strftime('%H:%M')
+            messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Il messaggio dinamico scade fra "+str(fermati)+ " secondi circa*")
+        except:
+            pass
+        fermati = fermati -1
+        time.sleep(1)
+        try:
+            while (valore == 5):
+                info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+                response = urllib.request.urlopen(info)
+                content = response.read()
+                data = json.loads(content.decode("utf8"))
+                orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+                orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+                try:
+                    oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+                except:
+                    oraUltimoRilevamento = "Il treno non è ancora partito"
+                if (data['destinazioneZero'] == data['stazioneUltimoRilevamento']):
+                    messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Messaggio dinamico disabilitato perché il treno è arrivato a destinazione*")
+                    editing = False
+                valore = 0
+        except:
+            continue
+        continue
     if (data['subTitle']) != None:
         chat.send("*Informazioni cancellazione*: "+data['subTitle'])
 #Comando: /fermata
@@ -493,6 +527,7 @@ def itinerario(chat, message, args):
         chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
         chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
         chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
+    #Cinque cambi
     if (ncambi == 5):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
@@ -594,6 +629,79 @@ def itinerario(chat, message, args):
 
     if (ncambi > 5):
         chat.send("*Errore*\n_Error 27_\nL'itinerario prevede un tragitto con troppi cambi (>5). Il bot supporterà più cambi nelle prossime versioni. In tanto, segui gli aggiornamenti su @orario_treni_channel")
+#Comando: Ricerca rapida
+#Con la ricerca rapida si possono cercare treni diretttamente in chat, senza scrivere /treno prima.
+#Utilizzo: <numero di treno>
+@bot.process_message
+def ricerca_veloce(chat, message):
+    id_treno = str(message.text)
+    print("Qualcuno ha usato la ricerca rapida per cercare il treno "+str(id_treno))
+    try:
+        annulla = False
+        id_treno2 = int(id_treno)
+    except:
+        annulla = True
+        if chat.type == "private":
+            chat.send("*Attenzione!*\nSei sicuro di stare utilizzando il comando correttamente? Ricorda che puoi inviarmi solo numeri di treni, qui direttamente in chat.\nPer imparare ad usare gli altri comandi utilizza il comando /help")
+    if (annulla is False):
+        chat.send("*Ricerca rapida*\nSto cercando con la ricerca rapida il treno "+id_treno)
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        try:
+            info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+            response = urllib.request.urlopen(info)
+        except:
+            chat.send("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+            editing = False
+        content = response.read()
+        data = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+        orario = datetime.datetime.now().strftime('%H:%M')
+        editing = True
+        fermati = 500
+        messaggio = chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Il messaggio dinamico scade fra "+str(fermati)+ " secondi circa*")
+        #While numero uno
+        valore = 4
+        while editing is True and fermati > 0:
+            valore = valore +1
+            try:
+                orario = datetime.datetime.now().strftime('%H:%M')
+                messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Il messaggio dinamico scade fra "+str(fermati)+ " secondi circa*")
+            except:
+                pass
+            fermati = fermati -1
+            time.sleep(1)
+            try:
+                while (valore == 5):
+                    info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+                    response = urllib.request.urlopen(info)
+                    content = response.read()
+                    data = json.loads(content.decode("utf8"))
+                    orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+                    orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+                    try:
+                        oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+                    except:
+                        oraUltimoRilevamento = "Il treno non è ancora partito"
+                    if (data['destinazioneZero'] == data['stazioneUltimoRilevamento']):
+                        messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Messaggio dinamico disabilitato perché il treno è arrivato a destinazione*")
+                        editing = False
+                    valore = 0
+            except:
+                continue
+            continue
+
+        if (fermati == 0):
+            messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Messaggio dinamico scaduto.*")
+        if (data['subTitle']) != None:
+            chat.send(data['subTitle'])
+
 
 #Avvio del bot
 if __name__ == "__main__":
