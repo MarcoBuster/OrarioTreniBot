@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 1.0
+Versione: 1.1
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
@@ -27,7 +27,19 @@ def info(chat, message, args):
     chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
     chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
     chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
-    chat.send("*Informazione utile*\nSe nel bot devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
+    chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
+    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot). *Grazie per il supporto!*\n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+#Comando: /help
+#Visualizza le informazioni sul bot
+#Utilizzo: /help
+@bot.command("help")
+def helpcommand(chat, message, args):
+    chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
+    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.")
+    chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
+    chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
+    chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
+    chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
     chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot). *Grazie per il supporto!*\n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
 #Comando: /treno
 #Cerca un treno e restituisce le informazioni principali
@@ -133,13 +145,16 @@ def statistiche(chat, message, args):
 #Utilizzo: /arrivi <nome stazione>
 @bot.command("arrivi")
 def arrivi(chat, message, args):
-    stazione = str((args[0]))
-    stazione = stazione.replace(".","%20")
+    stazione = (args)
+    if (stazione == ""):
+        chat.send("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/arrivi Milano Centrale`")
+    stazione = ' '.join(stazione)
+    stazione = stazione.replace(" ","%20").lstrip('%20')
     try:
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
         response = urllib.request.urlopen(content)
     except:
-        chat.send("*Errore*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
+        chat.send("*Errore*\n_Non ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
     content = response.read()
     data = json.loads(content.decode("utf8"))
     id_stazione = (str(data[0]['id']))
@@ -161,14 +176,16 @@ def arrivi(chat, message, args):
 #Utilizzo: /partenze <nome stazione>
 @bot.command("partenze")
 def partenze(chat, message, args):
-    stazione = str((args[0]))
-    stazione = stazione.replace(".","%20")
-    try:
-        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
-        response = urllib.request.urlopen(content)
-    except:
-        chat.send("*Errore*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
+    stazione = (args)
+    if (stazione == None):
+        chat.send("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/partenze Milano Centrale`")
+    stazione = ' '.join(stazione)
+    stazione = stazione.replace(" ","%20").lstrip('%20')
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
+    response = urllib.request.urlopen(content)
     content = response.read()
+    if (content ==b'[]'):
+        chat.send("*Errore*\n_Non ho trovato nessuna stazione con quel nome._\nSei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
     data = json.loads(content.decode("utf8"))
     id_stazione = (str(data[0]['id']))
     datatempo = (datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S GMT+0100'))
@@ -202,7 +219,7 @@ def itinerario(chat, message, args):
         chat.send("*Errore: stazione di partenza non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
     content = response.read()
     data = json.loads(content.decode("utf8"))
-    id_stazione1 = (str(data[0]['id'])).split("S")[-1][:9]
+    id_stazione1 = (str(data[0]['id'])).split("S")[-1][:9].split("N")[-1][:9]
     #Cerca ID stazione 2
     try:
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione2
@@ -211,35 +228,372 @@ def itinerario(chat, message, args):
         chat.send("*Errore: stazione di arrivo non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
     content = response.read()
     data = json.loads(content.decode("utf8"))
-    id_stazione2 = (str(data[0]['id'])).split("S")[-1][:9]
+    id_stazione2 = (str(data[0]['id'])).split("S")[-1][:9].split("N")[-1][:9]
     #Cerca itinerario
     content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/soluzioniViaggioNew/"+id_stazione1+"/"+id_stazione2+"/"+tempo
     response = urllib.request.urlopen(content)
     content = response.read()
     data = json.loads(content.decode("utf8"))
-    #Cerca altre informazioni sul treno
-    id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
-    #Cerca ID stazione di partenza
-    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
-    response = urllib.request.urlopen(content)
-    id_stazione = (str(response.read()).split("-")[-1][:-3])
-    #Cerca treno con la stazione
+    #Meccanismo per trovare quanti cambi ci sono
     try:
+        for n in range (0,10):
+            try:
+                cambio = data['soluzioni'][0]['vehicles'][n]['numeroTreno']
+            except:
+                ncambi = n-1
+                break
+    except:
+        pass
+    if (ncambi == 0):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
         info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
         response = urllib.request.urlopen(info)
-    except:
-        chat.send("_Errore_\n*Non ho trovato nulla. Forse perché...*:\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
-    content = response.read()
-    #Informazioni itinerario=data[], informazioni treno=data2[]
-    data2 = json.loads(content.decode("utf8"))
-    orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
-    orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
-    try:
-        oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
-    except:
-        oraUltimoRilevamento = "Il treno non è ancora partito"
-        pass
-    chat.send("*Ricerca di un treno per itinerario* ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][0]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        chat.send("*Ricerca di un treno per itinerario* ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][0]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+    if (ncambi == 1):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][1]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data3 = json.loads(content.decode("utf8"))
+        orarioPartenza3 = datetime.datetime.fromtimestamp(data3['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo3 = datetime.datetime.fromtimestamp(data3['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento3 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento3 = "Il treno non è ancora partito"
+            pass
+        chat.send("*Ricerca di un treno per itinerario*\n_1 cambio_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][1]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+    #Due cambi
+    if (ncambi == 2):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][1]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data3 = json.loads(content.decode("utf8"))
+        orarioPartenza3 = datetime.datetime.fromtimestamp(data3['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo3 = datetime.datetime.fromtimestamp(data3['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento3 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento3 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][2]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data4 = json.loads(content.decode("utf8"))
+        orarioPartenza4 = datetime.datetime.fromtimestamp(data4['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo4 = datetime.datetime.fromtimestamp(data4['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento4 = datetime.datetime.fromtimestamp(data4['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento4 = "Il treno non è ancora partito"
+            pass
+        chat.send("*Ricerca di un treno per itinerario*\n_2 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][2]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+    #Tre cambi
+    if (ncambi == 3):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][1]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data3 = json.loads(content.decode("utf8"))
+        orarioPartenza3 = datetime.datetime.fromtimestamp(data3['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo3 = datetime.datetime.fromtimestamp(data3['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento3 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento3 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][2]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data4 = json.loads(content.decode("utf8"))
+        orarioPartenza4 = datetime.datetime.fromtimestamp(data4['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo4 = datetime.datetime.fromtimestamp(data4['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento4 = datetime.datetime.fromtimestamp(data4['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento4 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][3]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data5 = json.loads(content.decode("utf8"))
+        orarioPartenza5 = datetime.datetime.fromtimestamp(data5['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo5 = datetime.datetime.fromtimestamp(data5['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento5 = datetime.datetime.fromtimestamp(data5['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento5 = "Il treno non è ancora partito"
+            pass
+        chat.send("*Ricerca di un treno per itinerario*\n_3 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][3]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+    #Quattro cambi
+    if (ncambi == 4):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][1]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data3 = json.loads(content.decode("utf8"))
+        orarioPartenza3 = datetime.datetime.fromtimestamp(data3['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo3 = datetime.datetime.fromtimestamp(data3['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento3 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento3 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][2]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data4 = json.loads(content.decode("utf8"))
+        orarioPartenza4 = datetime.datetime.fromtimestamp(data4['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo4 = datetime.datetime.fromtimestamp(data4['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento4 = datetime.datetime.fromtimestamp(data4['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento4 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][3]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data5 = json.loads(content.decode("utf8"))
+        orarioPartenza5 = datetime.datetime.fromtimestamp(data5['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo5 = datetime.datetime.fromtimestamp(data5['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento5 = datetime.datetime.fromtimestamp(data5['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento5 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][4]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data6 = json.loads(content.decode("utf8"))
+        orarioPartenza6 = datetime.datetime.fromtimestamp(data6['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo6 = datetime.datetime.fromtimestamp(data6['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento6 = datetime.datetime.fromtimestamp(data6['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento6 = "Il treno non è ancora partito"
+            pass
+
+        chat.send("*Ricerca di un treno per itinerario*\n_4 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][4]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
+    if (ncambi == 5):
+        id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data2 = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data2['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data2['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data2['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][1]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data3 = json.loads(content.decode("utf8"))
+        orarioPartenza3 = datetime.datetime.fromtimestamp(data3['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo3 = datetime.datetime.fromtimestamp(data3['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento3 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento3 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][2]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data4 = json.loads(content.decode("utf8"))
+        orarioPartenza4 = datetime.datetime.fromtimestamp(data4['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo4 = datetime.datetime.fromtimestamp(data4['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento4 = datetime.datetime.fromtimestamp(data4['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento4 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][3]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data5 = json.loads(content.decode("utf8"))
+        orarioPartenza5 = datetime.datetime.fromtimestamp(data5['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo5 = datetime.datetime.fromtimestamp(data5['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento5 = datetime.datetime.fromtimestamp(data5['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento5 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][4]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data6 = json.loads(content.decode("utf8"))
+        orarioPartenza6 = datetime.datetime.fromtimestamp(data6['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo6 = datetime.datetime.fromtimestamp(data6['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento6 = datetime.datetime.fromtimestamp(data6['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento6 = "Il treno non è ancora partito"
+            pass
+        id_treno = (data['soluzioni'][0]['vehicles'][5]['numeroTreno'])
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data7 = json.loads(content.decode("utf8"))
+        orarioPartenza7 = datetime.datetime.fromtimestamp(data7['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo7 = datetime.datetime.fromtimestamp(data7['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento6 = datetime.datetime.fromtimestamp(data3['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento6 = "Il treno non è ancora partito"
+            pass
+
+        chat.send("*Ricerca di un treno per itinerario*\n_5 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][5]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
+        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+" e prendere:\nNumero treno*: "+str(data7['numeroTreno'])+"\n*Provienienza*: "+data7['origineZero']+" ("+str(orarioPartenza7)+")\n*Destinazione*: "+data7['destinazioneZero']+" ("+str(orarioArrivo7)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][5]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][5]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data7['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data7['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento7)+")")
+
+    if (ncambi > 5):
+        chat.send("*Errore*\n_Error 27_\nL'itinerario prevede un tragitto con troppi cambi (>5). Il bot supporterà più cambi nelle prossime versioni. In tanto, segui gli aggiornamenti su @orario_treni_channel")
 
 #Avvio del bot
 if __name__ == "__main__":
