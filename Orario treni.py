@@ -22,27 +22,27 @@ bot.lang = "it"
 #Utilizzo: /info
 @bot.command("info")
 def infocommand(chat, message, args):
-    chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
-    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
-    chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
-    chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
-    chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
-    chat.send("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
-    chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
-    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+    message.reply("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
+    message.reply("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
+    message.reply("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
+    message.reply("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
+    message.reply("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
+    message.reply("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
+    message.reply("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
+    message.reply("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
 #Comando: /help
 #Visualizza le informazioni sul bot
 #Utilizzo: /help
 @bot.command("help")
 def helpcommand(chat, message, args):
-    chat.send("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
-    chat.send("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
-    chat.send("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
-    chat.send("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
-    chat.send("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
-    chat.send("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
-    chat.send("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
-    chat.send("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
+    message.reply("*Orario treni*\n_Con questo bot potrai cercare un treno, una fermata di un treno, una stazione e averne le informazioni principali._\n")
+    message.reply("*Comando /treno*\nPer cercare un treno dal numero fare questo comando:\n`/treno numero-treno`.\n*Suggerimento*\nRicorda che puoi cercare un treno anche scrivendo in chat il numero di treno, senza necessariamente scrivere `/treno` prima.")
+    message.reply("*Comando /fermata*\nPer cercare le informazioni di un treno rispetto a una stazione (_binario, ritardo, ecc..._) fare:\n`/fermata numero-treno numero-fermata`\n_In numero fermata inserire il numero che trovate facendo_: \n`/fermata numero-treno lista`")
+    message.reply("*Comandi /arrivi e /partenze*\nPer cercare il tabellone arrivi o partenze di una stazione fare:\n`/arrivi nome-stazione` o `/partenze nome-stazione`")
+    message.reply("*Comando /itinerario*\nPer cercare un treno che ferma tra due stazioni, fare:\n`/itinerario stazione1 stazione2`")
+    message.reply("*[NEW] Messaggi dinamici*\nLa funzione è in BETA. Nei comandi /treno e nella ricerca rapida, le informazioni sul treno come ritardo, stazione ultimo rilevamento, eccetera, sono aggiornate ogni secondo, senza dover rinviare di nuovo il comando.")
+    message.reply("*Informazione utile*\n*SOLO NEL COMANDO /itinerario*, quando devi mettere un nome di una stazione che ha uno spazio bisogna mettere un punto (`.`) al posto dello spazio.\n_Esempio_: `MILANO CENTRALE` diventa `MILANO.CENTRALE`.")
+    message.reply("*Votaci!*\nVota il bot [qui](https://telegram.me/storebot?start=orario_treni_bot).*Grazie per il supporto!*\nCanale con notizie, aggiornamenti e molto altro [qui](https://telegram.me/orario_treni_channel) \n_Aiuto, domande, questioni tecniche:_ @MarcoBuster")
     print("Qualcuno ha utilizzato il comando /help senza problemi")
 #Comando: /treno
 #Cerca un treno e restituisce le informazioni principali
@@ -57,7 +57,7 @@ def treno(chat, message, args):
         info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
         response = urllib.request.urlopen(info)
     except:
-        chat.send("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+        message.reply("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
         editing = False
     content = response.read()
     data = json.loads(content.decode("utf8"))
@@ -67,7 +67,7 @@ def treno(chat, message, args):
         oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
     except:
         oraUltimoRilevamento = "Il treno non è ancora partito"
-    messaggio = chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Il messaggio dinamico è in caricamento...*")
+    messaggio = message.reply("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Il messaggio dinamico è in caricamento...*")
     fermati = 500
     valore = 4
     editing = True
@@ -100,7 +100,7 @@ def treno(chat, message, args):
             continue
         continue
     if (data['subTitle']) != None:
-        chat.send("*Informazioni cancellazione*: "+data['subTitle'])
+        message.reply("*Informazioni cancellazione*: "+data['subTitle'])
 #Comando: /fermata
 #Visualizza le informazioni di un treno rispetto a una fermata specifica
 #Utilizzo: /fermata <numero di treno> <numero di fermata>:lista
@@ -114,7 +114,7 @@ def fermata(chat, message, args):
         info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
         response = urllib.request.urlopen(info)
     except:
-        chat.send("_Errore_\n*Non ho trovato nulla. Forse perché...*:\n-Il numero di treno inserito non è valido;\n-Il treno non è ancora partito;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+        message.reply("_Errore_\n*Non ho trovato nulla. Forse perché...*:\n-Il numero di treno inserito non è valido;\n-Il treno non è ancora partito;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
     content = response.read()
     data = json.loads(content.decode("utf8"))
     staz = (args[1])
@@ -147,7 +147,7 @@ def fermata(chat, message, args):
     except:
         ritardoPartenza = "--"
     if (staz == "lista"):
-        chat.send("*Lista stazioni*\n_Ecco la lista delle fermata, per vedere le informazioni di una fermata in dettaglio fare_\n `/fermata "+id_treno+" numero fermata`\n_Il numero fermata è il numeretto, nella lista seguente, prima del nome della stazione_")
+        message.reply("*Lista stazioni*\n_Ecco la lista delle fermata, per vedere le informazioni di una fermata in dettaglio fare_\n `/fermata "+id_treno+" numero fermata`\n_Il numero fermata è il numeretto, nella lista seguente, prima del nome della stazione_")
         b=""
         for k in range(0,51):
             try:
@@ -156,14 +156,14 @@ def fermata(chat, message, args):
                 break
             b=b+a
             b+="\n"
-        chat.send(b)
+        message.reply(b)
     else:
         binario = data['fermate'][s]['binarioProgrammatoArrivoDescrizione']
         if (binario=="None"):
             binario = "Errore di Trenitalia/Trenord."
         else:
             binario = str(binario)
-        chat.send("*Informazioni di un treno rispetto a una fermata specifica*:_ "+data['fermate'][s]['stazione']+"_\n*Arrivo programmato: *"+sOrarioArrivoP+"\n*Arrivo reale: *"+sOrarioArrivoR+"\n*Ritardo arrivo: *"+ritardoArrivo+"m\n*Partenza programmata: *"+sOrarioPartenzaP+"\n*Partenza reale: *"+sOrarioPartenzaR+"\n*Ritardo partenza: *"+ritardoPartenza+"m\n*Binario: *"+binario)
+        message.reply("*Informazioni di un treno rispetto a una fermata specifica*:_ "+data['fermate'][s]['stazione']+"_\n*Arrivo programmato: *"+sOrarioArrivoP+"\n*Arrivo reale: *"+sOrarioArrivoR+"\n*Ritardo arrivo: *"+ritardoArrivo+"m\n*Partenza programmata: *"+sOrarioPartenzaP+"\n*Partenza reale: *"+sOrarioPartenzaR+"\n*Ritardo partenza: *"+ritardoPartenza+"m\n*Binario: *"+binario)
 #Comando: /statistiche
 #Visualizza curiose statistiche sui treni italiani in tempo reale
 #Utilizzo: /statistiche
@@ -173,7 +173,7 @@ def statistiche(chat, message, args):
     response = urllib.request.urlopen(content)
     content = response.read()
     data = json.loads(content.decode("utf8"))
-    chat.send("_Statistiche dei treni italiani in tempo reale_"+"\n*Treni circolanti*: "+str(data['treniCircolanti'])+"\n*Treni totali di oggi*: "+str(data['treniGiorno']))
+    message.reply("_Statistiche dei treni italiani in tempo reale_"+"\n*Treni circolanti*: "+str(data['treniCircolanti'])+"\n*Treni totali di oggi*: "+str(data['treniGiorno']))
 #Comando: /arrivi
 #Visualizza gli arrivi di una stazione
 #Utilizzo: /arrivi <nome stazione>
@@ -181,14 +181,14 @@ def statistiche(chat, message, args):
 def arrivi(chat, message, args):
     stazione = (args)
     if (stazione == ""):
-        chat.send("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/arrivi Milano Centrale`")
+        message.reply("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/arrivi Milano Centrale`")
     stazione = ' '.join(stazione)
     stazione = stazione.replace(" ","%20").lstrip('%20')
     try:
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
         response = urllib.request.urlopen(content)
     except:
-        chat.send("*Errore*\n_Non ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
+        message.reply("*Errore*\n_Non ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
     content = response.read()
     data = json.loads(content.decode("utf8"))
     id_stazione = (str(data[0]['id']))
@@ -204,7 +204,7 @@ def arrivi(chat, message, args):
         if (binario=="None"):
             binario = "Errore di Trenitalia/Trenord."
         stazione = stazione.replace("%20"," ")
-        chat.send("*Informazioni degli arrivi nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Provenienza*: "+data[k]['origine']+"\n*Orario di arrivo*: "+str(sOrarioArrivoP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
+        message.reply("*Informazioni degli arrivi nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Provenienza*: "+data[k]['origine']+"\n*Orario di arrivo*: "+str(sOrarioArrivoP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
 #Comando: /partenze
 #Visualizza le partenze di una stazione
 #Utilizzo: /partenze <nome stazione>
@@ -212,14 +212,14 @@ def arrivi(chat, message, args):
 def partenze(chat, message, args):
     stazione = (args)
     if (stazione == None):
-        chat.send("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/partenze Milano Centrale`")
+        message.reply("*Errore*\n_Nessuna stazione inserita_\nPer cercare una stazione scrivere il nome della stazione dopo il comando. Esempio: `/partenze Milano Centrale`")
     stazione = ' '.join(stazione)
     stazione = stazione.replace(" ","%20").lstrip('%20')
     content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione
     response = urllib.request.urlopen(content)
     content = response.read()
     if (content ==b'[]'):
-        chat.send("*Errore*\n_Non ho trovato nessuna stazione con quel nome._\nSei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
+        message.reply("*Errore*\n_Non ho trovato nessuna stazione con quel nome._\nSei sicuro di stare usando il comando correttamente?\nEsempio di utilizzo: `/partenze Milano Centrale`")
     data = json.loads(content.decode("utf8"))
     id_stazione = (str(data[0]['id']))
     datatempo = (datetime.datetime.now().strftime('%a %b %d %Y %H:%M:%S GMT+0100'))
@@ -234,7 +234,7 @@ def partenze(chat, message, args):
         if (binario=="None"):
             binario = "Errore di Trenitalia/Trenord."
         stazione = stazione.replace("%20"," ")
-        chat.send("*Informazioni delle partenze nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Destinazione*: "+data[k]['destinazione']+"\n*Orario di partenza*: "+str(sOrarioPartenzaP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
+        message.reply("*Informazioni delle partenze nella stazione di* _"+stazione+"\nInformazioni del treno "+str(data[k]['numeroTreno'])+"_\n*Destinazione*: "+data[k]['destinazione']+"\n*Orario di partenza*: "+str(sOrarioPartenzaP)+"\n*Ritardo*: "+str(data[k]['ritardo'])+"m\n*Binario*: "+str(binario))
 #Comando: /itinerario
 #Cerca un itinerario tra due stazioni
 #Utilizzo: /itinerario <stazione di partenza> <stazione di arrivo>
@@ -250,7 +250,7 @@ def itinerario(chat, message, args):
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione1
         response = urllib.request.urlopen(content)
     except:
-        chat.send("*Errore: stazione di partenza non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
+        message.reply("*Errore: stazione di partenza non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
     content = response.read()
     data = json.loads(content.decode("utf8"))
     id_stazione1 = (str(data[0]['id'])).split("S")[-1][:9].split("N")[-1][:9]
@@ -259,7 +259,7 @@ def itinerario(chat, message, args):
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione2
         response = urllib.request.urlopen(content)
     except:
-        chat.send("*Errore: stazione di arrivo non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
+        message.reply("*Errore: stazione di arrivo non valida*\nNon ho trovato nessuna stazione con quel nome._Sei sicuro di stare usando il comando correttamente?\nRicorda che se c'è uno spazio nel nome della stazione (come Milano Centrale) devi mettere un punto dopo lo spazio (ovvero Milano.Centrale)_")
     content = response.read()
     data = json.loads(content.decode("utf8"))
     id_stazione2 = (str(data[0]['id'])).split("S")[-1][:9].split("N")[-1][:9]
@@ -294,7 +294,7 @@ def itinerario(chat, message, args):
         except:
             oraUltimoRilevamento = "Il treno non è ancora partito"
             pass
-        chat.send("*Ricerca di un treno per itinerario* ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][0]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("*Ricerca di un treno per itinerario* ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][0]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
     if (ncambi == 1):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
@@ -326,8 +326,8 @@ def itinerario(chat, message, args):
         except:
             oraUltimoRilevamento3 = "Il treno non è ancora partito"
             pass
-        chat.send("*Ricerca di un treno per itinerario*\n_1 cambio_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][1]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        message.reply("*Ricerca di un treno per itinerario*\n_1 cambio_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][1]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
     #Due cambi
     if (ncambi == 2):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
@@ -375,9 +375,9 @@ def itinerario(chat, message, args):
         except:
             oraUltimoRilevamento4 = "Il treno non è ancora partito"
             pass
-        chat.send("*Ricerca di un treno per itinerario*\n_2 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][2]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        message.reply("*Ricerca di un treno per itinerario*\n_2 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][2]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
     #Tre cambi
     if (ncambi == 3):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
@@ -440,10 +440,10 @@ def itinerario(chat, message, args):
         except:
             oraUltimoRilevamento5 = "Il treno non è ancora partito"
             pass
-        chat.send("*Ricerca di un treno per itinerario*\n_3 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][3]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+        message.reply("*Ricerca di un treno per itinerario*\n_3 cambi_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][3]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
     #Quattro cambi
     if (ncambi == 4):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
@@ -522,11 +522,11 @@ def itinerario(chat, message, args):
             oraUltimoRilevamento6 = "Il treno non è ancora partito"
             pass
 
-        chat.send("*Ricerca di un treno per itinerario*\n_4 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][4]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
+        message.reply("*Ricerca di un treno per itinerario*\n_4 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][4]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
     #Cinque cambi
     if (ncambi == 5):
         id_treno = (data['soluzioni'][0]['vehicles'][0]['numeroTreno'])
@@ -620,15 +620,15 @@ def itinerario(chat, message, args):
             oraUltimoRilevamento6 = "Il treno non è ancora partito"
             pass
 
-        chat.send("*Ricerca di un treno per itinerario*\n_5 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][5]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
-        chat.send("\n*Scendere a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+" e prendere:\nNumero treno*: "+str(data7['numeroTreno'])+"\n*Provienienza*: "+data7['origineZero']+" ("+str(orarioPartenza7)+")\n*Destinazione*: "+data7['destinazioneZero']+" ("+str(orarioArrivo7)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][5]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][5]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data7['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data7['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento7)+")")
+        message.reply("*Ricerca di un treno per itinerario*\n_5 cambi (Un bel po')_ ("+data['soluzioni'][0]['vehicles'][0]['origine']+" ~ "+data['soluzioni'][0]['vehicles'][5]['destinazione']+")\n*Treno trovato*: "+data['soluzioni'][0]['vehicles'][0]['numeroTreno']+"\n*Durata del tragitto*: "+data['soluzioni'][0]['durata']+"\n*Provienienza*: "+data2['origineZero']+" ("+str(orarioPartenza)+")\n*Destinazione*: "+data2['destinazioneZero']+" ("+str(orarioArrivo)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][0]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][0]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data2['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data2['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][0]['destinazione']+" e prendere:\nNumero treno*: "+str(data3['numeroTreno'])+"\n*Provienienza*: "+data3['origineZero']+" ("+str(orarioPartenza3)+")\n*Destinazione*: "+data3['destinazioneZero']+" ("+str(orarioArrivo3)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][1]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][1]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data3['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data3['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento3)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][1]['destinazione']+" e prendere:\nNumero treno*: "+str(data4['numeroTreno'])+"\n*Provienienza*: "+data4['origineZero']+" ("+str(orarioPartenza4)+")\n*Destinazione*: "+data4['destinazioneZero']+" ("+str(orarioArrivo4)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][2]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][2]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data4['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data4['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento4)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][2]['destinazione']+" e prendere:\nNumero treno*: "+str(data5['numeroTreno'])+"\n*Provienienza*: "+data5['origineZero']+" ("+str(orarioPartenza5)+")\n*Destinazione*: "+data5['destinazioneZero']+" ("+str(orarioArrivo5)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][3]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][3]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data5['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data5['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento5)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][3]['destinazione']+" e prendere:\nNumero treno*: "+str(data6['numeroTreno'])+"\n*Provienienza*: "+data6['origineZero']+" ("+str(orarioPartenza6)+")\n*Destinazione*: "+data6['destinazioneZero']+" ("+str(orarioArrivo6)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][4]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][4]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data6['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data6['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento6)+")")
+        message.reply("\n*Scendere a "+data['soluzioni'][0]['vehicles'][4]['destinazione']+" e prendere:\nNumero treno*: "+str(data7['numeroTreno'])+"\n*Provienienza*: "+data7['origineZero']+" ("+str(orarioPartenza7)+")\n*Destinazione*: "+data7['destinazioneZero']+" ("+str(orarioArrivo7)+")\n*Parte da "+data['soluzioni'][0]['vehicles'][5]['origine']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioPartenza'].split("T")[-1][:9].replace(":00","")+"\n*Arriva a "+data['soluzioni'][0]['vehicles'][5]['destinazione']+"* alle "+data['soluzioni'][0]['vehicles'][5]['orarioArrivo'].split("T")[-1][:9].replace(":00","")+"\n*Ritardo*: "+str(data7['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data7['stazioneUltimoRilevamento']+" ("+str(oraUltimoRilevamento7)+")")
 
     if (ncambi > 5):
-        chat.send("*Errore*\n_Error 27_\nL'itinerario prevede un tragitto con troppi cambi (>5). Il bot supporterà più cambi nelle prossime versioni. In tanto, segui gli aggiornamenti su @orario_treni_channel")
+        message.reply("*Errore*\n_Error 27_\nL'itinerario prevede un tragitto con troppi cambi (>5). Il bot supporterà più cambi nelle prossime versioni. In tanto, segui gli aggiornamenti su @orario_treni_channel")
 #Comando: Ricerca rapida
 #Con la ricerca rapida si possono cercare treni diretttamente in chat, senza scrivere /treno prima.
 #Utilizzo: <numero di treno>
@@ -642,9 +642,9 @@ def ricerca_veloce(chat, message):
     except:
         annulla = True
         if chat.type == "private":
-            chat.send("*Attenzione!*\nSei sicuro di stare utilizzando il comando correttamente? Ricorda che puoi inviarmi solo numeri di treni, qui direttamente in chat.\nPer imparare ad usare gli altri comandi utilizza il comando /help")
+            message.reply("*Attenzione!*\nSei sicuro di stare utilizzando il comando correttamente? Ricorda che puoi inviarmi solo numeri di treni, qui direttamente in chat.\nPer imparare ad usare gli altri comandi utilizza il comando /help")
     if (annulla is False):
-        chat.send("*Ricerca rapida*\nSto cercando con la ricerca rapida il treno "+id_treno)
+        message.reply("*Ricerca rapida*\nSto cercando con la ricerca rapida il treno "+id_treno)
         content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
         response = urllib.request.urlopen(content)
         id_stazione = (str(response.read()).split("-")[-1][:-3])
@@ -652,7 +652,7 @@ def ricerca_veloce(chat, message):
             info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
             response = urllib.request.urlopen(info)
         except:
-            chat.send("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+            message.reply("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
             editing = False
         content = response.read()
         data = json.loads(content.decode("utf8"))
@@ -665,7 +665,7 @@ def ricerca_veloce(chat, message):
         orario = datetime.datetime.now().strftime('%H:%M')
         editing = True
         fermati = 500
-        messaggio = chat.send("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Il messaggio dinamico scade fra "+str(fermati)+ " secondi circa*")
+        messaggio = message.reply("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Il messaggio dinamico scade fra "+str(fermati)+ " secondi circa*")
         #While numero uno
         valore = 4
         while editing is True and fermati > 0:
@@ -700,7 +700,7 @@ def ricerca_veloce(chat, message):
         if (fermati == 0):
             messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Messaggio dinamico scaduto.*")
         if (data['subTitle']) != None:
-            chat.send(data['subTitle'])
+            message.reply(data['subTitle'])
 
 
 #Avvio del bot
