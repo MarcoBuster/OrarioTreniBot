@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 1.4
+Versione: 1.5
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
@@ -129,6 +129,7 @@ def helpcommand(chat, message, args):
 #Comando: /treno
 #Cerca un treno e restituisce le informazioni principali
 #Utilizzo: /treno <numero di treno>
+@bot.command("treno")
 def treno(chat, message, args):
     id_treno = (args[0])
     print ("Qualcuno ha cercato il treno: ",(args[0]))
@@ -790,7 +791,75 @@ def ricerca_veloce(chat, message):
             messaggio.edit("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")"+"\n*Orario attuale:* "+orario+"\n*Messaggio dinamico scaduto.*")
         if (data['subTitle']) != None:
             message.reply(data['subTitle'])
-
+#Comando /traccia
+#Traccia il treno con notifiche in tempo reale sul suo andamento
+#Utilizzo: /traccia <numero di treno> [minuti massimi]
+@bot.command("traccia")
+def tracciaCOMMAND(chat, message, args):
+    if len(args) == 0:
+        message.reply("*Errore*\n_Sintassi del comando errata_\nPer tracciare un treno digita `/traccia numero-treno minuti-massimi`\nNon è obbligatorio inserire i minuti dopo i quali il tracciamento si conclude. Se non specificato dopo 10m il bot smetterà di tracciare il treno.")
+    if len(args) == 1:
+        id_treno = args[0]
+        stop = 10
+        message.reply("*Attendere...*\n_Il tracciamento del treno "+id_treno+" si sta avviando._\nVisto che non hai messo nulla nel campo _minuti_ il bot traccierà il treno per 10m.\nLa prossima volta, se vuoi impostare un tempo differente, fai: `/traccia numero-treno minuti-massimi`")
+        time.sleep(5)
+    if len(args) == 2:
+        id_treno = args[0]
+        stop = int(args[1])
+        message.reply("*Attendere...*\n_Il tracciamento del treno "+id_treno+" si sta avviando._\nTraccierà il treno per "+str(stop)+" minuti")
+        time.sleep(5)
+    stop = stop*60
+    print ("Qualcuno ha tracciato il treno: ",(args[0]))
+    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+    response = urllib.request.urlopen(content)
+    id_stazione = (str(response.read()).split("-")[-1][:-3])
+    try:
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+    except:
+        message.reply("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+        tracciamento = False
+        return
+    tracciamento = True
+    content = response.read()
+    data = json.loads(content.decode("utf8"))
+    orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+    orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+    try:
+        oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+    except:
+        oraUltimoRilevamento = "Il treno non è ancora partito"
+    ritardo = data['ritardo']
+    stazioneUltimoRilevamento = data['stazioneUltimoRilevamento']
+    if tracciamento is True and stop > 0 and data['destinazioneZero'] != stazioneUltimoRilevamento:
+        message.reply("_Informazioni iniziali sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n_Appena il treno cambierà stazione o avrà un grave ritardo sarai notificato_")
+    if tracciamento is True and stop > 0 and data['destinazioneZero'] == stazioneUltimoRilevamento:
+        message.reply("*Errore*\nQuesto treno è già arrivato a destinazione!")
+    while tracciamento is True and stop > 0 and data['destinazioneZero'] != stazioneUltimoRilevamento:
+        #INIZIO DEL LOOP
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data = json.loads(content.decode("utf8"))
+        ritardo2 = data['ritardo']
+        stop = stop-1
+        stazioneUltimoRilevamento2 = data['stazioneUltimoRilevamento']
+        differenzaritardo = ritardo2 - ritardo
+        if stazioneUltimoRilevamento != stazioneUltimoRilevamento2:
+            try:
+                oraUltimoRilevamento2 = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+            except:
+                oraUltimoRilevamento2 = "Il treno non è ancora partito"
+            message.reply("*Traccia treno*\n_Il treno "+id_treno+" ha cambiato stazione!_\n*Stazione precedente*: "+stazioneUltimoRilevamento+" ("+oraUltimoRilevamento+")"+"\n*Stazione corrente*: "+stazioneUltimoRilevamento2+" ("+oraUltimoRilevamento2+")"+"\n*Ritardo: *"+str(ritardo2)+"m")
+            stazioneUltimoRilevamento = data['stazioneUltimoRilevamento']
+            oraUltimoRilevamento = data['oraUltimoRilevamento']
+        if differenzaritardo == 10 or differenzaritardo > 10:
+            message.reply("*Traccia treno*\n_Il treno "+id_treno+" ha accumulato ritardo!_\n*Ritardo precedente*: "+str(ritardo)+"m\n*Ritardo attuale:* "+str(ritardo2)+"m")
+            ritardo = data['ritardo']
+        if stop == 1:
+            message.reply("*Traccia treno*\nFine del tracciamento del treno "+id_treno)
+        time.sleep(1)
+        continue
 
 #Avvio del bot
 if __name__ == "__main__":
