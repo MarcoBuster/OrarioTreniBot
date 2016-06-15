@@ -2,7 +2,7 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 1.2
+Versione: 1.4
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
@@ -13,10 +13,92 @@ import urllib.request
 from datetime import datetime
 import datetime
 import time
+import sqlite3
 bot = botogram.create("TOKEN")
 bot.about = "Con questo bot potrai tracciare il tuo treno comodamente da Telegram. Per iniziare fai /start"
 bot.owner = "@MarcoBuster"
 bot.lang = "it"
+conn = sqlite3.connect('utenti.db')
+c = conn.cursor()
+try:
+    c.execute('''CREATE TABLE news(user_id INTEGER, iscritto INTEGER''')
+except:
+    pass
+conn.commit()
+#Comando /news
+#Visualizza i messaggi per l'iscrizione alle news e altre informazioni
+#Utilizzo: /news
+@bot.command("news")
+def news(chat, message, args):
+    message.reply("*Orario treni NEWS!*\nIscriviti alle notizie per avere notifiche instantanee su *scioperi*, *avvisi* e molto altro riguardo le ferrovie in Italia!")
+    message.reply("*Come iscriversi?*\nIscriversi è molto semplice: basta scrivere /newson. Puoi disiscriverti quando vuoi facendo /newsoff")
+#Comando /newson
+#Iscrizione alle news
+#Utilizzo: /newson
+@bot.command("newson")
+def newson(chat, message):
+    iscritto = True
+    c.execute('''SELECT EXISTS(SELECT * FROM news where user_id=?)''',(message.chat.id,))
+    if str(c.fetchone()) == "(0,)": #Codice da migliorare
+        try:
+            c.execute('''INSERT INTO news(user_id, iscritto) VALUES(?, ?)''',(message.chat.id, 1))
+            conn.commit()
+            message.reply("*Fatto!*\nOra sei iscritto! Per disiscriverti fai /newsoff")
+        except:
+            message.reply("*Errore*\nQualcosa è andato storto.\nForse stai inviando comandi troppo velocemente?\nContatta lo sviluppatore @MarcoBuster")
+    else:
+        message.reply("*Errore*\nAttenzione! Sei già registrato alle news! Non dirmi che vuoi ricevere post doppi!")
+#Comando /viewnews
+#Visualizza la lista delle persone iscritte alle news
+#UTilizzo: /viewnews [SOLO AMMINISTRATORI]
+@bot.command("viewnews")
+def viewnews(chat, message):
+    try:
+        c.execute('''SELECT * from news''')
+        rows = c.fetchall()
+        for row in rows:
+            chat.send(str(row))
+    except:
+        pass
+    conn.commit()
+#Comando /newsoff
+#Discrizione alle news
+#Utilizzo: /newsoff
+@bot.command("newsoff")
+def newsoff(chat, message):
+    iscritto = False
+    c.execute('''SELECT EXISTS(SELECT * FROM news where user_id=?)''',(message.chat.id,))
+    if str(c.fetchone()) == "(0,)": #Codice da migliorare
+        message.reply("*Errore*\nTi sei già disiscritto o non ti sei mai iscritto! Va bene che mi odi, ma è inutile continuare!\nPer iscriverti fai /newson")
+    else:
+        try:
+            c.execute('''DELETE FROM news where user_id=?''',(message.chat.id,))
+            message.reply("*Disiscritto*\nDisiscrizione completata!\nPer iscriverti fai /newson")
+        except:
+            message.reply("*Errore*\nContatta @MarcoBuster per supporto")
+    conn.commit()
+#Comando /post
+#Posta una news
+#Utiizzo: /post <messaggio> [SOLO AMMINISTRATORE]
+@bot.command("post")
+def post(chat, message, args):
+    if str(message.chat.id) == "26170256":
+        messaggio_news = str(args)
+        message.reply("*Ecco il messaggio che stai per inviare*: "+messaggio_news+"\n_Confermare?_")
+        message.reply("*Confermato*")
+        c.execute('''SELECT user_id FROM news''')
+        utenteid= c.fetchall()
+        message.reply("*Lista dei destinatari* :"+str(utenteid))
+        for k in range(0,10000):
+            try:
+                #Codice ovviamente da cambiare in seguito
+                message.reply("*Messaggio inviato a: *"+str(utenteid[k]).replace("(","").replace(")","").replace(",",""))
+                bot.send(str(utenteid[k]).replace("(","").replace(")","").replace(",",""), str(messaggio_news).replace("'","").replace(",","").replace("[","").replace("]","").replace("ccc","\n"))
+                continue
+            except Exception as e:
+                print(str(e))
+                pass
+                continue
 #Comando: /info
 #Visualizza le informazioni sul bot
 #Utilizzo: /info
