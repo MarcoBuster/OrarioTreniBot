@@ -2,14 +2,14 @@
 ----------------------------------------------------------------------------------
 GENERAL INFO
 Orario treni: Il bot del vero pendolare!
-Versione: 1.6
+Versione: 2.0
 Telegram: @OrarioTreniBot
 Supporto: @MarcoBuster
 ----------------------------------------------------------------------------------
 """
 import botogram
 import botogram.objects.base
-#Grazie a Pietro Albini (botogram) per l'aiuto in questa parte
+#Grazie a Pietro Albini (botogram) per l'aiuto in CallBackQuery
 class CallbackQuery(botogram.objects.base.BaseObject):
     required = {
         "id": str,
@@ -22,6 +22,20 @@ class CallbackQuery(botogram.objects.base.BaseObject):
     }
 
 botogram.Update.optional["callback_query"] = CallbackQuery
+class InlineQuery(botogram.objects.base.BaseObject):
+    required = {
+        "id": str,
+        "from": botogram.User,
+        "query": str,
+    }
+    optional = {
+        "location": botogram.Location,
+        "offest": str,
+    }
+    replace_keys = {
+        "from": "sender"
+    }
+botogram.Update.optional["inline_query"] = InlineQuery
 import json
 import urllib.request
 from datetime import datetime
@@ -165,32 +179,135 @@ def treno(chat, message, args):
     bot.api.call("sendMessage", {"chat_id": chat.id, "text":testo,"parse_mode":"Markdown","reply_markup":'{"inline_keyboard":[[{"text":"Aggiorna le informazioni sul treno","callback_data": "'+str(id_treno)+'"}]]}'})
     #Processando la callback
 def process_callback(bot, chains, update):
-    #Pulsante "AGGIORNA INFORMAZIONI"
     message = update.callback_query.message
     chat = message.chat
-    id_treno = update.callback_query.data
-    callback_id = update.callback_query.id
-    content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
-    response = urllib.request.urlopen(content)
-    id_stazione = (str(response.read()).split("-")[-1][:-3])
-    info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
-    response = urllib.request.urlopen(info)
-    content = response.read()
-    data = json.loads(content.decode("utf8"))
-    orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
-    orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
-    try:
-        oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
-    except:
-        oraUltimoRilevamento = "Il treno non è ancora partito"
-    testo=("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Premi sul tasto in basso per aggiornare le informazioni del treno*")
-    try:
-        bot.api.call("editMessageText", {"chat_id": chat.id, "message_id": message.message_id, "text":str(testo),"parse_mode":"Markdown","reply_markup":'{"inline_keyboard":[[{"text":"Aggiorna le informazioni sul treno","callback_data": "'+str(id_treno)+'"}]]}'})
-    except:
-        pass
-    bot.api.call("answerCallbackQuery", {"callback_query_id": str(callback_id), "text": "Messaggio aggiornato", "show_alert":False})
-    return
+    callback_q = str(update.callback_query.data)
+    if callback_q.find('t') >= 0: #Il bot deve tracciare il treno
+        id_treno = str(callback_q).replace("t","") #Semplicemente toglie la "t" al numero di treno in modo da essere utilizzabile
+        stop = 1200 #Il tracciamento si spegnerà dopo 1200 secondi
+        #Cerca il treno
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        try:
+            info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+            response = urllib.request.urlopen(info)
+        except:
+            message.reply("*Errore, non trovato (404)*:\n_That’s an error. That’s all we know:_\n-Il numero di treno inserito non è valido;\n-Non stai utilizzando il comando correttamente. Usa /info per il tutorial del comando")
+            tracciamento = False
+            return #Se il treno non esiste, return
+        tracciamento = True
+        content = response.read()
+        data = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+        ritardo = data['ritardo']
+        stazioneUltimoRilevamento = data['stazioneUltimoRilevamento']
+        if tracciamento is True and data['destinazioneZero'] == stazioneUltimoRilevamento:
+            message.reply("*Errore*\nQuesto treno è già arrivato a destinazione!")
+            tracciamento = False
+            return
+        testo=("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Sto tracciando il treno*")
+        try:
+            bot.api.call("editMessageText", {"chat_id": chat.id, "message_id": message.message_id, "text":str(testo),"parse_mode":"Markdown","reply_markup":'{"inline_keyboard":[[{"text":"Aggiorna le informazioni sul treno","callback_data": "'+str(id_treno)+'"}]]}'}) #Qui non c'è il tasto per tracciare il treno altrimenti sarebbe illimitato
+        except:
+            pass
+
+        while tracciamento is True and stop > 0 and data['destinazioneZero'] != stazioneUltimoRilevamento: #Inizia il loop, quando le informazioni cambieranno sul treno verrà inviato un messaggio
+            info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+            response = urllib.request.urlopen(info)
+            content = response.read()
+            data = json.loads(content.decode("utf8"))
+            ritardo2 = data['ritardo']
+            stop = stop-1
+            stazioneUltimoRilevamento2 = data['stazioneUltimoRilevamento']
+            differenzaritardo = ritardo2 - ritardo
+            if stazioneUltimoRilevamento != stazioneUltimoRilevamento2: #Se le stazioni sono diverse...
+                try:
+                    oraUltimoRilevamento2 = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+                except:
+                    oraUltimoRilevamento2 = "Il treno non è ancora partito"
+                message.reply("*Traccia treno*\n_Il treno "+id_treno+" ha cambiato stazione!_\n*Stazione precedente*: "+stazioneUltimoRilevamento+" ("+oraUltimoRilevamento+")"+"\n*Stazione corrente*: "+stazioneUltimoRilevamento2+" ("+oraUltimoRilevamento2+")"+"\n*Ritardo: *"+str(ritardo2)+"m")
+                stazioneUltimoRilevamento = data['stazioneUltimoRilevamento']
+                oraUltimoRilevamento = data['oraUltimoRilevamento']
+            if differenzaritardo == 10 or differenzaritardo > 10: #Se il treno ha subito un grave ritardo...
+                message.reply("*Traccia treno*\n_Il treno "+id_treno+" ha accumulato ritardo!_\n*Ritardo precedente*: "+str(ritardo)+"m\n*Ritardo attuale:* "+str(ritardo2)+"m")
+                ritardo = data['ritardo']
+            if stop == 1: #Quando il tracciamento è finito...
+                message.reply("*Traccia treno*\nFine del tracciamento del treno "+id_treno)
+            time.sleep(1)
+            continue
+            if stop == 0:
+                return #RESET
+    else: #Il bot deve solo aggiornare il messaggio
+        #Aggiornamento delle informazioni...
+        id_treno = str(update.callback_query.data)
+        callback_id = update.callback_query.id
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+        response = urllib.request.urlopen(info)
+        content = response.read()
+        data = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+        testo=("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")\n*Premi sul tasto in basso per aggiornare le informazioni del treno*")
+        try:
+            #Edita il messaggio senza il tastino "TRACCIA TRENO"
+            bot.api.call("editMessageText", {"chat_id": chat.id, "message_id": message.message_id, "text":str(testo),"parse_mode":"Markdown","reply_markup":'{"inline_keyboard":[[{"text":"Aggiorna le informazioni sul treno","callback_data": "'+str(id_treno)+'"}]]}'}) #Qui non c'è il tasto per tracciare il treno altrimenti sarebbe illimitato
+        except Exception as e:
+            pass
+        bot.api.call("answerCallbackQuery", {"callback_query_id": str(callback_id), "text": "Messaggio aggiornato", "show_alert":False}) #Avviso sopra lo schermo
+        return
 bot.register_update_processor("callback_query", process_callback)
+#INLINE MODE
+def process_inline(bot, chains, update):
+    #Inline mode
+    user = update.inline_query.sender
+    testo = update.inline_query.query
+    if testo != None:
+        try:
+            int(testo)
+        except:
+            #Il numero di treno inserito non è un numero, quindi come può essere un numero di treno valido? return immediato...
+            bot.api.call("answerInlineQuery", {"inline_query_id":update.inline_query.id, "cache_time":0, "results":'[{"type":"article","id":"2","title":"ERRORE","description":"Attenzione! Il numero di treno inserito non è un numero di treno","input_message_content":{"message_text":"*Errore*\n_Non ho digitato un numero di treno. _\nPer utilizzare questo bot devo scrivere, in qualsiasi chat, `@OrarioTreniBot numero di treno`","parse_mode":"Markdown"}}]'})
+            return
+        id_treno = str(testo)
+        content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaNumeroTrenoTrenoAutocomplete/"+id_treno
+        response = urllib.request.urlopen(content)
+        id_stazione = (str(response.read()).split("-")[-1][:-3])
+        try:
+            info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
+            response = urllib.request.urlopen(info)
+        except:
+            #Il treno non esiste
+            bot.api.call("answerInlineQuery", {"inline_query_id":update.inline_query.id, "cache_time":0, "results":'[{"type":"article","id":"2","title":"ERRORE","description":"Attenzione! Numero di treno inesistente!","input_message_content":{"message_text":"*Errore*\n_Il treno non esiste_\nPer utilizzare questo bot devo scrivere, in qualsiasi chat, `@OrarioTreniBot numero di treno`","parse_mode":"Markdown"}}]'})
+            return
+        content = response.read()
+        data = json.loads(content.decode("utf8"))
+        orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
+        orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
+        try:
+            oraUltimoRilevamento = datetime.datetime.fromtimestamp(data['oraUltimoRilevamento'] / 1000).strftime('%H:%M')
+        except:
+            oraUltimoRilevamento = "Il treno non è ancora partito"
+        testo=("_Informazioni sul treno _"+"_"+id_treno+"_"+"\n*Stazione di partenza*: "+data['origineZero']+" ("+(orarioPartenza)+")""\n*Stazione di arrivo*: "+data['destinazioneZero']+" ("+(orarioArrivo)+")"+"\n*Ritardo*: "+str(data['ritardo'])+"m"+"\n*Stazione ultimo rilevamento*: "+data['stazioneUltimoRilevamento']+" ("+(oraUltimoRilevamento)+")")
+        descrizione = "Cerca il treno "+id_treno
+        #Fa uscire le informazioni sul treno
+        bot.api.call("answerInlineQuery", {"inline_query_id":update.inline_query.id, "cache_time":0, "switch_pm_text":"Vai al bot per altre funzioni","results":'[{"type":"article","id":"1","title":"Cerca treno","description":"'+str(descrizione)+'","input_message_content":{"message_text":"'+testo+'","parse_mode":"Markdown"}}]'})
+    if testo == None:
+        print("Testo none")
+        bot.api.call("answerInlineQuery", {"inline_query_id":update.inline_query.id, "cache_time":0, "results":'[{"type":"article","id":"2","title":"ERRORE","description":"Attenzione! Non hai scritto nessun numero di treno!","input_message_content":{"message_text":"*Errore*\n_Non ho digitato nessun numero di treno. _\nPer utilizzare questo bot devo scrivere, in qualsiasi chat, `@OrarioTreniBot numero di treno`","parse_mode":"Markdown"}}]'})
+bot.register_update_processor("inline_query", process_inline)
 #Comando: /fermata
 #Visualizza le informazioni di un treno rispetto a una fermata specifica
 #Utilizzo: /fermata <numero di treno> <numero di fermata>:lista
