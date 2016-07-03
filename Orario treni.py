@@ -59,6 +59,10 @@ except:
     pass
 conn.commit()
 
+@bot.command("start")
+def start(chat, message, args):
+    message.reply("*Benvenuto in OrarioTreniBot!*\nDigita il comando /help per vedere cosa può fare questo bot")
+    newson(chat, message)
 #Comando /news
 #Visualizza i messaggi per l'iscrizione alle news e altre informazioni
 #Utilizzo: /news
@@ -160,6 +164,7 @@ def post(chat, message, args):
     for res in lista_utenti:
         try:
             bot.chat(res[0]).send(messaggio_news)
+            message.reply("*Messaggio inviato a *"+str(res[0]))
         except Exception as e:
             message.reply("*Errore* "+str(e))
     conn.commit()
@@ -593,8 +598,11 @@ def statistiche(chat, message, args):
     response = urllib.request.urlopen(content)
     content = response.read()
     data = json.loads(content.decode("utf8"))
+    c.execute('''SELECT COUNT(*) AS conto FROM news;''')
+    conto = c.fetchone()[0]
     message.reply("_Statistiche dei treni italiani in tempo reale_"+\
-        "\n*Treni circolanti*: "+str(data['treniCircolanti'])+"\n*Treni totali di oggi*: "+str(data['treniGiorno']))
+        "\n*Treni circolanti*: "+str(data['treniCircolanti'])+"\n*Treni totali di oggi*: "+str(data['treniGiorno'])+\
+        "\n_Statistiche degli utenti_\n*Utenti iscritti*: "+str(conto))
     bot.chat(-1001057273480).send("#Comando #statistiche"\
         "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
         "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
@@ -912,7 +920,22 @@ def tracciaCOMMAND(chat, message, args):
             message.reply("*Traccia treno*\nFine del tracciamento del treno "+id_treno)
         time.sleep(1)
         continue
-
+@bot.chat_unavailable
+def remove_user(chat_id, reason):
+    # Remove the user from our database
+    c.execute("DELETE FROM news WHERE id = ?", chat_id)
+    conn.commit()
+#Easter eggs
+@bot.process_message
+def easter_eggs(chat, message):
+    if message.text.lower() == "batti cinque!":
+        message.reply("Certamente, *"+message.sender.name+"*")
+    if message.text.lower() == "grande bot!":
+        message.reply("[Votami](https://www.telegram.me/storebot?start=OrarioTreniBot)❤️")
+    if message.text.lower() == "orario treni":
+        message.reply("*Ciao, *"+message.sender.name+" cosa posso fare per te?")
+    if message.text.lower() == "orario treni, cerca treno 2097":
+        message.reply("Usa il comando */treno* per questo. Non sono mica Siri io, eh!")
 #Avvio del bot
 if __name__ == "__main__":
     bot.run()
