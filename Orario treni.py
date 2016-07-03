@@ -58,6 +58,7 @@ try:
 except:
     pass
 conn.commit()
+
 #Comando /news
 #Visualizza i messaggi per l'iscrizione alle news e altre informazioni
 #Utilizzo: /news
@@ -69,116 +70,99 @@ def news(chat, message, args):
     message.reply("*Come iscriversi?*\nIscriversi è molto semplice:" \
         "basta scrivere /newson." \
         "Puoi disiscriverti quando vuoi facendo /newsoff")
+
 #Comando /newson
 #Iscrizione alle news
 #Utilizzo: /newson
 @bot.command("newson")
 def newson(chat, message):
-    iscritto = True
-    c.execute('''SELECT EXISTS(SELECT * FROM news where user_id=?)''',(message.chat.id,))
-    if not c.fetchone():
-        try:
-            c.execute('''INSERT INTO news(user_id, iscritto) VALUES(?, ?)''',(message.chat.id, 1))
-            conn.commit()
-            message.reply("*Fatto!*\nOra sei iscritto! Per disiscriverti fai \
-                /newsoff")
-            bot.chat(-1001057273480).send("#Comando #newson"\
-                "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
-                "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
-                "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
-                "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
-        except Exception as e:
-            message.reply("*Errore*\nQualcosa è andato storto."\
-                "\nContatta lo sviluppatore @MarcoBuster e inviagli questo messaggio d'errore: "+\
-                str(e))
-            bot.chat(-1001057273480).send("#Comando #newson"\
-                "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
-                "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
-                "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
-                "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y"))+\
-                "\n<b>Altro</b>: "+"<b>Errore</b>: "+str(e),syntax="html")
-            return
-    else:
-        message.reply("*Errore*\nAttenzione! Sei già registrato alle news!"\
-            "Non dirmi che vuoi ricevere post doppi!")
+    try:
+        c.execute('''DELETE FROM news WHERE user_id =?''',(message.sender.id,))
+        c.execute('''INSERT INTO news(user_id, iscritto) VALUES(?, ?)''',(message.chat.id, 1))
+        conn.commit()
+        message.reply("*Fatto!*\nOra sei iscritto! Per disiscriverti fai" \
+            "/newsoff")
+        bot.chat(-1001057273480).send("#Comando #newson"\
+            "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
+            "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
+            "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
+            "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+    except Exception as e:
+        message.reply("*Errore*\nQualcosa è andato storto."\
+            "\nContatta lo sviluppatore @MarcoBuster e inviagli questo messaggio d'errore: "+\
+            str(e))
         bot.chat(-1001057273480).send("#Comando #newson"\
             "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
             "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
             "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
             "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y"))+\
-            "\n<b>Altro</b>: "+"L'utente era già iscritto alle news",syntax="html")
+            "\n<b>Altro</b>: "+"<b>Errore</b>: "+str(e),syntax="html")
         return
+
 #Comando /viewnews
 #Visualizza la lista delle persone iscritte alle news
 #UTilizzo: /viewnews [SOLO AMMINISTRATORI]
 @bot.command("viewnews")
 def viewnews(chat, message):
     if message.sender.id != 26170256:
+        message.reply("`ADMIN ONLY`\n*Non sei autorizzato ad eseguire questo comando."\
+        "Esegui il comando /help per info sui comandi che puoi usare.*")
         return
     try:
         c.execute('''SELECT * from news''')
         rows = c.fetchall()
         for row in rows:
             chat.send(str(row))
-    except:
+    except Exception as e:
+        message.reply("*Errore*: "+str(e))
         pass
     conn.commit()
+
 #Comando /newsoff
 #Discrizione alle news
 #Utilizzo: /newsoff
 @bot.command("newsoff")
 def newsoff(chat, message):
-    c.execute('''SELECT EXISTS(SELECT * FROM news where user_id=?)''',(message.chat.id,))
-    if not c.fetchone(): #Codice da migliorare
-        message.reply("*Errore*\nTi sei già disiscritto o non ti sei mai iscritto!"\
-            "Va bene che mi odi, ma è inutile continuare!\nPer iscriverti fai /newson")
+    try:
+        c.execute('''DELETE FROM news where user_id=?''',(message.chat.id,))
+        message.reply("*Disiscritto*\nDisiscrizione completata!\n"\
+            "Per iscriverti fai /newson")
+        bot.chat(-1001057273480).send("#Comando #newsoff"\
+            "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
+            "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
+            "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
+            "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+    except Exception as e:
+        message.reply("*Errore*\nContatta @MarcoBuster per supporto"\
+            "Codice di errore da inoltrare: "+str(e))
         bot.chat(-1001057273480).send("#Comando #newsoff"\
             "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
             "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
             "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
             "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y"))+\
-            "\n:<b>Altro</b>: "+"L'utente non era iscritto alle news",syntax="html")
-    else:
-        try:
-            c.execute('''DELETE FROM news where user_id=?''',(message.chat.id,))
-            message.reply("*Disiscritto*\nDisiscrizione completata!\n"\
-                "Per iscriverti fai /newson")
-            bot.chat(-1001057273480).send("#Comando #newsoff"\
-                "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
-                "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
-                "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
-                "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
-        except Exception as e:
-            message.reply("*Errore*\nContatta @MarcoBuster per supporto"\
-                "Codice di errore da inoltrare: "+str(e))
-            bot.chat(-1001057273480).send("#Comando #newsoff"\
-                "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
-                "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
-                "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
-                "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y"))+\
-                "\n<b>Altro</b>: "+"<b>Errore</b>: "+str(e),syntax="html")
+            "\n<b>Altro</b>: "+"<b>Errore</b>: "+str(e),syntax="html")
     conn.commit()
+
 #Comando /post
 #Posta una news
 #Utiizzo: /post <messaggio> [SOLO AMMINISTRATORE]
 @bot.command("post")
 def post(chat, message, args):
-    if str(message.chat.id) == "26170256":
-        messaggio_news = str(args)
-        message.reply("*Ecco il messaggio che stai per inviare*: "+messaggio_news+"\n_Confermare?_")
-        message.reply("*Confermato*")
-        c.execute('''SELECT user_id FROM news''')
-        utenteid= c.fetchall()
-        message.reply("*Lista dei destinatari* :"+str(utenteid))
-        for k in range(0,10000):
-            try:
-                message.reply("*Messaggio inviato a: *"+"".join(utenteid[k]))
-                bot.send("".join(utenteid[k]), " ".join(messaggio_news))
-                continue
-            except Exception as e:
-                chat.send("*Errore*\nCodice d'errore: "+str(e))
-                pass
-                continue
+    if message.sender.id != 26170256:
+        message.reply("`ADMIN ONLY`\n*Non sei autorizzato ad eseguire questo comando."\
+        "Esegui il comando /help per info sui comandi che puoi usare.*")
+        return
+    messaggio_news = " ".join(message.text.split(" ", 1)[1:])
+    message.reply("*Ecco il messaggio che stai per inviare*: "+str(messaggio_news)+"\n_Confermare?_")
+    c.execute('''SELECT user_id FROM news''')
+    lista_utenti= c.fetchall()
+    message.reply("Lista destinatari"+", ".join(str(res[0]) for res in lista_utenti))
+    for res in lista_utenti:
+        try:
+            bot.chat(res[0]).send(messaggio_news)
+        except Exception as e:
+            message.reply("*Errore* "+str(e))
+    conn.commit()
 #Comando: /info
 #Visualizza le informazioni sul bot
 #Utilizzo: /info
@@ -277,6 +261,7 @@ def treno(chat, message, args):
         "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
         "\n<b>Treno</b>: "+id_treno+\
         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+
     #Processando la callback
 def process_callback(bot, chains, update):
     message = update.callback_query.message
@@ -411,6 +396,7 @@ def process_callback(bot, chains, update):
          "text": "Messaggio aggiornato", "show_alert":False}) #Avviso sopra lo schermo
         return
 bot.register_update_processor("callback_query", process_callback)
+
 #INLINE MODE
 def process_inline(bot, chains, update):
     #Inline mode
@@ -481,6 +467,7 @@ def process_inline(bot, chains, update):
             'Per utilizzare questo bot devo scrivere, in qualsiasi chat, '\
             '`@OrarioTreniBot numero di treno`","parse_mode":"Markdown"}}]'})
 bot.register_update_processor("inline_query", process_inline)
+
 #Comando: /fermata
 #Visualizza le informazioni di un treno rispetto a una fermata specifica
 #Utilizzo: /fermata <numero di treno> <numero di fermata>:lista
@@ -561,7 +548,7 @@ def fermata(chat, message, args):
                 break
             b=b+a
             b+="\n"
-        message.reply(b)
+        message.reply(b,syntax="plain")
         bot.chat(-1001057273480).send("#Comando #fermata"\
             "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
             "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
@@ -588,6 +575,15 @@ def fermata(chat, message, args):
         "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
         "\n<b>Treno</b>: "+id_treno+\
         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+
+#Comando: /fermate
+#Visualizza le informazioni di un treno rispetto a una fermata specifica
+#REDIRECT COMANDO /FERMATA
+#Utilizzo: /fermate <numero di treno> <numero di fermata>:lista
+@bot.command("fermate")
+def fermate(chat, message, args):
+    fermata(chat, message, args)
+
 #Comando: /statistiche
 #Visualizza curiose statistiche sui treni italiani in tempo reale
 #Utilizzo: /statistiche
@@ -604,6 +600,7 @@ def statistiche(chat, message, args):
         "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
         "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")))
+
 #Comando: /arrivi
 #Visualizza gli arrivi di una stazione
 #Utilizzo: /arrivi <nome stazione>
@@ -656,7 +653,8 @@ def arrivi(chat, message, args):
         "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
         "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
         "\n<b>Stazione</b>: "+str(stazione)+\
-        "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")))
+        "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+
 #Comando: /partenze
 #Visualizza le partenze di una stazione
 #Utilizzo: /partenze <nome stazione>
@@ -709,6 +707,7 @@ def partenze(chat, message, args):
         "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
         "\n<b>Stazione</b>: "+str(stazione)+\
         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+
 #Comando: /itinerario
 #Cerca un itinerario tra due stazioni
 #Utilizzo: /itinerario <stazione di partenza> <stazione di arrivo>
@@ -801,6 +800,7 @@ def itinerario(chat, message, args):
         "\n<b>Stazione di partenza</b>: "+str(data['origine'])+\
         "\n<b>Stazione di arrivo</b>: "+str(data['destinazione'])+\
         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
+
 @bot.process_message
 def ricerca_veloce(shared, chat, message):
     isTreno = None
@@ -822,6 +822,7 @@ def ricerca_veloce(shared, chat, message):
     if isStazione == True and len(message.text) > 5:
         stazione = str(message.text)
         partenze(chat, message, str(message.text).split(" "))
+
 #Comando /traccia
 #Traccia il treno con notifiche in tempo reale sul suo andamento
 #Utilizzo: /traccia <numero di treno> [minuti massimi]
