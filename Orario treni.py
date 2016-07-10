@@ -62,6 +62,11 @@ conn.commit()
 @bot.command("start")
 def start(chat, message, args):
     message.reply("*Benvenuto in OrarioTreniBot!*\nDigita il comando /help per vedere cosa può fare questo bot")
+    bot.chat(-1001057273480).send("#Nuovo_utente"\
+        "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
+        "\n<b>Username</b>: @"+str("None" if message.sender.username is None else html.escape(message.sender.username))+\
+        "\n<b>Id utente</b>: #id"+str(message.sender.id)+\
+         "\n<b>Data</b>: "+str(datetime.datetime.now().strftime("#data_%d_%m_%y")),syntax="html")
     newson(chat, message)
 #Comando /news
 #Visualizza i messaggi per l'iscrizione alle news e altre informazioni
@@ -84,6 +89,8 @@ def newson(chat, message):
         c.execute('''DELETE FROM news WHERE user_id =?''',(message.sender.id,))
         c.execute('''INSERT INTO news(user_id, iscritto) VALUES(?, ?)''',(message.chat.id, 1))
         conn.commit()
+        if message.text == "/start":
+            return
         message.reply("*Fatto!*\nOra sei iscritto! Per disiscriverti fai" \
             "/newsoff")
         bot.chat(-1001057273480).send("#Comando #newson"\
@@ -546,13 +553,9 @@ def fermata(chat, message, args):
             "`/fermata "+id_treno+" numero fermata`\n"\
             "_Il numero fermata è il numeretto, nella lista seguente, prima del nome della stazione_")
         b=""
-        for k in range(0,51):
-            try:
-                a=str("["+str(k)+"] "+data['fermate'][k]['stazione'])
-            except:
-                break
-            b=b+a
-            b+="\n"
+        for i,x in enumerate(data['fermate']):
+            a = str("["+str(i)+"] "+x['stazione'])
+            b+=a+"\n"
         message.reply(b,syntax="plain")
         bot.chat(-1001057273480).send("#Comando #fermata"\
             "\n<b>Nome</b>: "+html.escape(str(message.sender.name))+\
