@@ -57,7 +57,45 @@ try:
     c.execute('''CREATE TABLE news(user_id INTEGER, iscritto INTEGER''')
 except:
     pass
+
+try:
+    c.execute('''CREATE TABLE bannati(user_id INTEGER)''')
+except:
+    pass
 conn.commit()
+
+@bot.before_processing
+def process_banned_users(chat, message):
+    c.execute('''SELECT * FROM bannati WHERE user_id=?''',(message.sender.id,))
+    if c.fetchone():
+        return True
+
+@bot.command("ban")
+def ban(chat, message, args):
+    if len(args) == 0:
+        message.reply("Per bannare qualcuno devi fare <code>/ban idutente</code>")
+    if message.sender.id != 26170256:
+        if chat.type != "private":
+            message.reply("Solo l'*admin supremo* del bot può bannare")
+        return
+    userid = int(args[0])
+    c.execute('''DELETE FROM bannati WHERE user_id=?''',(userid,))
+    c.execute('''INSERT INTO bannati(user_id) VALUES(?)''',(userid,))
+    conn.commit()
+    chat.send("bannato {}".format(str(userid)))
+
+@bot.command("unban")
+def ban(chat, message, args):
+    if len(args) == 0:
+        message.reply("Per sbannare qualcuno devi fare <code>/unban idutente</code>")
+    if message.sender.id != 26170256:
+        if chat.type != "private":
+            message.reply("Solo l'*admin supremo* del bot può sbannare")
+        return
+    userid = int(args[0])
+    c.execute('''DELETE FROM bannati WHERE user_id=?''',(userid,))
+    conn.commit()
+    chat.send("sbannato {}".format(str(userid)))
 
 @bot.command("start")
 def start(chat, message, args):
