@@ -4,6 +4,8 @@ import datetime
 
 import urllib.request
 
+from CONFIG import TOKEN
+
 import API
 from Callback import Callback
 from Inlinemode import Inline
@@ -41,7 +43,7 @@ class InlineQuery(botogram.objects.base.BaseObject):
 botogram.Update.optional["inline_query"] = InlineQuery
 
 import botogram
-bot = botogram.create("TOKEN")
+bot = botogram.create(TOKEN)
 bot.lang = "it"
 
 import sqlite3
