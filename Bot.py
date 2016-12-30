@@ -50,20 +50,12 @@ import sqlite3
 conn = sqlite3.connect('OrarioTreni.db')
 c = conn.cursor()
 
-try:
-    c.execute('''CREATE TABLE stato(userid INTEGER, stato STRING, completato INTEGER)''')
-except sqlite3.OperationalError: #table already exists
-    pass
 
-try:
-    c.execute('''CREATE TABLE bannati(userid INTEGER)''')
-except sqlite3.OperationalError: #table already exists
-    pass
+c.execute('''CREATE TABLE IF NOT EXISTS stato(userid INTEGER, stato STRING, completato INTEGER)''')
 
-try:
-    c.execute('''CREATE TABLE itinerario(userid INTEGER, stazione1 STRING, stazione2 STRING, orario STRING)''')
-except sqlite3.OperationalError: #table already exists
-    pass
+c.execute('''CREATE TABLE IF NOT EXISTS bannati(userid INTEGER)''')
+
+c.execute('''CREATE TABLE IF NOT EXISTS itinerario(userid INTEGER, stazione1 STRING, stazione2 STRING, orario STRING)''')
 
 conn.commit()
 
