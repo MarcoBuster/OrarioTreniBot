@@ -150,7 +150,7 @@ def post(chat, message, args):
             bot.chat(res[0]).send(message)
             chat.send("Post sent to "+str(res[0]))
         except botogram.api.ChatUnavailableError:
-            c.execute('DELETE FROM stato WHERE userid=?', (user_id,))
+            c.execute('DELETE FROM stato WHERE userid = (?)', (res[0],))
             chat.send("The user "+str(res[0])+" has blocked your bot, so I removed him from the database")
             conn.commit()
         except Exception as e:
