@@ -11,6 +11,14 @@ from Callback import Callback
 from Inlinemode import Inline
 from Callback.InlineCallback import INCallback
 
+import logging
+logger = logging.getLogger("bot")
+logging.getLogger("requests").setLevel(logging.WARNING)
+
+format = "%(asctime)s [%(levelname)s]: %(message)s"
+level = logging.INFO
+logging.basicConfig(format=format, level=level)
+
 import botogram.objects.base
 class CallbackQuery(botogram.objects.base.BaseObject):
     required = {
@@ -81,6 +89,7 @@ bot.register_update_processor("inline_query", process_inline)
 
 @bot.command("start")
 def start(chat, message, args):
+    logger.info("Utente {} comando /start".format(message.sender.id))
 
     if len(args) == 1:
         if args[0] == "inline":
@@ -141,7 +150,7 @@ def post(chat, message, args):
             bot.chat(res[0]).send(message)
             chat.send("Post sent to "+str(res[0]))
         except botogram.api.ChatUnavailableError:
-            c.execute('DELETE FROM stato WHERE userid={}'.format(res[0]))
+            c.execute('DELETE FROM stato WHERE userid=?', (user_id,))
             chat.send("The user "+str(res[0])+" has blocked your bot, so I removed him from the database")
             conn.commit()
         except Exception as e:
@@ -176,6 +185,8 @@ def cerca_treno(chat, message):
     if state != "treno1":
         return
 
+    logger.info("Utente {} process message cerca treno".format(message.sender.id))
+
     id_treno = str(message.text)
     data, success, error = API.orarioTreni.cercaTreno(id_treno)
     if success == False and error == 404:
@@ -193,7 +204,10 @@ def cerca_treno(chat, message):
     "reply_markup":
         '{"inline_keyboard":[[{"text":"🚉Lista fermate","callback_data":"'+callbackdata1+'"},'
         '{"text":"🔄Aggiorna le informazioni","callback_data":"'+callbackdata2+'"}],'
+        '[{"text": "🚦Traccia il treno [BETA]", "callback_data": "traccia@'+id_treno+'"},'
+        '{"text": "📊Grafico ritardo", "callback_data": "grafico@'+id_treno+'"}],'
         '[{"text":"🔙Torna indietro","callback_data":"home"}]]}'})
+
     API.db.updateState(chat.id, "nullstate", 0)
 
 @bot.process_message
@@ -202,6 +216,8 @@ def cerca_stazione(chat, message):
 
     if state != "stazione1":
         return
+
+    logger.info("Utente {} process message cerca stazione".format(message.sender.id))
 
     stazione = message.text
 
@@ -228,6 +244,7 @@ def cerca_stazione(chat, message):
                 '{"inline_keyboard":[[{"text":"Arrivi","callback_data":"'+callbackdata1+'"},{"text":"Partenze","callback_data":"'+callbackdata2+'"}],'\
                 '[{"text":"📍Posizione","callback_data":"'+callbackdata3+'"}],[{"text":"🔙Torna indietro","callback_data":"home"}]]}'}
             )
+        return
 
     bot.api.call("sendMessage", {
     "chat_id":chat.id, "text":testo, "parse_mode":"HTML", "reply_markup":'{'
@@ -241,6 +258,8 @@ def sottoscrivi_itinerario_stazione1(chat, message): #CHIEDE NOME RICEVE USERNAM
     if state != "itinerario1":
         conn.commit()
         return
+
+    logger.info("Utente {} process message itinerario stazione".format(message.sender.id))
 
     stazione = message.text
     esiste, data = API.orarioTreni.stazione.check(stazione)
@@ -291,6 +310,8 @@ def sottoscrivi_itinerario_stazione2(chat, message): #CHIEDE NOME RICEVE USERNAM
         conn.commit()
         return
 
+    logger.info("Utente {} process message itinerario stazione 2".format(message.sender.id))
+
     if completato == 0 and state == "itinerario2":
         c.execute('''UPDATE stato SET completato=1 WHERE userid=?''',(chat.id,))
         conn.commit()
@@ -340,6 +361,8 @@ def sottoscrivi_itinerario_orario(chat, message): #CHIEDE NOME RICEVE USERNAME
         conn.commit()
         return
 
+    logger.info("Utente {} process message itinerario orario".format(message.sender.id))
+
     if completato == 0 and state == "itinerario3":
         c.execute('''UPDATE stato SET completato=1 WHERE userid=?''',(chat.id,))
         conn.commit()
@@ -378,6 +401,7 @@ def nullstate(chat, message):
 
 @bot.command("feedback")
 def feedback(chat, message, args):
+    logger.info("Utente {} comando /feedback".format(message.sender.id))
     if len(args) == 0:
         message.reply("*Comando /feedback*"
                     "\nQuesto comando *invia* direttamente un *feedback* allo *sviluppatore* (@MarcoBuster)"
@@ -428,4 +452,5 @@ def no_old_commands(chat, message):
         return True
 
 if __name__ == "__main__":
-    bot.run()
+    bot.process_backlog = True
+    bot.run(workers=5)

@@ -12,6 +12,8 @@ def process(bot, chains, update):
     sender = update.inline_query.sender
     query = update.inline_query.query
 
+    Bot.logger.info("Utente {} inline query {}".format(update.inline_query.sender.id, update.inline_query.query))
+
     if not query:
         testo = "<b>Avviami in privata</b> per scoprire come si usa questo bot in <b>modalità inline</b>"
         bot.api.call("answerInlineQuery", {

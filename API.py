@@ -1,9 +1,30 @@
 import urllib.request
 import json
 import sqlite3
+import time
 from datetime import datetime
 import datetime
 from urllib import *
+import os
+
+import random
+import string
+
+import logging
+logger = logging.getLogger("bot")
+logging.getLogger("requests").setLevel(logging.WARNING)
+
+format = "%(asctime)s [%(levelname)s]: %(message)s"
+level = logging.INFO
+logging.basicConfig(format=format, level=level)
+
+from CONFIG import PLOTLY_USERNAME, PLOTLY_API_KEY
+
+import plotly
+plotly.tools.set_credentials_file(username=PLOTLY_USERNAME, api_key=PLOTLY_API_KEY)
+
+import plotly.plotly as py
+import plotly.graph_objs as go
 
 conn = sqlite3.connect('OrarioTreni.db')
 c = conn.cursor()
@@ -13,7 +34,7 @@ class db:
 
     def creaTutto():
         """Crea la la connessione e la table"""
-        conn = sqlite3.connect('OrarioTreniBot.db')
+        conn = sqlite3.connect('OrarioTreni.db')
         c = conn.cursor()
         try:
             c.execute('''CREATE TABLE stato(userid INTEGER, stato STRING, completato INTEGER)''')
@@ -30,6 +51,11 @@ class db:
         except:
             pass
 
+        try:
+            c.execute('''CREATE TABLE tracciamento(request_id INTEGER, userid INTEGER, id_treno TEXT, solo_oggi BOOLEAN, stazione_ultimo_rilevamento TEXT, random_string TEXT)''')
+        except:
+            pass
+
         conn.commit()
 
     def updateState(userid, new_state, completato):
@@ -37,6 +63,7 @@ class db:
             c.execute('''DELETE FROM stato WHERE userid=?''',(userid,))
             c.execute('''INSERT INTO stato VALUES(?,?,?)''',(userid, new_state, completato))
             conn.commit()
+            logger.info("Utente {} nuovo stato {}".format(userid, new_state))
             return True, None #return <success> <error>
         except Exception as e:
             return False, e
@@ -46,6 +73,7 @@ class db:
             c.execute('''SELECT stato, completato FROM stato WHERE userid=?''',(userid,))
             rows = c.fetchall()
             for res in rows:
+                logger.debug("Stato dell'utente {}: {} {}".format(userid, res[0], res[1]))
                 return res[0], res[1], True, None #return <state> <completato> <success> <error>
             conn.commit()
         except Exception as e:
@@ -54,6 +82,37 @@ class db:
     def resetItinerario(userid):
         c.execute('''DELETE FROM itinerario WHERE userid=?''',(userid,))
         conn.commit()
+
+    def tracciaTreno(user_id, id_treno, solo_oggi):
+        data, success, error = orarioTreni.cercaTreno(id_treno)
+
+        stazione_ultimo_rilevamento = data['stazioneUltimoRilevamento']
+        if stazione_ultimo_rilevamento == "--":
+            stazione_ultimo_rilevamento = data['origine']
+
+        if stazione_ultimo_rilevamento == data['destinazione']:
+            logger.debug("Utente {} ha provato a tracciare il treno {} ma è già arrivato a destinazione".format(user_id, id_treno))
+            return "Il treno è già arrivato a destinazione, traccialo domani!"
+
+        random_string = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(10))
+
+        c.execute('SELECT * FROM tracciamento WHERE userid=? AND id_treno=?', (user_id, id_treno,))
+        if c.fetchall():
+            logger.debug("Utente {} ha provato a tracciare il treno {} ma lo stava già tracciando".format(user_id, id_treno))
+            return "Stai già tracciando questo treno!"
+
+        c.execute('''SELECT request_id FROM tracciamento ORDER BY request_id DESC LIMIT 1''')
+        rows = c.fetchall()
+        if not rows:
+            request_id = 0
+        for res in rows:
+            request_id = res[0] + 1
+
+        c.execute('''INSERT INTO tracciamento VALUES(?, ?, ?, ?, ?, ?)''', (request_id, user_id, id_treno, solo_oggi, stazione_ultimo_rilevamento, random_string))
+        conn.commit()
+
+        logger.info("Utente {} ha messo a tracciare il treno {}, request id {}".format(user_id, id_treno, request_id))
+        return request_id
 
 class orarioTreni:
     """Cerca treni, arrivi, partenze, itinerari, statistiche"""
@@ -79,9 +138,11 @@ class orarioTreni:
             info = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/andamentoTreno/"+id_stazione+"/"+id_treno
             response = urllib.request.urlopen(info)
         except: #errore urllib (non trovato)
+            logging.debug("Treno {} non trovato".format(id_treno))
             return None, False, 404 #data, success, error
         content = response.read()
         data = json.loads(content.decode("utf8"))
+        logging.info("Cercato il treno {}".format(id_treno))
         return data, True, None
 
     def cercaItinerario(stazione1, stazione2, orario):
@@ -122,6 +183,7 @@ class orarioTreni:
         response = urllib.request.urlopen(content)
         content = response.read()
         data = json.loads(content.decode("utf8"))
+        logging.info("Itinerario cercato da {} a {} orario {}".format(stazione1, stazione2, orario))
         return data, True, None
 
     def cercaStatistiche():
@@ -129,6 +191,7 @@ class orarioTreni:
         response = urllib.request.urlopen(content)
         content = response.read()
         data = json.loads(content.decode("utf8"))
+        logging.info("Statistiche cercate")
         return data, True, None
 
     class stazione:
@@ -138,13 +201,15 @@ class orarioTreni:
                 content = "http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/cercaStazione/"+stazione.replace(" ","%20") #soluzione temporanea TODO
                 response = urllib.request.urlopen(content)
             except Exception as e:
+                logging.info("{} non è una stazione".format(stazione))
                 return False, None
             content = response.read()
             if content == b'[]':
+                logging.info("{} non è una stazione".format(stazione))
                 return False, None
 
             data = json.loads(content.decode("utf8"))
-
+            logging.info("{} è una stazione".format(stazione))
             return True, data
 
         def informazioni(stazione):
@@ -166,6 +231,7 @@ class orarioTreni:
             response = urllib.request.urlopen(content)
             content = response.read()
             data = json.loads(content.decode("utf8"))
+            logging.info("{} informazioni ottenute".format(stazione))
             return data
 
 
@@ -187,6 +253,7 @@ class orarioTreni:
             response = urllib.request.urlopen(content)
             content = response.read()
             data = json.loads(content.decode("utf8"))
+            logging.info("{} arrivi ottenuti".format(stazione))
             return data, True, None
 
         def partenze(stazione):
@@ -207,6 +274,7 @@ class orarioTreni:
             response = urllib.request.urlopen(content)
             content = response.read()
             data = json.loads(content.decode("utf8"))
+            logging.info("{} partenze ottenute".format(stazione))
             return data, True, None
 
 class Messaggi:
@@ -215,6 +283,7 @@ class Messaggi:
                     "\n_Ci scusiamo per il disagio._"
                     "\nInoltra questo messaggio *tecnico* a @MarcoBuster *[DEV]*:"
                     "`{}`".format(error))
+        logging.error("Erorre database: {}".format(error))
     def treno1(data):
         orarioPartenza = datetime.datetime.fromtimestamp(data['orarioPartenza'] / 1000).strftime('%H:%M')
         orarioArrivo = datetime.datetime.fromtimestamp(data['orarioArrivo'] / 1000).strftime('%H:%M')
@@ -235,12 +304,13 @@ class Messaggi:
             .format(data['categoria'], str(data['numeroTreno']), data['origine'], orarioPartenza,
             data['destinazione'], orarioArrivo, str(data['ritardo']), data['stazioneUltimoRilevamento'],
             oraUltimoRilevamento, str(n_fermate)))
+        logging.info("Formattato treno {}".format(data['numeroTreno']))
         return testo
 
     def arriviStazione(data, nomestazione):
         messaggio_iniziale = "<b>Arrivi della stazione di "+nomestazione+"</b>:\n"
-        for k in range(0,4):
-            messaggio = None
+        messaggio = ""
+        for k in range(0,9):
             try:
                 data[k]['numeroTreno']
             except IndexError or TypeError:
@@ -250,8 +320,8 @@ class Messaggi:
             if data[k]['inStazione'] == False:
                 inStazione = "No"
             elif data[k]['inStazione'] == True:
-                inStazione == "Sì"
-            messaggio = ("<i>🚅Treno {} {}</i>"
+                inStazione = "Sì"
+            messaggio += ("<i>🚅Treno {} {}</i>"
                                     "\n<b>🚉Proveniente da</b>: {}"
                                     "\n<b>🚧In stazione</b>: {}"
                                     "\n<b>🕒Ritardo</b>: {}m"
@@ -261,12 +331,13 @@ class Messaggi:
         if messaggio == None:
             messaggio = "\n<i>Non c'è nessun treno in arrivo in questa stazione</i>"
         testo = messaggio_iniziale + messaggio
+        logging.info("Formattati arrivi stazione {}".format(nomestazione))
         return testo
 
     def partenzeStazione(data, nomestazione):
         messaggio_iniziale = "<b>Partenze della stazione di "+nomestazione+"</b>:\n"
-        for k in range(0,4):
-            messaggio = None
+        messaggio = ""
+        for k in range(0,9):
             try:
                 data[k]['numeroTreno']
             except IndexError or TypeError:
@@ -276,8 +347,8 @@ class Messaggi:
             if data[k]['inStazione'] == False:
                 inStazione = "No"
             elif data[k]['inStazione'] == True:
-                inStazione == "Sì"
-            messaggio = ("<i>🚅Treno {} {}</i>"
+                inStazione = "Sì"
+            messaggio += ("<i>🚅Treno {} {}</i>"
                                     "\n<b>🚉Diretto a</b>: {}"
                                     "\n<b>🚧In stazione</b>: {}"
                                     "\n<b>🕒Ritardo</b>: {}m"
@@ -287,29 +358,52 @@ class Messaggi:
         if messaggio == None:
             messaggio = "\n<i>Non c'è nessun treno in partenza in questa stazione</i>"
         testo = messaggio_iniziale + messaggio
+        logging.info("Formattati arrivi stazione {}".format(nomestazione))
         return testo
 
     def itinerario(data):
-        durata = data['soluzioni'][0]['durata']
-        messaggio = "<b>Ho trovato questo itinerario da</b> <code>{0}</code> <b>a</b> <code>{1}</code>\n".format(data['origine'], data['destinazione'])
-        n_cambi = -1
+        messaggio = "<b>Ho trovato questo itinerario da</b> <code>{0}</code> <b>a</b> <code>{1}</code>".format(data['origine'], data['destinazione'])
         inline_keyboard = '['
-        for dict in data['soluzioni'][0]['vehicles']:
-            n_cambi = n_cambi + 1
-            orarioPartenza = (datetime.datetime.strptime(dict['orarioPartenza'], '%Y-%m-%dT%H:%M:%S')).strftime('%H:%M')
-            orarioArrivo = (datetime.datetime.strptime(dict['orarioArrivo'], '%Y-%m-%dT%H:%M:%S')).strftime('%H:%M')
-            if n_cambi > 0:
-                a_capo = "\n\n🚧<b>Cambio</b>🚧\n"
-            else:
-                a_capo = ""
-            messaggio =  messaggio + a_capo + (
-                        "<b>🚅Treno {0} {1}</b>"
-                        "\n<b>🚉Parte da </b><code>{2}</code><b> alle ore </b><code>{3}</code>"
-                        "\n<b>🚉Arriva a </b><code>{4}</code><b> alle ore </b><code>{5}</code>".format(dict['categoriaDescrizione'], str(dict['numeroTreno']), dict['origine'], orarioPartenza, dict['destinazione'], orarioArrivo)
-            )
-            inline_keyboard = inline_keyboard + '[{"text":"🔍Altre informazioni sul treno '+dict['categoriaDescrizione']+" "+str(dict['numeroTreno'])+'", "callback_data": "agg@'+str(dict['numeroTreno'])+'"}],'
+        soluzioni = ""
+        n_soluzioni = 0
+        fff = ""
+
+        for dictionary in data['soluzioni']:
+            n_soluzioni += 1
+            soluzioni = "\n\n➖➖➖<b>Soluzione {n}</b>".format(n=n_soluzioni)
+            fff += "\n\n\nSoluzione #{n}".format(n=n_soluzioni)
+
+            n_cambi = -1
+
+            for dict in dictionary['vehicles']:
+                n_cambi = n_cambi + 1
+                fff += "---Cambio #{n}".format(n=n_cambi)
+                orarioPartenza = datetime.datetime.strptime(dict['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
+                orarioArrivo = datetime.datetime.strptime(dict['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
+
+                if n_cambi > 0:
+                    a_capo = "\n🚧<b>Cambio</b>🚧"
+                else:
+                    a_capo = ""
+
+                if n_cambi == 0:
+                    soluzione = soluzioni
+                else:
+                    soluzione = ""
+
+                messaggio = messaggio + soluzione + a_capo + (
+                            "\n<b>🚅Treno {0} {1}</b>"
+                            "\n<b>🚉Parte da </b><code>{2}</code><b> alle ore </b><code>{3}</code>"
+                            "\n<b>🚉Arriva a </b><code>{4}</code><b> alle ore </b><code>{5}</code>".format(dict['categoriaDescrizione'], str(dict['numeroTreno']), dict['origine'], orarioPartenza, dict['destinazione'], orarioArrivo)
+                )
+                inline_keyboard = inline_keyboard + '[{"text":"🔍Altre informazioni sul treno '+dict['categoriaDescrizione']+" "+str(dict['numeroTreno'])+'", "callback_data": "agg@'+str(dict['numeroTreno'])+'"}],'
+
+            if n_soluzioni > 4:
+                break
 
         inline_keyboard = inline_keyboard + '[{"text":"🔙Torna indietro", "callback_data":"home"}]]'
+        logging.info("Formattato itinerario da {} a {}".format(data['origine'], data['destinazione']))
+        print(messaggio)
         return messaggio, inline_keyboard
 
     def listaStazioni(data):
@@ -326,6 +420,7 @@ class Messaggi:
 
         messaggio = "<b>Ho trovato {} stazioni con quel nome</b>:".format(numero_dict)
         inline_keyboard = inline_keyboard + '[{"text":"🔙Torna indietro","callback_data":"home"}]]'
+        logging.info("Formattata lista stazioni")
         return messaggio, inline_keyboard
 
     def fermata(data, numeroFermata):
@@ -395,7 +490,7 @@ class Messaggi:
                     ritardoArrivo = "con un <b>ritardo di {} minuti</b>".format(str(ritardoArrivo))
                     emoji = "❗️"
                 elif ritardoArrivo < 1:
-                    ritardoArrivo = "in <b>anticipo di {} minuti</b>".format(str(abs(RitardoArrivo)))
+                    ritardoArrivo = "in <b>anticipo di {} minuti</b>".format(str(abs(ritardoArrivo)))
                     emoji = "⁉️"
 
                 if data['ritardoArrivo'] == 0:
@@ -488,7 +583,9 @@ class Messaggi:
                 ritardoArrivo = "in <b>perfetto orario</b>"
                 emoji = "👌"
 
-            if data['binarioEffettivoArrivoDescrizione'] == None:
+            if data['binarioEffettivoArrivoDescrizione'] == None and data['binarioProgrammatoArrivoDescrizione'] == None:
+                binario = "?"
+            elif data['binarioEffettivoArrivoDescrizione'] == None:
                 binario = data['binarioProgrammatoArrivoDescrizione'].strip()
             else:
                 binario = data['binarioEffettivoArrivoDescrizione'].strip()
@@ -522,6 +619,7 @@ class Messaggi:
                         "\n\n<i>Non arrabiarti con lo sviluppatore o lasciare recensioni negative, tu non immagini nemmeno quante variabili ci sono in ballo e quanto i dati di Trenitalia siano sballati a volte😢</i>" #A sad but true story
                         "\nGuarda il codice su GitHub, se non ci credi: www.github.com/MarcoBuster/OrarioTreniBot.".format(str(id_treno), str(numeroFermata), str(data['actualFermataType']))
             )
+            logging.error("Formattazione fermata id treno: {}, numero fermata: {}, actualFermataType: {}".format(id_treno, numeroFermata, actualFermataType))
             return messaggio
 
         if Arrivo == None and Partenza == None:
@@ -529,6 +627,7 @@ class Messaggi:
                 "<b>ℹ️Informazioni del treno {0} {1} rispetto alla fermata {2}</b>\n".format(cat_treno, id_treno, data['stazione'])
                 +actualFermataType
                 )
+            logging.info("Formattazione fermata {} treno {} ".format(numeroFermata, id_treno))
             return messaggio
         else:
             messaggio = (
@@ -537,12 +636,48 @@ class Messaggi:
                     +Partenza+ ("\n" if Partenza != "" else "")
                     +actualFermataType
             )
+            logging.info("Formattazione fermata {} treno {} ".format(numeroFermata, id_treno))
             return messaggio
+
+    def grafico(data, id_treno):
+        fermate = []
+        ritardi = []
+
+        for dictionary in data['fermate']:
+            if dictionary['actualFermataType'] == 0:
+                break
+
+            fermate = fermate + [dictionary['stazione']]
+            ritardi = ritardi + [dictionary['ritardo']]
+
+        if len(fermate) < 2 or len(ritardi) < 2:
+            return False
+
+        line = go.Scatter(
+            x = fermate,
+            y = ritardi,
+            name = 'Ritardo',
+            line = dict(
+                color = ('rgb(205, 12, 24)'),
+                width = 4,
+                shape = 'spline')
+        )
+
+        title = 'Ritardo del treno {id_treno} • @OrarioTreniBot'.format(id_treno=id_treno)
+        layout = dict(title = title,
+                      xaxis = dict(title = 'Fermata'),
+                      yaxis = dict(title = 'Ritardo (minuti)'),
+                      )
+
+        filename = os.getcwd() + "/ritardo_treno@{id_treno}.png".format(id_treno=id_treno)
+        fig = dict(data=[line], layout=layout)
+        py.image.save_as(fig, filename=filename)
+        return filename
 
     def statistiche(data):
         messaggio = ("<b>Statistiche dei treni circolanti</b>:"
                     "\n<b>🚅Treni oggi</b>: {}"
                     "\n<b>🚅Treni circolanti in questo momento</b>: {}"
-                    "\n<b>✅Versione del bot</b>: <code>3.0 OPEN ALPHA</code>".format(str(data['treniGiorno']), str(data['treniCircolanti'])))
-
+                    "\n<b>✅Versione del bot</b>: <code>3.1</code>".format(str(data['treniGiorno']), str(data['treniCircolanti'])))
+        logging.info("Formattazione statistiche")
         return messaggio

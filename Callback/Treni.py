@@ -7,6 +7,8 @@ import sqlite3
 conn = sqlite3.connect('OrarioTreni.db')
 c = conn.cursor()
 
+import os
+
 def callback(bot, chains, update):
     API.db.creaTutto()
     message = update.callback_query.message
@@ -37,6 +39,8 @@ def callback(bot, chains, update):
                 "reply_markup":
                     '{"inline_keyboard":[[{"text":"🚉Lista fermate","callback_data":"'+callbackdata1+'"},'
                     '{"text":"🔄Aggiorna le informazioni","callback_data":"'+callbackdata2+'"}],'
+                    '[{"text": "🚦Traccia il treno [BETA]", "callback_data": "traccia@'+id_treno+'"},'
+                    '{"text": "📊Grafico ritardo", "callback_data": "grafico@'+id_treno+'"}],'
                     '[{"text":"🔙Torna indietro","callback_data":"home"}]]}'})
             except botogram.api.APIError:
                 bot.api.call("answerCallbackQuery", {"callback_query_id": callback_id,
@@ -114,3 +118,65 @@ def callback(bot, chains, update):
                     '[{"text":"🔙Torna indietro", "callback_data":"list@'+id_treno+'"}]'
                                 ']}'
             })
+
+        if azione == "traccia":
+            if "T" in id_treno:
+                stringa = id_treno.split("T")
+                id_treno = stringa[0]
+                azione_2 = stringa[1]
+
+                if azione_2 == "oggi":
+                    solo_oggi = True
+                    stringa_solo_oggi = "<b>Il treno verrà tracciato solo per oggi</b>"
+                if azione_2 == "sempre":
+                    solo_oggi = False
+                    stringa_solo_oggi = "<b>Il treno verrà tracciato fino a interruzione</b>"
+
+                result = API.db.tracciaTreno(message.chat.id, id_treno, solo_oggi)
+                if type(result) == str:
+                    bot.api.call("answerCallbackQuery", {
+                        "callback_query_id": callback_id, "text": result, "show_alert": True
+                    })
+                    return
+
+                text = (
+                    "<b>🚦 Traccia treno</b>"
+                    "\n🚅 Sto tracciando il <b>treno {treno}</b>"
+                    "\n\n{solo_oggi}".format(solo_oggi=stringa_solo_oggi, treno=id_treno)
+                )
+                bot.api.call("editMessageText", {
+                    "chat_id": chat.id, "message_id": message.message_id, "text": text, "parse_mode": "HTML", "reply_markup":
+                        '{"inline_keyboard": [[{"text": "❌ Annulla il tracciamento", "callback_data": "stop_tracciamentoT'+str(result)+'"}]]}'
+                })
+
+                return
+
+            text = (
+                "<b>Traccia treno {treno}</b>"
+                "\nVuoi tracciare questo treno <b>solo oggi</b> o ricevere notifiche <b>tutti i giorni?</b>".format(treno=id_treno)
+            )
+            bot.api.call("editMessageText", {
+                "chat_id": chat.id, "message_id": message.message_id, "text": text, "parse_mode": "HTML", "reply_markup":
+                    '{"inline_keyboard":'
+                    '[[{"text": "📅 Traccia solo per oggi", "callback_data": "traccia@'+id_treno+'Toggi"}, {"text": "🗓 Traccia tutti i giorni", "callback_data": "traccia@'+id_treno+'Tsempre"}],'
+                    '[{"text":"🔙Torna indietro", "callback_data": "agg@'+id_treno+'"}]]}'
+            })
+
+        if azione == "grafico":
+            data, success, error = API.orarioTreni.cercaTreno(id_treno)
+            bot.api.call("answerCallbackQuery", {
+                "callback_query_id": callback_id, "text": "📊Sto generando il grafico, attendere..."
+            })
+
+            filename = API.Messaggi.grafico(data, id_treno)
+
+            if filename == False:
+                text = (
+                    "❌<b>Impossibile generare il grafico</b>: troppi pochi dati"
+                    "\n<i>Attendi che il treno fermi in qualche altra fermata e ritenta!</i>"
+                )
+                message.reply(text)
+                return
+
+            message.reply_with_photo(filename, caption="Grafico del treno "+id_treno+" generato con @OrarioTreniBot")
+            os.remove(filename)
