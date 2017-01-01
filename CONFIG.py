@@ -10,3 +10,11 @@ Una volta fatto, incollare il token al posto di INSERT YOUR TOKEN HERE
 '''
 
 TOKEN = "INSERT YOUR TOKEN HERE"
+
+'''
+Configurazione di Plotly (per i grafici)
+Per avere le credenziali è necessario registrarsi su plot.ly
+'''
+
+PLOTLY_USERNAME = 'PLOTLY USERNAME'
+PLOTLY_API_KEY = 'PLOTLY API KEY'

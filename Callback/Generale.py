@@ -40,6 +40,7 @@ def callback(bot, chains, update):
             "\n\n<b>Link utili:</b>"
             "\n<b>Creatore e sviluppatore</b>: 👉 @MarcoBuster"
             "\n<b>Gruppo del bot</b>: 👉 @MarcoBusterGroup"
+            "\n<b>Canale con aggiornamenti e anteprime</b>: 👉 @OrarioTreni"
             "\n<b>Vota il bot</b>: 👉 <a href=\"telegram.me/storebot?start=OrarioTreniBot\">Storebot</a>"
             "\n<b>Codice sorgente</b>: <a href=\"www.github.com/MarcoBuster/OrarioTreniBot\">GitHub</a>")
 
@@ -86,8 +87,38 @@ def callback(bot, chains, update):
     if callback_q == "altro":
         testo = "Visualizza le *statistiche* o vai al codice sorgente di *GitHub*"
         bot.api.call("editMessageText", {"chat_id":chat.id, "message_id": message.message_id, "text": testo, "parse_mode":"Markdown", "reply_markup":\
-                    '{"inline_keyboard":[[{"text":"📊Statistiche","callback_data":"stats"},{"text":"💻GitHub","url":"www.github.com/MarcoBuster/OrarioTreniBot"}],'\
+                    '{"inline_keyboard":[[{"text":"📊Statistiche","callback_data":"stats"}, {"text":"💻GitHub","url":"www.github.com/MarcoBuster/OrarioTreniBot"}],'\
+                    '[{"text": "🚦 Treni in tracciamento", "callback_data": "lista_tracciamento"}],'
                     '[{"text":"🔙Torna indietro","callback_data":"home"}]]}'})
+
+    if callback_q == "lista_tracciamento":
+        c.execute('SELECT * FROM tracciamento WHERE userid=?', (chat.id,))
+        rows = c.fetchall()
+
+        text = "<b>Ecco la lista dei treni che sono in tracciamento in questa chat</b>"
+
+        if not rows:
+            text = text + "\n\n<i>Non stai tracciando nessun treno, per tracciarne uno, cerca un treno e premi su 🚦 Traccia treno</i>"
+
+        for res in rows:
+            request_id = str(res[0])
+            user_id = res[1]
+            id_treno = res[2]
+            solo_oggi = res[3]
+            stazione_ultimo_rilevamento = res[4]
+            random_string = res[5]
+
+            if solo_oggi == True:
+                solo_oggi = "<i>stai tracciando questo treno solo per oggi</i>"
+            else:
+                solo_oggi = "<i>il tracciamento del treno continuerà fino a quando non sarà annullato</i>"
+
+            text = text + "\n➡️ 🚅<b>Treno {treno}</b>, {solo_oggi}, #tr{random}".format(treno=id_treno, solo_oggi=solo_oggi, id=request_id, random=random_string)
+
+        bot.api.call("editMessageText",
+            {"chat_id":chat.id, "message_id": message.message_id, "text": text, "parse_mode": "HTML", "reply_markup":
+                '{"inline_keyboard":[[{"text":"🔙Torna indietro","callback_data":"home"}]]}'})
+
 
     if callback_q == "stats":
         data, success, error = API.orarioTreni.cercaStatistiche()
