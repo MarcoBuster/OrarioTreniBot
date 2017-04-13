@@ -21,8 +21,9 @@
 # ALL CREDITS FOR THIS FILE TO https://github.com/bluviolin
 
 import json
-import re
 import os
+import re
+
 from . import dateutils
 
 try:
