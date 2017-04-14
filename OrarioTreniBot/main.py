@@ -19,18 +19,41 @@
 # SOFTWARE.
 
 from . import config
-from .objects import user
+from .objects.user import User
+from .objects.callback import Callback
+from .updates import callback
 
 import json
 
+import botogram.objects.base
 import botogram
+
+
+class CallbackQuery(botogram.objects.base.BaseObject):
+    def __init__(self, update):
+        super().__init__(update)
+
+    required = {
+        "id": str,
+        "from": botogram.User,
+        "data": str,
+    }
+    optional = {
+        "inline_message_id": str,
+        "message": botogram.Message,
+    }
+    replace_keys = {
+        "from": "sender"
+    }
+
+botogram.Update.optional["callback_query"] = CallbackQuery
 
 bot = botogram.create(config.BOT_TOKEN)
 
 
 @bot.command("start")
 def start(chat, message):
-    u = user.User(message.sender)
+    u = User(message.sender)
     u.state("home")
 
     text = (
@@ -49,3 +72,13 @@ def start(chat, message):
             ]}
         )
     })
+
+
+def process_callback(__bot, __chains, update):
+    del (__bot, __chains)  # Useless arguments from botogram
+    cb = Callback(update)
+    u = User(cb.sender)
+
+    callback.process_callback(bot, update, u)
+
+bot.register_update_processor("callback_query", process_callback)
