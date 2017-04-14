@@ -49,13 +49,26 @@ def process_callback(bot, update, u):
     if cb.query == "info":
         text = (
             "<b>Informazioni sul bot</b>"
-            # TODO: Write more text
+            "\n<i>Link utili</i>"
+            "\n➖ <b>👤 Contatta lo sviluppatore</b> su Telegram per avere <b>assistenza gratuita</b> "
+            "o per proporre <b>una nuova funzione</b>"
+            "\n➖ Entra nel <b>📢 Canale ufficiale</b> per ricevere <b>news</b> e <b>aggiornamenti</b> "
+            "in anteprima <b>sul bot</b>"
+            "\n➖ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
+            "<b>il lavoro dello sviluppatore</b>"
+            "\n➖ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
+            "\n➖ Prova <b>❇️ Altri bot</b> fatti da me!"
         )
         bot.api.call("editMessageText", {
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {'inline_keyboard': [
+                    [{"text": "👤 Contatta lo sviluppatore", "url": "https://t.me/MarcoBuster"},
+                     {"text": "📢 Canale ufficiale", "url": "https://t.me/OrarioTreni"}],
+                    [{"text": "💰 Dona", "url": "https://paypal.me/marcoaceti"},
+                     {"text": "🔘 GitHub", "url": "https://github.com/MarcoBuster/OrarioTreniBot/tree/rewrite"},
+                     {"text": "❇️ Altri bot", "url": "https://t.me/IMieiProgetti"}],
                     [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                 ]}
             )
