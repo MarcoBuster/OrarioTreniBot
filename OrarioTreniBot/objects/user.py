@@ -46,6 +46,8 @@ class User:
         if not self.state():
             r.hset(self.rhash, 'state', 'home')
 
+        r.hset("users", user.id, True)
+
     def state(self, new_state=None):
         """
         Get current user state or set a new user state
@@ -57,3 +59,12 @@ class User:
 
         r.hset(self.rhash, 'state', new_state)
         return True
+
+    def increaseStat(self, stat):
+        """
+        Increase a stat value
+        :param stat: which stat increase
+        :return: redis response
+        """
+        response = r.hincrby(self.rhash, stat)
+        return response

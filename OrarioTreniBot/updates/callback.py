@@ -19,8 +19,13 @@
 # SOFTWARE.
 
 from ..objects.callback import Callback
+from .. import config
 
 import json
+
+import redis
+
+r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB)
 
 
 def process_callback(bot, update, u):
@@ -57,7 +62,7 @@ def process_callback(bot, update, u):
             "\n➖ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
             "<b>il lavoro dello sviluppatore</b>"
             "\n➖ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
-            "\n➖ Prova <b>❇️ Altri bot</b> fatti da me!"
+            "\n➖ Visualizza le <b>📈 Statistiche</b> di utilizzo del bot!"
         )
         bot.api.call("editMessageText", {
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
@@ -68,8 +73,50 @@ def process_callback(bot, update, u):
                      {"text": "📢 Canale ufficiale", "url": "https://t.me/OrarioTreni"}],
                     [{"text": "💰 Dona", "url": "https://paypal.me/marcoaceti"},
                      {"text": "🔘 GitHub", "url": "https://github.com/MarcoBuster/OrarioTreniBot/tree/rewrite"},
-                     {"text": "❇️ Altri bot", "url": "https://t.me/IMieiProgetti"}],
+                     {"text": "📈 Statistiche", "callback_data": "stats"}],
                     [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                ]}
+            )
+        })
+
+    if cb.query == "stats":
+        users = r.hgetall('users')
+
+        active_users = 0
+        total_users = 0
+        start_command = 0
+        callbacks_count = 0
+        for user in users:
+            active_users += 1 if users[user] else 0
+            total_users += 1
+
+            user = int(user)
+
+            start_command += int(r.hget('user:' + str(user), 'stats_command_start')) \
+                if r.hget('user:' + str(user), 'stats_command_start') else 0
+            callbacks_count += int(r.hget('user:' + str(user), 'stats_callback_count')) \
+                if r.hget('user:' + str(user), 'stats_callback_count') else 0
+
+        personal_start_command = int(r.hget(u.rhash, 'stats_command_start'))
+        personal_callback_count = int(r.hget(u.rhash, 'stats_callback_count'))
+
+        text = (
+            "<b>Statistiche</b>"
+            "\n➖➖ 👤 <i>Utenti</i>"
+            "\n<b>Utenti attivi</b>: {au}"
+            "\n<b>Utenti totali</b>: {tu}"
+            "\n➖➖ 💬 <i>Comandi</i>"
+            "\n<b>Comando /start</b>: {sc} <i>(tu {psc})</i>"
+            "\n<b>Pulsanti inline</b>: {cc} <i>(tu {pcc})</i>"
+            .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count,
+                    psc=personal_start_command, pcc=personal_callback_count)
+        )
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "parse_mode": "HTML",
+            "text": text, "reply_markup":
+            json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "⬅️ Torna indietro", "callback_data": "info"}]
                 ]}
             )
         })
