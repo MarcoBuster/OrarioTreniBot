@@ -55,6 +55,7 @@ bot = botogram.create(config.BOT_TOKEN)
 def start(chat, message):
     u = User(message.sender)
     u.state("home")
+    u.increaseStat('stats_command_start')
 
     text = (
         "<b>Benvenuto in Orario Treni Bot!</b>"
@@ -78,6 +79,7 @@ def process_callback(__bot, __chains, update):
     del (__bot, __chains)  # Useless arguments from botogram
     cb = Callback(update)
     u = User(cb.sender)
+    u.increaseStat('stats_callback_count')
 
     callback.process_callback(bot, update, u)
 
