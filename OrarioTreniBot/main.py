@@ -21,7 +21,7 @@
 from . import config
 from .objects.user import User
 from .objects.callback import Callback
-from .updates import callback
+from .updates import callback, messages
 
 import json
 
@@ -73,6 +73,12 @@ def start(chat, message):
             ]}
         )
     })
+
+
+@bot.process_message
+def process_messages(message):
+    u = User(message.sender)
+    messages.process_messages(bot, message, u)
 
 
 def process_callback(__bot, __chains, update):
