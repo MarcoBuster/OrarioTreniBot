@@ -57,7 +57,14 @@ def process_messages(bot, message, u):
         if len(results) == 1:
             raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
             text = format.formatTrain(raw)
-            message.reply(text)
+            bot.api.call('sendMessage', {
+                'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+            })
 
         if len(results) > 1:
             inline_keyboard = []

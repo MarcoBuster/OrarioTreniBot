@@ -20,6 +20,7 @@
 
 from ..objects.callback import Callback
 from .. import config
+from ..viaggiatreno import viaggiatreno, format
 
 import json
 
@@ -156,3 +157,25 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+
+    # TRAINS CALLBACK
+    if 'train@' in cb.query:
+        arguments = cb.query.split('@')
+        del(arguments[0])
+        departure_station, train = arguments[0].split('_')[0:2]
+        del(arguments[0])
+
+        api = viaggiatreno.API()
+        raw = api.call('andamentoTreno', departure_station, train)
+
+        if not arguments:
+            text = format.formatTrain(raw)
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+            })
