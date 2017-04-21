@@ -134,7 +134,7 @@ def process_callback(bot, update, u):
             json.dumps(
                 {"inline_keyboard": [
                     [{"text": "1️⃣ Numero", "callback_data": "train_bynum"},
-                    {"text": "🛤 Itinerario", "callback_data": "train_byiti"}],
+                     {"text": "🛤 Itinerario", "callback_data": "train_byiti"}],
                     [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                 ]}
             )
