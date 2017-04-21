@@ -22,7 +22,7 @@ from . import dateutils
 
 
 def formatTrain(raw: dict):
-    dh = dateutils.format_timestamp(raw.get('orarioPartenza'), fmt="%H:$M")
+    dh = dateutils.format_timestamp(raw.get('orarioPartenza'), fmt="%H:%M")
     ah = dateutils.format_timestamp(raw.get('orarioArrivo'), fmt="%H:%M")
 
     delay = raw['ritardo']
@@ -35,7 +35,7 @@ def formatTrain(raw: dict):
 
     last_detection = raw['stazioneUltimoRilevamento']
     if last_detection in ['--', None] or last_detection == raw.get('origine'):
-        status += ' a {o} (deve ancora partire'.format(o=raw.get('origine'))
+        status += ' a {o} (in partenza)'.format(o=raw.get('origine'))
     elif last_detection == raw.get('destinazione'):
         status += ' a {d} (arrivato a destinazione)'.format(d=last_detection)
     else:
