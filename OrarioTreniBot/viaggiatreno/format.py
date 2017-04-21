@@ -26,10 +26,12 @@ def formatTrain(raw: dict):
     ah = dateutils.format_timestamp(raw.get('orarioArrivo'), fmt="%H:%M")
 
     delay = raw['ritardo']
-    if delay > 0:
+    if delay == 1:
+        status = '\n🕒 <b>In ritardo di {x} minuto</b>'.format(x=delay)
+    elif delay > 1:
         status = '\n🕒 <b>In ritardo di {x} minuti</b>'.format(x=delay)
     elif delay < 0:
-        status = '\n🕒 <b>In anticipo di {x} minuti</b>'.format(x=delay)
+        status = '\n🕒 <b>In anticipo di {x} minuti</b>'.format(x=abs(delay))
     else:
         status = '\n🕒 <b>In perfetto orario</b>'
 
@@ -39,7 +41,8 @@ def formatTrain(raw: dict):
     elif last_detection == raw.get('destinazione'):
         status += ' a {d} (arrivato a destinazione)'.format(d=last_detection)
     else:
-        status += 'a {l} ({h})'.format(l=last_detection, h=raw.get('oraUltimoRilevamento'))
+        status += ' a {l} ({h})'.format(l=last_detection,
+                                        h=dateutils.format_timestamp(raw.get('oraUltimoRilevamento'), fmt="%H:%M"))
 
     return (
         "🚅 <b>Treno {n}</b>"
