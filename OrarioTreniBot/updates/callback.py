@@ -120,3 +120,39 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+
+    if cb.query == "train":
+        text = (
+            "<b>🚅 Cerca treno</b>"
+            "\n<b>Cerca</b> un <b>treno</b>, <b>visualizza</b> le <b>informazioni principali</b> e "
+            "<b>molto altro</b>."
+            "\n\nVuoi cercare il treno 1️⃣ <b>per numero di treno</b> o 🛤 <b>per itinerario</b>?"
+        )
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "parse_mode": "HTML", "reply_markup":
+            json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "1️⃣ Numero", "callback_data": "train_bynum"},
+                     {"text": "🛤 Itinerario", "callback_data": "train_byiti"}],
+                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                ]}
+            )
+        })
+
+    if cb.query == "train_bynum":
+        u.state("train_bynum")
+        text = (
+            "<b>🚅 Cerca treno</b> per numero"
+            "\nInserisci il <b>numero di treno</b> (senza nessuna sigla prima, per esempio <code>9650</code>)"
+        )
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "parse_mode": "HTML", "reply_markup":
+            json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "🛤 Cerca invece per itinerario", "callback_data": "train_byiti"}],
+                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                ]}
+            )
+        })
