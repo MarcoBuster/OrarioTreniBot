@@ -22,6 +22,8 @@ from ..objects.callback import Callback
 from .. import config
 from ..viaggiatreno import viaggiatreno, format
 
+from datetime import datetime
+
 import json
 
 import redis
@@ -211,6 +213,27 @@ def process_callback(bot, update, u):
             text = (
                 "<b>🛤 Cerca treno</b> per itinerario"
                 "\nInserisci ora la <b>stazione di arrivo</b>"
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+
+        if state == "train_byiti_2":
+            u.setRedis('iti_station2', station)
+            u.state('train_byiti_3')
+            text = (
+                "<b>🛤 Cerca treno</b> per itinerario"
+                "\nInserisci ora <b>la data</b> e/o <b>l'orario di partenza</b> desiderati "
+                "(per esempio: <code>{a}</code>; <code>{b}</code>; <code>{c}</code>)"
+                .format(a=datetime.now().strftime('%d/%m %H:%M'),
+                        b=datetime.now().strftime("%H:%M %d/%m/%y"),
+                        c=datetime.now().strftime("%H:%M"))
             )
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
