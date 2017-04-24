@@ -23,7 +23,7 @@ from datetime import datetime
 
 import redis
 
-from src import config
+import config
 from ..objects.callback import Callback
 from ..viaggiatreno import viaggiatreno, format
 

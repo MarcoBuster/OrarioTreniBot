@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Rename this file to "config.py"
+
 # -- Redis configuration --
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
