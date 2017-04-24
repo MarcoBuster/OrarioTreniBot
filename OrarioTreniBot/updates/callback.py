@@ -235,7 +235,7 @@ def process_callback(bot, update, u):
                         b=datetime.now().strftime("%H:%M %d/%m/%y"),
                         c=datetime.now().strftime("%H:%M"))
             )
-            bot.api.call('sendMessage', {
+            bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
