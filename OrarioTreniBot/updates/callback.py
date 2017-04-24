@@ -158,6 +158,23 @@ def process_callback(bot, update, u):
             )
         })
 
+    if cb.query == "train_byiti":
+        u.state("train_byiti")
+        text = (
+            "<b>🛤 Cerca treno</b> per itinerario"
+            "\nInserisci, come prima cosa, la <b>stazione di partenza</b>"
+        )
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "parse_mode": "HTML", "reply_markup":
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "1️⃣ Cerca invece per numero", "callback_data": "train_bynum"}],
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+
     # TRAINS CALLBACK
     if 'train@' in cb.query:
         arguments = cb.query.split('@')
@@ -178,4 +195,29 @@ def process_callback(bot, update, u):
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
+            })
+
+    # STATIONS CALLBACK
+    if 'station@' in cb.query:
+        arguments = cb.query.split('@')
+        del(arguments[0])
+        station = arguments[0]
+
+        state = u.state().decode('utf-8')
+
+        if state == "train_byiti":
+            u.setRedis('iti_station1', station)
+            u.state('train_byiti_2')
+            text = (
+                "<b>🛤 Cerca treno</b> per itinerario"
+                "\nInserisci ora la <b>stazione di arrivo</b>"
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
             })
