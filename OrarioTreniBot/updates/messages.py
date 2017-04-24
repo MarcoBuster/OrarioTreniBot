@@ -24,6 +24,7 @@ import json
 from urllib.error import HTTPError
 
 from datetime import datetime
+from dateutil.parser import parse
 
 
 def process_messages(bot, message, u):
@@ -188,3 +189,45 @@ def process_messages(bot, message, u):
                         {"inline_keyboard": inline_keyboard}
                     )
             })
+
+    if state == "train_byiti_3":
+        try:
+            date = parse(message.text)
+        except ValueError:
+            text = (
+                "<b>🛤 Cerca treno</b> per itinerario"
+                "\nL'orario inserito <b>non è valido</b>."
+                "\n<b>Esempi</b>: <code>{a}</code>; <code>{b}</code>; <code>{c}</code>"
+                .format(a=datetime.now().strftime('%d/%m %H:%M'),
+                        b=datetime.now().strftime("%H:%M %d/%m/%y"),
+                        c=datetime.now().strftime("%H:%M"))
+            )
+            bot.api.call('sendMessage', {
+                'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+            return
+
+        def minifyStation(__str):
+            __str = __str[1:]
+            x = 0
+            for i in __str:
+                if i != "0":
+                    __str = __str[x:]
+                    break
+                x += 1
+            return __str
+
+        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
+        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
+        u.delRedis('iti_station1')
+        u.delRedis('iti_station2')
+
+        date = date.strftime('%Y-%m-%dT%H:%M:%S')
+
+        raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
+        print(raw)
