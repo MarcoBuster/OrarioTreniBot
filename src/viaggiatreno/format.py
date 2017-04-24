@@ -18,9 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from . import dateutils
-
 from datetime import datetime
+
+from . import dateutils
 
 
 def formatTrain(raw: dict):
