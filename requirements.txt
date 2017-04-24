@@ -1,3 +1,2 @@
 redis
 botogram
-dateutil
