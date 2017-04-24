@@ -141,7 +141,11 @@ class API:
         if verbose:
             print(url)
 
-        req = self.__urlopen(url)
+        try:
+            req = self.__urlopen(url)
+        except UnicodeError:
+            return []
+
         data = req.read().decode('utf-8')
         if plain:
             return data

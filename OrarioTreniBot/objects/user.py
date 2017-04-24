@@ -60,6 +60,31 @@ class User:
         r.hset(self.rhash, 'state', new_state)
         return True
 
+    def setRedis(self, key, value):
+        """
+        Set a redis value
+        :param key: redis key
+        :param value: redis value
+        :return: value
+        """
+        return r.hset(self.rhash, key, value)
+
+    def getRedis(self, key):
+        """
+        Get a redis value
+        :param key: redis key
+        :return: value
+        """
+        return r.hget(self.rhash, key)
+
+    def delRedis(self, key):
+        """
+        Delete a redis value
+        :param key: redis key
+        :return: None
+        """
+        return r.hdel(self.rhash, key)
+
     def increaseStat(self, stat):
         """
         Increase a stat value
