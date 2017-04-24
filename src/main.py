@@ -23,7 +23,7 @@ import json
 import botogram
 import botogram.objects.base
 
-from . import config
+import config
 from .objects.callback import Callback
 from .objects.user import User
 from .updates import callback, messages

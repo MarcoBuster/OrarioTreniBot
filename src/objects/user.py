@@ -22,7 +22,7 @@ from datetime import datetime as dt
 
 import redis
 
-from .. import config
+import config
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB)
 
