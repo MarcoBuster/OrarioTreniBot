@@ -122,7 +122,8 @@ class API:
             'dettaglioStazione': _decode_json,
             'regione': _decode_json,
             'cercaNumeroTrenoTrenoAutocomplete': _decode_cercaNumeroTrenoTrenoAutocomplete,
-            'autocompletaStazione': _decode_autocompletaStazione
+            'autocompletaStazione': _decode_autocompletaStazione,
+            'soluzioniViaggioNew': _decode_json
         }
         self.__default_decoder = lambda x: x
 
