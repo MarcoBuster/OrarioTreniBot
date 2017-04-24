@@ -18,13 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ..viaggiatreno import viaggiatreno, format
-
 import json
+from datetime import datetime
 from urllib.error import HTTPError
 
-from datetime import datetime
 from dateutil.parser import parse
+
+from ..viaggiatreno import viaggiatreno, format
 
 
 def process_messages(bot, message, u):
@@ -230,4 +230,12 @@ def process_messages(bot, message, u):
         date = date.strftime('%Y-%m-%dT%H:%M:%S')
 
         raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
-        print(raw)
+        text = format.formatItinerary(raw)
+        bot.api.call('sendMessage', {
+            'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
