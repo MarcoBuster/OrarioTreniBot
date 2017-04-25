@@ -91,7 +91,7 @@ def process_callback(bot, update, u):
         start_command = 0
         callbacks_count = 0
         for user in users:
-            active_users += 1 if bool(r.hget("user:"+str(user), "active")) else 0
+            active_users += 1 if bool(r.hget("user:" + str(user), "active")) else 0
             total_users += 1
 
             start_command += int(r.hget('user:' + str(user), 'stats_command_start')) \
