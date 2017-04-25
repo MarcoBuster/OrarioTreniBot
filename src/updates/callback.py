@@ -176,6 +176,22 @@ def process_callback(bot, update, u):
                 )
         })
 
+    if cb.query == "station":
+        u.state("station")
+        text = (
+            "<b>🚉 Cerca stazione</b>"
+            "\nInserisci il <b>nome</b> della stazione che vuoi cercare"
+        )
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "parse_mode": "HTML", "reply_markup":
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+
     # TRAINS CALLBACK
     if 'train@' in cb.query:
         arguments = cb.query.split('@')
@@ -222,6 +238,21 @@ def process_callback(bot, update, u):
                         ]}
                     )
             })
+            return
+
+        text = (
+            "<b>🚉 Cerca stazione</b>"
+            "\nStazione trovata (todo)"
+        )
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
 
         if state == "train_byiti_2":
             u.setRedis('iti_station2', station)
