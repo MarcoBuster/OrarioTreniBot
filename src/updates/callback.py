@@ -27,7 +27,7 @@ import config
 from ..objects.callback import Callback
 from ..viaggiatreno import viaggiatreno, format
 
-r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB)
+r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWD)
 
 
 def process_callback(bot, update, u):
@@ -82,17 +82,17 @@ def process_callback(bot, update, u):
         })
 
     if cb.query == "stats":
-        users = r.hgetall('users')
+        users = []
+        for user in r.keys("user:*"):
+            users.append(int(user[5:]))
 
         active_users = 0
         total_users = 0
         start_command = 0
         callbacks_count = 0
         for user in users:
-            active_users += 1 if users[user] else 0
+            active_users += 1 if bool(r.hget("user:"+str(user), "active")) else 0
             total_users += 1
-
-            user = int(user)
 
             start_command += int(r.hget('user:' + str(user), 'stats_command_start')) \
                 if r.hget('user:' + str(user), 'stats_command_start') else 0

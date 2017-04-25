@@ -24,7 +24,7 @@ import redis
 
 import config
 
-r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB)
+r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWD)
 
 
 class User:
@@ -40,13 +40,14 @@ class User:
         self.rhash = 'user:' + str(user.id)
 
         # Redis database
-        r.hset(self.rhash, 'id', user.id)
-        r.hset(self.rhash, 'username', user.username)
+        if r.hget(self.rhash, 'id') != user.id:
+            r.hset(self.rhash, 'id', user.id)
+        if r.hget(self.rhash, 'username') != user.username:
+            r.hset(self.rhash, 'username', user.username)
         r.hset(self.rhash, 'last_update', dt.now())
         if not self.state():
             r.hset(self.rhash, 'state', 'home')
-
-        r.hset("users", user.id, True)
+        r.hset(self.rhash, "active", True)
 
     def state(self, new_state=None):
         """
@@ -93,3 +94,6 @@ class User:
         """
         response = r.hincrby(self.rhash, stat)
         return response
+
+    def isActive(self):
+        return bool(r.hget(self.rhash, "active")) or False
