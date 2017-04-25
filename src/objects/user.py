@@ -31,6 +31,7 @@ class User:
     """
     User base object
     """
+
     def __init__(self, user):
         """
         Create an user object
