@@ -18,15 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from . import config
-from .objects.user import User
-from .objects.callback import Callback
-from .updates import callback, messages
-
 import json
 
-import botogram.objects.base
 import botogram
+import botogram.objects.base
+
+import config
+from .objects.callback import Callback
+from .objects.user import User
+from .updates import callback, messages
 
 
 class CallbackQuery(botogram.objects.base.BaseObject):

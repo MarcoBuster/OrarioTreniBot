@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from datetime import datetime
+
 from . import dateutils
 
 
@@ -54,3 +56,29 @@ def formatTrain(raw: dict):
                 a=raw.get('destinazione'), ah=ah,
                 s=status)
     )
+
+
+def formatItinerary(raw: dict):
+    text = (
+        "<b>🛤 Cerca treno</b> per itinerario"
+        "\n<i>Soluzioni di viaggio da {p} a {a}</i>"
+        .format(p=raw['origine'], a=raw['destinazione'])
+    )
+
+    x = 0
+    for solution in raw['soluzioni']:
+        if x == 5:
+            break
+
+        x += 1
+        text += "\n\n➖➖ <b>Soluzione {n}</b>".format(n=x)
+        text += "\n🕑 <b>Durata</b>: {t}".format(t=solution['durata'])
+        for vehicle in solution['vehicles']:
+            start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
+            end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
+
+            text += "\n➖ <b>Treno {n}</b>".format(n=vehicle['numeroTreno'])
+            text += "\n🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
+            text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
+
+    return text

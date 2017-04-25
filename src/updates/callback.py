@@ -18,15 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ..objects.callback import Callback
-from .. import config
-from ..viaggiatreno import viaggiatreno, format
-
+import json
 from datetime import datetime
 
-import json
-
 import redis
+
+import config
+from ..objects.callback import Callback
+from ..viaggiatreno import viaggiatreno, format
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB)
 
