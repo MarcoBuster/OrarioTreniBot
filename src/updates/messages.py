@@ -239,3 +239,51 @@ def process_messages(bot, message, u):
                     ]}
                 )
         })
+
+    if state == "station":
+        results = api.call('cercaStazione', message.text)
+        if len(results) == 0:
+            text = (
+                "<b>🚉 Cerca stazione</b>"
+                "\n❌ <b>Stazione non trovata</b>, riprovare o annullare?"
+            )
+            bot.api.call("sendMessage", {
+                "chat_id": chat.id, "text": text, "parse_mode": "HTML", "reply_markup":
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "🔄 Riprova", "callback_data": "station"}],
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+
+        if len(results) == 1:
+            text = (
+                "<b>🚉 Cerca stazione</b>"
+                "\nStazione trovata (todo)"
+            )
+            bot.api.call('sendMessage', {
+                'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+
+        if len(results) > 1:
+            inline_keyboard = []
+            for station in results:
+                inline_keyboard.append([{"text": station['nomeLungo'], "callback_data": "station@" + station['id']}])
+            inline_keyboard.append([{"text": "⬅️ Torna indietro", "callback_data": "home"}])
+
+            text = (
+                "<b>🛤 Cerca stazione</b>"
+                "\nHo trovato {x} stazioni con quel nome, selezionane una:".format(x=len(results))
+            )
+            bot.api.call('sendMessage', {
+                'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": inline_keyboard}
+                    )
+            })
