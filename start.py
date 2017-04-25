@@ -60,7 +60,7 @@ def gen_config():
     if rpwd:
         conf = conf + "\nREDIS_PASSWD = \"" + rpwd + "\""
     else:
-        conf += "\nREDIS_PASSWD = None"
+        conf += "\nREDIS_PASSWORD = None"
 
     conf += "\n\n# Telegram Bot API token from t.me/BotFather"
     conf += conf + "\nBOT_TOKEN = \"" + token + "\"\n"
