@@ -20,7 +20,14 @@
 
 from datetime import datetime
 
+import wikipedia
+from wikipedia.exceptions import PageError
+
+import re
+
 from . import dateutils
+
+wikipedia.set_lang("it")
 
 
 def formatTrain(raw: dict):
@@ -56,6 +63,29 @@ def formatTrain(raw: dict):
                 a=raw.get('destinazione'), ah=ah,
                 s=status)
     )
+
+
+def cleanHTML(string: str):
+    cleaner = re.compile('<.*?>')
+    return re.sub(cleaner, '', string)
+
+
+def getWikipediaSummary(station: str):
+    try:
+        result = wikipedia.summary("Stazione di {station}".format(station=station))
+    except PageError:
+        return "Nessuna informazione aggiuntiva disponibile"
+    return cleanHTML(result) + " (da Wikipedia, l'enciclopedia libera)"
+
+
+def formatStation(station: str):
+    text = (
+        "🚉 <b>Stazione di {name}</b>"
+        "\nℹ️ <i>{wikipedia}</i>"
+        .format(name=station.title(),
+                wikipedia=getWikipediaSummary(station))
+    )
+    return text
 
 
 def formatItinerary(raw: dict):

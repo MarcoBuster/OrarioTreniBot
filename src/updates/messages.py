@@ -258,10 +258,7 @@ def process_messages(bot, message, u):
             })
 
         if len(results) == 1:
-            text = (
-                "<b>🚉 Cerca stazione</b>"
-                "\nStazione trovata (todo)"
-            )
+            text = format.formatStation(results[0]['nomeLungo'])
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
