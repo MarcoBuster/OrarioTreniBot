@@ -240,10 +240,9 @@ def process_callback(bot, update, u):
             })
             return
 
-        text = (
-            "<b>🚉 Cerca stazione</b>"
-            "\nStazione trovata (todo)"
-        )
+        utils = viaggiatreno.Utils()
+        station = utils.station_from_ID(station)
+        text = format.formatStation(station)
         bot.api.call('editMessageText', {
             'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
             'text': text, 'parse_mode': 'HTML', 'reply_markup':
