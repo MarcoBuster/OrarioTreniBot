@@ -284,4 +284,16 @@ def process_callback(bot, update, u):
         elif len(arguments) == 1:
             date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
-            print(raw)
+            text = format.formatDepartures(raw, station) if arguments[0] == 'departures' \
+                else format.formatArrivals(raw, station)
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
+                             {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
+                            [{"text": "⬅️ Torna indietro", "callback_data": "station@" + station}]
+                        ]}
+                    )
+            })
