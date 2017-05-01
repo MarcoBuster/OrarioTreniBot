@@ -59,7 +59,7 @@ def start(chat, message):
 
     text = (
         "<b>Benvenuto in Orario Treni Bot!</b>"
-        "\nCon questo bot potrai cercare 🚅 <b>treni</b>, 🚉 <b>stazioni</b> e 🚊 <b>itinerari</b>"
+        "\nCon questo bot potrai cercare 🚅 <b>treni</b>, 🚉 <b>stazioni</b> e 🚊 <b>itinerari</b> "
         "anche ☑️ <b>inline</b>!"
         "\nPremi uno dei <b>tasti qui sotto</b> per iniziare"
     )

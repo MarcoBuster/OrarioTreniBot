@@ -19,7 +19,8 @@
 # SOFTWARE.
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from ..viaggiatreno.dateutils import is_DST
 
 import redis
 
@@ -32,12 +33,13 @@ r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.
 
 def process_callback(bot, update, u):
     cb = Callback(update)
+    api = viaggiatreno.API()
 
     if cb.query == "home":
         u.state("home")
         text = (
             "<b>Benvenuto in Orario Treni Bot!</b>"
-            "\nCon questo bot potrai cercare 🚅 <b>treni</b>, 🚉 <b>stazioni</b> e 🚊 <b>itinerari</b>"
+            "\nCon questo bot potrai cercare 🚅 <b>treni</b>, 🚉 <b>stazioni</b> e 🚊 <b>itinerari</b> "
             "anche ☑️ <b>inline</b>!"
             "\nPremi uno dei <b>tasti qui sotto</b> per iniziare"
         )
@@ -199,7 +201,6 @@ def process_callback(bot, update, u):
         departure_station, train = arguments[0].split('_')[0:2]
         del(arguments[0])
 
-        api = viaggiatreno.API()
         raw = api.call('andamentoTreno', departure_station, train)
 
         if not arguments:
@@ -219,6 +220,7 @@ def process_callback(bot, update, u):
         arguments = cb.query.split('@')
         del(arguments[0])
         station = arguments[0]
+        del(arguments[0])
 
         state = u.state().decode('utf-8')
 
@@ -240,20 +242,7 @@ def process_callback(bot, update, u):
             })
             return
 
-        utils = viaggiatreno.Utils()
-        station = utils.station_from_ID(station)
-        text = format.formatStation(station)
-        bot.api.call('editMessageText', {
-            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
-            'text': text, 'parse_mode': 'HTML', 'reply_markup':
-                json.dumps(
-                    {"inline_keyboard": [
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                    ]}
-                )
-        })
-
-        if state == "train_byiti_2":
+        elif state == "train_byiti_2":
             u.setRedis('iti_station2', station)
             u.state('train_byiti_3')
             text = (
@@ -273,3 +262,26 @@ def process_callback(bot, update, u):
                         ]}
                     )
             })
+            return
+
+        elif not arguments:
+            utils = viaggiatreno.Utils()
+            station_name = utils.station_from_ID(station)
+            text = format.formatStation(station_name)
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
+                             {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+            return
+
+        elif len(arguments) == 1:
+            date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
+            print(raw)

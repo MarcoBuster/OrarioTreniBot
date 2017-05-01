@@ -263,6 +263,8 @@ def process_messages(bot, message, u):
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
+                            [{"text": "🚦 Arrivi", "callback_data": "station@" + results[0]["id"] + "@arrivals"},
+                             {"text": "🚦 Partenze", "callback_data": "station@" + results[0]["id"] + "@departures"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )

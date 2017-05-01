@@ -21,6 +21,7 @@
 # ALL CREDITS FOR THIS FILE TO https://github.com/bluviolin
 
 import datetime
+import time
 
 __italian_holidays = (
     '01-01', '06-01', '25-04', '01-05', '02-06',
@@ -57,6 +58,10 @@ def iter_month(year, month):
     while d.month == month:
         yield d
         d += oneday
+
+
+def is_DST(_time=time.localtime()):
+    return bool(_time.isdst)
 
 
 def check_timestamp(ts):
