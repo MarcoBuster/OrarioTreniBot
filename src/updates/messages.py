@@ -284,4 +284,3 @@ def process_messages(bot, message, u):
                         {"inline_keyboard": inline_keyboard}
                     )
             })
- 
