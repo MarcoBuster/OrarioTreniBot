@@ -58,7 +58,7 @@ def gen_config():
     conf = conf + "\nREDIS_DB = " + str(rdb)
 
     if rpwd:
-        conf = conf + "\nREDIS_PASSWD = \"" + rpwd + "\""
+        conf = conf + "\nREDIS_PASSWORD = \"" + rpwd + "\""
     else:
         conf += "\nREDIS_PASSWORD = None"
 

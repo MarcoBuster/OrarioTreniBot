@@ -75,7 +75,7 @@ def getWikipediaSummary(station: str):
         result = wikipedia.summary("Stazione di {station}".format(station=station))
     except PageError:
         return "Nessuna informazione aggiuntiva disponibile"
-    return cleanHTML(result) + "(da Wikipedia, l'enciclopedia libera)"
+    return cleanHTML(result) + " (da Wikipedia, l'enciclopedia libera)"
 
 
 def formatStation(station: str):
