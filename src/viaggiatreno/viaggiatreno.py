@@ -24,6 +24,8 @@ import json
 import os
 import re
 
+from urllib.parse import quote
+
 from . import dateutils
 
 try:
@@ -123,7 +125,9 @@ class API:
             'regione': _decode_json,
             'cercaNumeroTrenoTrenoAutocomplete': _decode_cercaNumeroTrenoTrenoAutocomplete,
             'autocompletaStazione': _decode_autocompletaStazione,
-            'soluzioniViaggioNew': _decode_json
+            'soluzioniViaggioNew': _decode_json,
+            'partenze': _decode_json,
+            'arrivi': _decode_json,
         }
         self.__default_decoder = lambda x: x
 
@@ -136,7 +140,7 @@ class API:
         verbose = options.get('verbose', self.__verbose)
 
         base = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/'
-        path = '/'.join(str(p) for p in params)
+        path = '/'.join(quote(str(p)) for p in params)
         url = base + function + '/' + path
 
         if verbose:
