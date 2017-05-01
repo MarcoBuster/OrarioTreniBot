@@ -53,7 +53,7 @@ def process_callback(bot, update, u):
             )
         })
 
-    if cb.query == "info":
+    elif cb.query == "info":
         text = (
             "<b>Informazioni sul bot</b>"
             "\n<i>Link utili</i>"
@@ -81,7 +81,7 @@ def process_callback(bot, update, u):
             )
         })
 
-    if cb.query == "stats":
+    elif cb.query == "stats":
         users = []
         for user in r.keys("user:*"):
             users.append(int(user[5:]))
@@ -123,7 +123,7 @@ def process_callback(bot, update, u):
             )
         })
 
-    if cb.query == "train":
+    elif cb.query == "train":
         text = (
             "<b>🚅 Cerca treno</b>"
             "\n<b>Cerca</b> un <b>treno</b>, <b>visualizza</b> le <b>informazioni principali</b> e "
@@ -142,7 +142,7 @@ def process_callback(bot, update, u):
             )
         })
 
-    if cb.query == "train_bynum":
+    elif cb.query == "train_bynum":
         u.state("train_bynum")
         text = (
             "<b>🚅 Cerca treno</b> per numero"
@@ -159,7 +159,7 @@ def process_callback(bot, update, u):
             )
         })
 
-    if cb.query == "train_byiti":
+    elif cb.query == "train_byiti":
         u.state("train_byiti")
         text = (
             "<b>🛤 Cerca treno</b> per itinerario"
@@ -176,7 +176,7 @@ def process_callback(bot, update, u):
                 )
         })
 
-    if cb.query == "station":
+    elif cb.query == "station":
         u.state("station")
         text = (
             "<b>🚉 Cerca stazione</b>"
@@ -193,7 +193,7 @@ def process_callback(bot, update, u):
         })
 
     # TRAINS CALLBACK
-    if 'train@' in cb.query:
+    elif 'train@' in cb.query:
         arguments = cb.query.split('@')
         del(arguments[0])
         departure_station, train = arguments[0].split('_')[0:2]
@@ -215,7 +215,7 @@ def process_callback(bot, update, u):
             })
 
     # STATIONS CALLBACK
-    if 'station@' in cb.query:
+    elif 'station@' in cb.query:
         arguments = cb.query.split('@')
         del(arguments[0])
         station = arguments[0]

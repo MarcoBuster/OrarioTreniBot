@@ -57,7 +57,7 @@ def process_messages(bot, message, u):
                 )
             })
 
-        if len(results) == 1:
+        elif len(results) == 1:
             raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
             text = format.formatTrain(raw)
             bot.api.call('sendMessage', {
@@ -69,7 +69,7 @@ def process_messages(bot, message, u):
                 )
             })
 
-        if len(results) > 1:
+        elif len(results) > 1:
             inline_keyboard = []
             for result in results:
                 text = "🚉 {n} - Da {d}".format(n=message.text, d=result[0])
@@ -86,7 +86,7 @@ def process_messages(bot, message, u):
                 )
             })
 
-    if state == "train_byiti":
+    elif state == "train_byiti":
         results = api.call('cercaStazione', message.text)
         if len(results) == 0:
             text = (
@@ -103,7 +103,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) == 1:
+        elif len(results) == 1:
             u.setRedis('iti_station1', results[0]['id'])
             u.state('train_byiti_2')
             text = (
@@ -119,7 +119,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) > 1:
+        elif len(results) > 1:
             inline_keyboard = []
             for station in results:
                 inline_keyboard.append([{"text": station['nomeLungo'], "callback_data": "station@" + station['id']}])
@@ -136,7 +136,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-    if state == "train_byiti_2":
+    elif state == "train_byiti_2":
         results = api.call('cercaStazione', message.text)
         if len(results) == 0:
             text = (
@@ -153,7 +153,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) == 1:
+        elif len(results) == 1:
             u.setRedis('iti_station2', results[0]['id'])
             u.state('train_byiti_3')
             text = (
@@ -173,7 +173,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) > 1:
+        elif len(results) > 1:
             inline_keyboard = []
             for station in results:
                 inline_keyboard.append([{"text": station['nomeLungo'], "callback_data": "station@" + station['id']}])
@@ -190,7 +190,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-    if state == "train_byiti_3":
+    elif state == "train_byiti_3":
         try:
             date = parse(message.text)
         except ValueError:
@@ -240,7 +240,7 @@ def process_messages(bot, message, u):
                 )
         })
 
-    if state == "station":
+    elif state == "station":
         results = api.call('cercaStazione', message.text)
         if len(results) == 0:
             text = (
@@ -257,7 +257,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) == 1:
+        elif len(results) == 1:
             text = format.formatStation(results[0]['nomeLungo'])
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
@@ -268,7 +268,7 @@ def process_messages(bot, message, u):
                     )
             })
 
-        if len(results) > 1:
+        elif len(results) > 1:
             inline_keyboard = []
             for station in results:
                 inline_keyboard.append([{"text": station['nomeLungo'], "callback_data": "station@" + station['id']}])
