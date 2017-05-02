@@ -217,15 +217,14 @@ def formatArrivals(raw: dict, station: str, xrange: int):
             binary = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b> (id {x})"
+            "\n\n➖➖ <b>Treno {n}</b>"
             "\n🚉 <b>Origine</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di arrivo</b>: {dt}"
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
             .format(n=train['compNumeroTreno'], d=train['origine'], b=binary, dt=train['compOrarioArrivo'],
-                    r=train['ritardo'], st='in arrivo' if not train['inStazione'] else 'arrivato',
-                    x=x)
+                    r=train['ritardo'], st='in arrivo' if not train['inStazione'] else 'arrivato')
         )
         x += 1
 
