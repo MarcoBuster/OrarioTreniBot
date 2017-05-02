@@ -284,16 +284,32 @@ def process_callback(bot, update, u):
         elif len(arguments) == 1:
             date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
-            text = format.formatDepartures(raw, station) if arguments[0] == 'departures' \
-                else format.formatArrivals(raw, station)
+            text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
+                else format.formatArrivals(raw, station, format.ELEMENTS_FOR_PAGE)
+
+            inline_keyboard = format.generateInlineKeyboard([0, format.ELEMENTS_FOR_PAGE], format.getPagesCount(raw),
+                                                            station, arguments[0])
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
-                        {"inline_keyboard": [
-                            [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
-                             {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
-                            [{"text": "⬅️ Torna indietro", "callback_data": "station@" + station}]
-                        ]}
+                        {"inline_keyboard": inline_keyboard}
+                    )
+            })
+
+        elif len(arguments) == 2:
+            date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
+            text = format.formatDepartures(raw, station, int(arguments[1])) if arguments[0] == 'departures' \
+                else format.formatArrivals(raw, station, int(arguments[1]))
+
+            inline_keyboard = format.generateInlineKeyboard([int(arguments[1]) - format.ELEMENTS_FOR_PAGE,
+                                                             int(arguments[1])], format.getPagesCount(raw),
+                                                            station, arguments[0])
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": inline_keyboard}
                     )
             })

@@ -32,6 +32,8 @@ utils = viaggiatreno.Utils()
 
 wikipedia.set_lang("it")
 
+ELEMENTS_FOR_PAGE = 5
+
 
 def formatTrain(raw: dict):
     dh = dateutils.format_timestamp(raw.get('orarioPartenza'), fmt="%H:%M")
@@ -91,14 +93,61 @@ def formatStation(station: str):
     return text
 
 
-def formatDepartures(raw: dict, station: str):
+def getPagesCount(raw: dict):
+    x = 0
+    for element in raw:
+        del element
+        x += 1
+
+    return {'first': 0, 'last': x}
+
+
+def generateInlineKeyboard(current_range: list, pages_count: dict, station: str, kind: str,):
+    start = current_range[0]
+    first = pages_count['first']
+    end = current_range[1]
+    last = pages_count['last']
+
+    inline_keyboard = [[
+        {"text": "⏮", "callback_data": "station@" + station + "@" + kind + "@" + str(first + ELEMENTS_FOR_PAGE)},
+        {"text": "◀️", "callback_data": "station@" + station + "@" + kind + "@" + str(start)},
+        {"text": "▶️", "callback_data": "station@" + station + "@" + kind + "@" + str(end + ELEMENTS_FOR_PAGE)},
+        {"text": "⏭", "callback_data": "station@" + station + "@" + kind + "@" + str(last)}
+    ],
+        [
+        {"text": "⬅️ Torna indietro", "callback_data": "station@" + station}
+    ]]
+
+    if start == first and end >= last:
+        del inline_keyboard[0]
+        return inline_keyboard
+
+    if start == first:
+        del inline_keyboard[0][0]
+        del inline_keyboard[0][0]
+
+    if end >= last:
+        del inline_keyboard[0][2]
+        del inline_keyboard[0][2]
+
+    return inline_keyboard
+
+
+def formatDepartures(raw: dict, station: str, xrange: int):
+    last = getPagesCount(raw)['last']
     text = "🚦 <b>Partenze nella stazione di {station}</b>".format(station=utils.station_from_ID(station))
+    text += "\n<i>Pagina {x}</i>".format(x=(xrange // ELEMENTS_FOR_PAGE))
     x = 0
     for train in raw:
-        if x == 5:
+        if x > last:
             break
 
-        x += 1
+        if x < (xrange - ELEMENTS_FOR_PAGE):
+            x += 1
+            continue
+
+        if x == xrange:
+            break
 
         if train['binarioProgrammatoPartenzaDescrizione'] != train['binarioEffettivoPartenzaDescrizione'] and \
                 train['binarioProgrammatoPartenzaDescrizione'] and train['binarioEffettivoPartenzaDescrizione']:
@@ -127,20 +176,28 @@ def formatDepartures(raw: dict, station: str):
             .format(n=train['compNumeroTreno'], d=train['destinazione'], b=binary, dt=train['compOrarioPartenza'],
                     r=train['ritardo'], st='in partenza' if train['inStazione'] else 'partito')
         )
+        x += 1
 
     if x == 0:
         text += "\n<i>Nessun treno in arrivo</i>"
     return text
 
 
-def formatArrivals(raw: dict, station: str):
+def formatArrivals(raw: dict, station: str, xrange: int):
+    last = getPagesCount(raw)['last']
     text = "🚦 <b>Arrivi nella stazione di {station}</b>".format(station=utils.station_from_ID(station))
+    text += "\n<i>Pagina {x}</i>)".format(x=(xrange // ELEMENTS_FOR_PAGE))
     x = 0
     for train in raw:
-        if x == 5:
+        if x > last:
             break
 
-        x += 1
+        if x < (xrange - ELEMENTS_FOR_PAGE):
+            x += 1
+            continue
+
+        if x == xrange:
+            break
 
         if train['binarioProgrammatoArrivoDescrizione'] != train['binarioEffettivoArrivoDescrizione'] and \
                 train['binarioProgrammatoArrivoDescrizione'] and train['binarioEffettivoArrivoDescrizione']:
@@ -160,15 +217,17 @@ def formatArrivals(raw: dict, station: str):
             binary = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b>"
+            "\n\n➖➖ <b>Treno {n}</b> (id {x})"
             "\n🚉 <b>Origine</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di arrivo</b>: {dt}"
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
             .format(n=train['compNumeroTreno'], d=train['origine'], b=binary, dt=train['compOrarioArrivo'],
-                    r=train['ritardo'], st='in arrivo' if train['inStazione'] else 'arrivato')
+                    r=train['ritardo'], st='in arrivo' if not train['inStazione'] else 'arrivato',
+                    x=x)
         )
+        x += 1
 
     if x == 0:
         text += "\n<i>Nessun treno in arrivo</i>"
