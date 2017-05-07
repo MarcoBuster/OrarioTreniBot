@@ -1,4 +1,6 @@
 # Orario Treni Bot [![Bot](https://img.shields.io/badge/Telegram-@OrarioTreniBot-red.svg?style=flat)][Bot] [![News channel](https://img.shields.io/badge/News-@OrarioTreni-0d86d7.svg?style=flat)][Channel]
+> <b>Repository in riscrittura!</b> Guarda il [branch rewrite](https://github.com/MarcoBuster/OrarioTreniBot/tree/rewrite). <i>Tutte le Pull Request in questo branch saranno ignorate.</i>
+
 Orario treni è un **bot Telegram** per le ferrovie italiane programmato in Python con numerose funzioni
 
 ### Funzionalità e utilizzo
