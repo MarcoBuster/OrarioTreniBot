@@ -58,6 +58,8 @@ def process_messages(bot, message, u):
             })
 
         elif len(results) == 1:
+            u.increaseStat('stats_trains_bynum')
+
             raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
             text = format.formatTrain(raw)
             bot.api.call('sendMessage', {
@@ -227,6 +229,8 @@ def process_messages(bot, message, u):
         u.delRedis('iti_station1')
         u.delRedis('iti_station2')
 
+        u.increaseStat('stats_trains_byiti')
+
         date = date.strftime('%Y-%m-%dT%H:%M:%S')
 
         raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
@@ -258,6 +262,8 @@ def process_messages(bot, message, u):
             })
 
         elif len(results) == 1:
+            u.increaseStat('stats_stations')
+
             text = format.formatStation(results[0]['nomeLungo'])
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':

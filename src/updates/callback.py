@@ -92,28 +92,54 @@ def process_callback(bot, update, u):
         total_users = 0
         start_command = 0
         callbacks_count = 0
+        trains_bynum = 0
+        trains_byiti = 0
+        stations = 0
         for user in users:
-            active_users += 1 if bool(r.hget("user:" + str(user), "active")) else 0
+            user_hash = "user:" + str(user)
+            active_users += 1 if bool(r.hget(user_hash, "active")) else 0
             total_users += 1
 
-            start_command += int(r.hget('user:' + str(user), 'stats_command_start')) \
-                if r.hget('user:' + str(user), 'stats_command_start') else 0
-            callbacks_count += int(r.hget('user:' + str(user), 'stats_callback_count')) \
-                if r.hget('user:' + str(user), 'stats_callback_count') else 0
+            start_command += int(r.hget(user_hash, 'stats_command_start')) \
+                if r.hget(user_hash, 'stats_command_start') else 0
+            callbacks_count += int(r.hget(user_hash, 'stats_callback_count')) \
+                if r.hget(user_hash, 'stats_callback_count') else 0
+            trains_bynum += int(r.hget(user_hash, 'stats_trains_bynum')) \
+                if r.hget(user_hash, 'stats_trains_bynum') else 0
+            trains_byiti += int(r.hget(user_hash, 'stats_trains_byiti')) \
+                if r.hget(user_hash, 'stats_trains_byiti') else 0
+            stations += int(r.hget(user_hash, 'stats_stations')) \
+                if r.hget(user_hash, 'stats_stations') else 0
 
-        personal_start_command = int(r.hget(u.rhash, 'stats_command_start'))
-        personal_callback_count = int(r.hget(u.rhash, 'stats_callback_count'))
+        personal_start_command = int(r.hget(u.rhash, 'stats_command_start')) \
+            if r.hget(u.rhash, 'stats_command_start') else 0
+        personal_callback_count = int(r.hget(u.rhash, 'stats_callback_count')) \
+            if r.hget(u.rhash, 'stats_callback_count') else 0
+        personal_trains_bynum = int(r.hget(u.rhash, 'stats_trains_bynum')) \
+            if r.hget(u.rhash, 'stats_trains_bynum') else 0
+        personal_trains_byiti = int(r.hget(u.rhash, 'stats_trains_byiti')) \
+            if r.hget(u.rhash, 'stats_trains_byiti') else 0
+        personal_stations = int(r.hget(u.rhash, 'stats_stations')) \
+            if r.hget(u.rhash, 'stats_stations') else 0
 
         text = (
             "<b>Statistiche</b>"
+            "\n<i>Le informazioni</i>"
             "\n➖➖ 👤 <i>Utenti</i>"
             "\n<b>Utenti attivi</b>: {au}"
             "\n<b>Utenti totali</b>: {tu}"
             "\n➖➖ 💬 <i>Comandi</i>"
             "\n<b>Comando /start</b>: {sc} <i>(tu {psc})</i>"
-            "\n<b>Pulsanti inline</b>: {cc} <i>(tu {pcc})</i>"
+            "\n<b>Tastiere inline</b>: {cc} <i>(tu {pcc})</i>"
+            "\n➖➖ 👁‍🗨 <i>Query</i>"
+            "\n<b>Treni cercati</b> per numero: {tr_bynum} <i>(tu {ptr_bynum})</i>"
+            "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
+            "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
             .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count,
-                    psc=personal_start_command, pcc=personal_callback_count)
+                    psc=personal_start_command, pcc=personal_callback_count,
+                    tr_bynum=trains_bynum, ptr_bynum=personal_trains_bynum,
+                    tr_byiti=trains_byiti, ptr_byiti=personal_trains_byiti,
+                    st=stations, pst=personal_stations)
         )
         bot.api.call("editMessageText", {
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "parse_mode": "HTML",
@@ -204,6 +230,8 @@ def process_callback(bot, update, u):
         raw = api.call('andamentoTreno', departure_station, train)
 
         if not arguments:
+            u.increaseStat('stats_trains_bynum')
+
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
@@ -265,6 +293,7 @@ def process_callback(bot, update, u):
             return
 
         elif not arguments:
+            u.increaseStat('stats_stations')
             utils = viaggiatreno.Utils()
             station_name = utils.station_from_ID(station)
             text = format.formatStation(station_name)
