@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from .. import main
+
 
 class Callback:
     """
@@ -34,8 +36,17 @@ class Callback:
         self.sender = self.update.sender
         self.message = self.update.message
         self.chat = self.message.chat
+        self._api = main.bot.api
 
         if self.chat is None:
             self.isInline = True
         else:
             self.isInline = False
+
+    def notify(self, text, alert=False, cache_time=0):
+        self._api.call("answerCallbackQuery", {
+            "callback_query_id": self.id,
+            "text": text,
+            "show_alert": alert,
+            "cache_time": cache_time
+        })
