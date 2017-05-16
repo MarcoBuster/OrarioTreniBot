@@ -66,6 +66,9 @@ def process_messages(bot, message, u):
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
+                        [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
+                            .format(d=results[0][1],
+                                    n=message.text)}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )

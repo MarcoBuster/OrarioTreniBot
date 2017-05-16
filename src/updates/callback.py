@@ -22,6 +22,8 @@ import json
 from datetime import datetime, timedelta
 from ..viaggiatreno.dateutils import is_DST
 
+from botogram.api import APIError
+
 import redis
 
 import config
@@ -238,10 +240,29 @@ def process_callback(bot, update, u):
                 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
+                        [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
             })
+
+        if arguments[0] == "update":
+            text = format.formatTrain(raw)
+
+            try:
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "Aggiorna", "callback_data": cb.query + "@update"}],
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+                })
+            except APIError:  # Message is not modified
+                # TODO: Error message with answerCallbackQuery
+                return
 
     # STATIONS CALLBACK
     elif 'station@' in cb.query:
