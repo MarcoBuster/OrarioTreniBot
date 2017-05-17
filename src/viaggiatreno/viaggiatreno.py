@@ -128,6 +128,7 @@ class API:
             'soluzioniViaggioNew': _decode_json,
             'partenze': _decode_json,
             'arrivi': _decode_json,
+            'news': _decode_json,
         }
         self.__default_decoder = lambda x: x
 
