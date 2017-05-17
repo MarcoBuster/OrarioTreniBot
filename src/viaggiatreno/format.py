@@ -257,3 +257,46 @@ def formatItinerary(raw: dict):
             text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
 
     return text
+
+
+def formatNews(raw: dict):
+    def __toBool(__str: str) -> bool:
+        return True if __str == "true" else False
+
+    header = "📰 <b>Ultime news da viaggiatreno.it</b>"
+    if not raw:
+        return header + "\n<i>Nessuna news disponibile al momento</i>"
+
+    text = header
+    for news in raw:  # First pinned news
+        if not __toBool(news['primoPiano']):
+            continue
+        text += (
+            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n<b>Data</b>: {date}"
+            "\n{text}"
+            .format(
+                pinned="📌",
+                title=news['titolo'],
+                date=dateutils.format_timestamp(news['data'], "%d/%m/%y %H:%M"),
+                text=news['testo']
+            )
+        )
+
+    for news in raw:  # Second not pinned news
+        if __toBool(news['primoPiano']):
+            continue
+
+        text += (
+            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n<b>Data</b>: {date}"
+            "\n{text}"
+            .format(
+                pinned="",
+                title=news['titolo'],
+                date=dateutils.format_timestamp(news['data'], "%d/%m/%y %H:%M"),
+                text=news['testo']
+            )
+        )
+
+    return text
