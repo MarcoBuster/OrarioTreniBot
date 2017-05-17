@@ -61,7 +61,7 @@ def iter_month(year, month):
 
 
 def is_DST(_time=time.localtime()):
-    return bool(_time.isdst)
+    return bool(_time.tm_isdst)
 
 
 def check_timestamp(ts):

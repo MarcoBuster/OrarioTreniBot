@@ -36,6 +36,7 @@ r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.
 def process_callback(bot, update, u):
     cb = Callback(update)
     api = viaggiatreno.API()
+    utils = viaggiatreno.Utils()
 
     if cb.query == "home":
         u.state("home")
@@ -56,6 +57,7 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+        cb.notify("🏡 Menù principale")
 
     elif cb.query == "info":
         text = (
@@ -84,6 +86,7 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+        cb.notify("ℹ️ Altre informazioni")
 
     elif cb.query == "stats":
         users = []
@@ -152,6 +155,7 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+        cb.notify("📈 Statistiche")
 
     elif cb.query == "train":
         text = (
@@ -171,6 +175,7 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+        cb.notify("🚅 Cerca treno")
 
     elif cb.query == "train_bynum":
         u.state("train_bynum")
@@ -188,6 +193,7 @@ def process_callback(bot, update, u):
                 ]}
             )
         })
+        cb.notify("1️⃣ Cerca treno per numero")
 
     elif cb.query == "train_byiti":
         u.state("train_byiti")
@@ -205,6 +211,7 @@ def process_callback(bot, update, u):
                     ]}
                 )
         })
+        cb.notify("🛤 Cerca treno per itinerario")
 
     elif cb.query == "station":
         u.state("station")
@@ -221,6 +228,7 @@ def process_callback(bot, update, u):
                     ]}
                 )
         })
+        cb.notify("🚉 Cerca stazione")
 
     # TRAINS CALLBACK
     elif 'train@' in cb.query:
@@ -245,6 +253,7 @@ def process_callback(bot, update, u):
                     ]}
                 )
             })
+            cb.notify("🚅 Treno {n} da {d} a {a}".format(n=train, d=raw['origine'], a=raw['destinazione']))
 
         if arguments[0] == "update":
             text = format.formatTrain(raw)
@@ -255,20 +264,21 @@ def process_callback(bot, update, u):
                     'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
-                            [{"text": "Aggiorna", "callback_data": cb.query + "@update"}],
+                            [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
                 })
+                cb.notify("🔄 Informazioni per il treno {n} aggiornate".format(n=train))
             except APIError:  # Message is not modified
-                # TODO: Error message with answerCallbackQuery
-                return
+                cb.notify("❎ Informazioni invariate per il treno {n}".format(n=train), alert=True)
 
     # STATIONS CALLBACK
     elif 'station@' in cb.query:
         arguments = cb.query.split('@')
         del(arguments[0])
         station = arguments[0]
+        station_name = utils.station_from_ID(station)
         del(arguments[0])
 
         state = u.state().decode('utf-8')
@@ -289,6 +299,7 @@ def process_callback(bot, update, u):
                         ]}
                     )
             })
+            cb.notify("🚉 Stazione di partenza selezionata: {s}".format(s=station_name))
             return
 
         elif state == "train_byiti_2":
@@ -311,12 +322,11 @@ def process_callback(bot, update, u):
                         ]}
                     )
             })
+            cb.notify("🚉 Stazione di arrivo selezionata: {s}".format(s=station_name))
             return
 
         elif not arguments:
             u.increaseStat('stats_stations')
-            utils = viaggiatreno.Utils()
-            station_name = utils.station_from_ID(station)
             text = format.formatStation(station_name)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
@@ -329,10 +339,11 @@ def process_callback(bot, update, u):
                         ]}
                     )
             })
+            cb.notify("ℹ️ Informazioni della stazione di {s}".format(s=station_name))
             return
 
         elif len(arguments) == 1:
-            date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, format.ELEMENTS_FOR_PAGE)
@@ -346,9 +357,15 @@ def process_callback(bot, update, u):
                         {"inline_keyboard": inline_keyboard}
                     )
             })
+            cb.notify(
+                "{a} della stazione di {s} (pagina {x})".format(
+                    a="🚦 Partenze " if arguments[0] == "departures" else "🚦 Arrivi ",
+                    s=station_name,
+                    x=int(arguments[1]) // format.ELEMENTS_FOR_PAGE)
+            )
 
         elif len(arguments) == 2:
-            date = (datetime.now() - timedelta(hours=1) if is_DST else 0).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, int(arguments[1])) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, int(arguments[1]))
@@ -363,3 +380,9 @@ def process_callback(bot, update, u):
                         {"inline_keyboard": inline_keyboard}
                     )
             })
+            cb.notify(
+                "{a} della stazione di {s} (pagina {x})".format(
+                    a="🚦 Partenze " if arguments[0] == "departures" else "🚦 Arrivi ",
+                    s=station_name,
+                    x=int(arguments[1]) // format.ELEMENTS_FOR_PAGE)
+            )
