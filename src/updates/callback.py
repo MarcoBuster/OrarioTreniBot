@@ -255,6 +255,9 @@ def process_callback(bot, update, u):
             })
             cb.notify("🚅 Treno {n} da {d} a {a}".format(n=train, d=raw['origine'], a=raw['destinazione']))
 
+        if not arguments:
+            return
+
         if arguments[0] == "update":
             text = format.formatTrain(raw)
 
@@ -264,7 +267,7 @@ def process_callback(bot, update, u):
                     'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
-                            [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
+                            [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
@@ -304,7 +307,7 @@ def process_callback(bot, update, u):
 
         elif state == "train_byiti_2":
             u.setRedis('iti_station2', station)
-            u.state('train_byiti_3')
+            u.state('train_byiti _3')
             text = (
                 "<b>🛤 Cerca treno</b> per itinerario"
                 "\nInserisci ora <b>la data</b> e/o <b>l'orario di partenza</b> desiderati "
