@@ -53,6 +53,7 @@ def process_callback(bot, update, u):
                 {'inline_keyboard': [
                     [{"text": "🚅 Cerca treno", "callback_data": "train"},
                      {"text": "🚉 Cerca stazione", "callback_data": "station"}],
+                    [{"text": "📰 News", "callback_data": "news"}],
                     [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
                 ]}
             )
@@ -229,6 +230,20 @@ def process_callback(bot, update, u):
                 )
         })
         cb.notify("🚉 Cerca stazione")
+
+    elif cb.query == "news":
+        raw = api.call("news", 0, "it")
+        text = format.formatNews(raw)
+        bot.api.call("editMessageText", {
+            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "parse_mode": "HTML", "reply_markup":
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+        cb.notify("📰 News")
 
     # TRAINS CALLBACK
     elif 'train@' in cb.query:

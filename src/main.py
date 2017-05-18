@@ -69,6 +69,7 @@ def start(chat, message):
             {'inline_keyboard': [
                 [{"text": "🚅 Cerca treno", "callback_data": "train"},
                  {"text": "🚉 Cerca stazione", "callback_data": "station"}],
+                [{"text": "📰 News", "callback_data": "news"}],
                 [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
             ]}
         )
