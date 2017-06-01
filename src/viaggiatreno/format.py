@@ -300,3 +300,82 @@ def formatNews(raw: dict):
         )
 
     return text
+
+
+def getStopsInlineKeyboard(raw: dict, cb_query: str):
+    inline_keyboard = []
+    x = 0
+    for stop in raw['fermate']:
+        inline_keyboard.append([
+            {"text": "🚉 " + stop["stazione"], "callback_data": cb_query.replace("stops", "stop") + "@" + str(x)}
+        ])
+        x += 1
+
+    inline_keyboard.append([
+        {"text": "⬅️ Torna indietro", "callback_data": cb_query.rstrip("stops")}
+    ])
+    return inline_keyboard
+
+
+def formatTrainStop(raw: dict, stop_number: int):
+    x = 0
+    for stop in raw['fermate']:
+        if x != stop_number:
+            x += 1
+            continue
+
+        if stop['tipoFermata'] == "P":
+            format_arrival = False
+            format_departure = True
+
+        elif stop['tipoFermata'] == "F":
+            format_arrival = True
+            format_departure = True
+
+        elif stop['tipoFermata'] == "A":
+            format_arrival = True
+            format_departure = False
+
+        else:
+            return "ERROR (TODO)"
+
+        arrival = ""
+        departure = ""
+
+        rail = stop['binarioEffettivoArrivoDescrizione'] or stop['binarioEffettivoPartenzaDescrizione'] \
+            or stop['binarioProgrammatoArrivoDescrizione'] or stop['binarioProgrammatoPartenzaDescrizione'] \
+            or "errore Trenitalia"
+
+        if format_arrival:
+            if stop['arrivoReale']:
+                arrival = "<b>{p}</b> (arrivato alle {e})".format(
+                    p=dateutils.format_timestamp(stop['arrivo_teorico'], "%H:%M"),
+                    e=dateutils.format_timestamp(stop['arrivoReale'], "%H:%M"),
+                    r=stop['ritardoArrivo']
+                )
+            else:
+                arrival = "<b>{p}</b>".format(p=dateutils.format_timestamp(stop['arrivo_teorico'], "%H:%M"))
+
+        if format_departure:
+            if stop['partenzaReale']:
+                departure = "<b>{p}</b> (partito alle {e})".format(
+                    p=dateutils.format_timestamp(stop['partenza_teorica'], "%H:%M"),
+                    e=dateutils.format_timestamp(stop['partenzaReale'], "%H:%M"),
+                )
+            else:
+                departure = "<b>{p}</b>".format(p=dateutils.format_timestamp(stop['partenza_teorica'], "%H:%M"))
+
+        text = (
+            "🚉 <b>Informazioni del treno {train} rispetto alla fermata {station}</b>"
+            "{arrival}"
+            "{departure}"
+            "\n🛤 <b>Binario</b>: {rail}"
+            .format(
+                train=raw['compNumeroTreno'],
+                station=stop['stazione'],
+                arrival="\n🚥 <b>Arrivo</b>: {arrival}".format(arrival=arrival) if arrival else "",
+                departure="\n🚥 <b>Partenza</b>: {departure}".format(departure=departure) if departure else "",
+                rail=rail
+            )
+        )
+        return text

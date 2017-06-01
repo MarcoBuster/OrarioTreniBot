@@ -69,10 +69,14 @@ def process_messages(bot, message, u):
                         [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
                             .format(d=results[0][1],
                                     n=message.text)}],
+                        [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
+                          .format(d=results[0][1],
+                                  n=message.text)}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
             })
+            u.state("home")
 
         elif len(results) > 1:
             inline_keyboard = []

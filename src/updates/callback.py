@@ -264,13 +264,15 @@ def process_callback(bot, update, u):
                 json.dumps(
                     {"inline_keyboard": [
                         [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
+                        [{"text": "🚉 Fermate", "callback_data": cb.query + "@stops"}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
             })
             cb.notify("🚅 Treno {n} da {d} a {a}".format(n=train, d=raw['origine'], a=raw['destinazione']))
+            return
 
-        if not arguments:
+        if not arguments[0]:
             return
 
         if arguments[0] == "update":
@@ -283,6 +285,7 @@ def process_callback(bot, update, u):
                     json.dumps(
                         {"inline_keyboard": [
                             [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
+                            [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
@@ -290,6 +293,32 @@ def process_callback(bot, update, u):
                 cb.notify("🔄 Informazioni per il treno {n} aggiornate".format(n=train))
             except APIError:  # Message is not modified
                 cb.notify("❎ Informazioni invariate per il treno {n}".format(n=train), alert=True)
+            return
+
+        if arguments[0] == "stops":
+            inline_keyboard = format.getStopsInlineKeyboard(raw, cb.query)
+            text = "<b>Lista fermate del treno {x}</b>".format(x=raw['compNumeroTreno'])
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": inline_keyboard}
+                )
+            })
+            return
+
+        if arguments[0] == "stop":
+            text = format.formatTrainStop(raw, int(arguments[1]))
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Torna indietro", "callback_data": "train@" + departure_station + "_" + train + "@stops"}]
+                        ]}
+                    )
+            })
+            return
 
     # STATIONS CALLBACK
     elif 'station@' in cb.query:
