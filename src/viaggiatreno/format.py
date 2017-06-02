@@ -102,7 +102,7 @@ def getPagesCount(raw: dict):
     return {'first': 0, 'last': x}
 
 
-def generateInlineKeyboard(current_range: list, pages_count: dict, station: str, kind: str,):
+def generateStationPagesInlineKeyboard(current_range: list, pages_count: dict, station: str, kind: str, ):
     start = current_range[0]
     first = pages_count['first']
     end = current_range[1]
