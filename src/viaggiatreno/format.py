@@ -35,6 +35,10 @@ wikipedia.set_lang("it")
 ELEMENTS_FOR_PAGE = 5
 
 
+def _generateTrainCallbackQuery(raw: dict):
+    return "train@" + raw['idOrigine'] + "_" + str(raw['numeroTreno'])
+
+
 def formatTrain(raw: dict):
     dh = dateutils.format_timestamp(raw.get('orarioPartenza'), fmt="%H:%M")
     ah = dateutils.format_timestamp(raw.get('orarioArrivo'), fmt="%H:%M")
@@ -379,3 +383,46 @@ def formatTrainStop(raw: dict, stop_number: int):
             )
         )
         return text
+
+
+def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
+    x = 0
+    inline_keyboard = []
+    for stop in raw['fermate']:
+        if x != stop_number:
+            x += 1
+            continue
+
+        first = 0
+        current = x
+        last = len(raw['fermate']) - 1
+
+        if current == first:
+            inline_keyboard = [[
+                {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
+                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+            ]]
+
+        elif current == last:
+            inline_keyboard = [[
+                {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
+                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)}
+            ]]
+
+        else:
+            inline_keyboard = [[
+                {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
+                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)},
+                {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
+                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+            ]]
+
+        inline_keyboard.append(
+            [{"text": "🔍 Stazione di " + raw['fermate'][x]['stazione'],
+              "callback_data": "station@" + raw['fermate'][x]['id'] + "@send"}]
+        )
+        inline_keyboard.append(
+            [{"text": "⬅️ Torna indietro", "callback_data": _generateTrainCallbackQuery(raw) + "@stops"}]
+        )
+
+    return inline_keyboard

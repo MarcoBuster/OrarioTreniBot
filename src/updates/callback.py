@@ -309,14 +309,11 @@ def process_callback(bot, update, u):
 
         if arguments[0] == "stop":
             text = format.formatTrainStop(raw, int(arguments[1]))
+            inline_keyboard = format.generateTrainStopInlineKeyboard(raw, int(arguments[1]))
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
                 'parse_mode': 'HTML', 'reply_markup':
-                    json.dumps(
-                        {"inline_keyboard": [
-                            [{"text": "⬅️ Torna indietro", "callback_data": "train@" + departure_station + "_" + train + "@stops"}]
-                        ]}
-                    )
+                    json.dumps({"inline_keyboard": inline_keyboard})
             })
             return
 
@@ -390,6 +387,21 @@ def process_callback(bot, update, u):
             return
 
         elif len(arguments) == 1:
+            if arguments[0] == "send":
+                text = format.formatStation(station_name)
+                bot.api.call('sendMessage', {
+                    'chat_id': cb.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                        json.dumps(
+                            {"inline_keyboard": [
+                                [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
+                                 {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
+                                [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                            ]}
+                        )
+                })
+                cb.notify("ℹ️ Informazioni della stazione di {s}".format(s=station_name))
+                return
+
             date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
@@ -405,10 +417,9 @@ def process_callback(bot, update, u):
                     )
             })
             cb.notify(
-                "{a} della stazione di {s} (pagina {x})".format(
-                    a="🚦 Partenze " if arguments[0] == "departures" else "🚦 Arrivi ",
-                    s=station_name,
-                    x=int(arguments[1]) // format.ELEMENTS_FOR_PAGE)
+                "{a} della stazione di {s}".format(
+                    a="🚦 Partenze" if arguments[0] == "departures" else "🚦 Arrivi ",
+                    s=station_name)
             )
 
         elif len(arguments) == 2:
@@ -429,7 +440,7 @@ def process_callback(bot, update, u):
             })
             cb.notify(
                 "{a} della stazione di {s} (pagina {x})".format(
-                    a="🚦 Partenze " if arguments[0] == "departures" else "🚦 Arrivi ",
+                    a="🚦 Partenze" if arguments[0] == "departures" else "🚦 Arrivi ",
                     s=station_name,
                     x=int(arguments[1]) // format.ELEMENTS_FOR_PAGE)
             )
