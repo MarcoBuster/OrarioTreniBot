@@ -26,7 +26,7 @@ import botogram.objects.base
 import config
 from .objects.callback import Callback
 from .objects.user import User
-from .updates import callback, messages
+from .updates import callback, messages, deeplinking
 
 
 class CallbackQuery(botogram.objects.base.BaseObject):
@@ -52,7 +52,11 @@ bot = botogram.create(config.BOT_TOKEN)
 
 
 @bot.command("start")
-def start(chat, message):
+def start(chat, message, args):
+    if args:
+        deeplinking.process_deeplinking(bot, message, args)
+        return
+
     u = User(message.sender)
     u.state("home")
     u.increaseStat('stats_command_start')

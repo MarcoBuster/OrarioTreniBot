@@ -34,7 +34,7 @@ wikipedia.set_lang("it")
 ELEMENTS_FOR_PAGE = 5
 
 
-def _generateTrainCallbackQuery(raw: dict):
+def generateTrainCallbackQuery(raw: dict):
     return "train@" + raw['idOrigine'] + "_" + str(raw['numeroTreno'])
 
 
@@ -399,21 +399,21 @@ def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
         if current == first:
             inline_keyboard = [[
                 {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
-                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
             ]]
 
         elif current == last:
             inline_keyboard = [[
                 {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
-                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)}
+                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)}
             ]]
 
         else:
             inline_keyboard = [[
                 {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
-                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)},
+                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)},
                 {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
-                 "callback_data": _generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
             ]]
 
         inline_keyboard.append(
@@ -421,7 +421,7 @@ def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
               "callback_data": "station@" + raw['fermate'][x]['id'] + "@send"}]
         )
         inline_keyboard.append(
-            [{"text": "⬅️ Torna indietro", "callback_data": _generateTrainCallbackQuery(raw) + "@stops"}]
+            [{"text": "⬅️ Torna indietro", "callback_data": generateTrainCallbackQuery(raw) + "@stops"}]
         )
 
     return inline_keyboard
