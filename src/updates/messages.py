@@ -177,6 +177,7 @@ def process_messages(bot, message, u):
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
+                            [{"text": "🕒 Orario attuale", "callback_data": "train_byiti@now"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )

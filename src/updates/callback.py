@@ -362,6 +362,7 @@ def process_callback(bot, update, u):
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
+                            [{"text": "🕒 Orario attuale", "callback_data": "train_byiti@now"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
@@ -444,3 +445,38 @@ def process_callback(bot, update, u):
                     s=station_name,
                     x=int(arguments[1]) // format.ELEMENTS_FOR_PAGE)
             )
+
+    # ITINERARY CALLBACK
+    elif cb.query == "train_byiti@now":
+        def minifyStation(__str):
+            __str = __str[1:]
+            x = 0
+            for i in __str:
+                if i != "0":
+                    __str = __str[x:]
+                    break
+                x += 1
+            return __str
+
+        date = datetime.now()
+
+        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
+        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
+        u.delRedis('iti_station1')
+        u.delRedis('iti_station2')
+
+        u.increaseStat('stats_trains_byiti')
+
+        date = date.strftime('%Y-%m-%dT%H:%M:%S')
+
+        raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
+        text = format.formatItinerary(raw)
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+        u.state("home")
