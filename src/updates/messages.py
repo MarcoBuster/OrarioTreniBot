@@ -250,6 +250,7 @@ def process_messages(bot, message, u):
                     ]}
                 )
         })
+        u.state("home")
 
     elif state == "station":
         results = api.call('cercaStazione', message.text)
@@ -282,6 +283,7 @@ def process_messages(bot, message, u):
                         ]}
                     )
             })
+            u.state("home")
 
         elif len(results) > 1:
             inline_keyboard = []
@@ -299,3 +301,4 @@ def process_messages(bot, message, u):
                         {"inline_keyboard": inline_keyboard}
                     )
             })
+            u.state("home")
