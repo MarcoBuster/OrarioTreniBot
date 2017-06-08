@@ -20,15 +20,14 @@
 
 import json
 from datetime import datetime, timedelta
-from ..viaggiatreno.dateutils import is_DST
-
-from botogram.api import APIError
 
 import redis
+from botogram.api import APIError
 
 import config
 from ..objects.callback import Callback
 from ..viaggiatreno import viaggiatreno, format
+from ..viaggiatreno.dateutils import is_DST
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
 

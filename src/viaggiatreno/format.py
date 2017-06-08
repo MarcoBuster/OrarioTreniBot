@@ -18,12 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import re
 from datetime import datetime
 
 import wikipedia
 from wikipedia.exceptions import PageError
-
-import re
 
 from . import dateutils
 from . import viaggiatreno
