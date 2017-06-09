@@ -18,16 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import base64
 import re
 from datetime import datetime
 
+import botogram
 import wikipedia
 from wikipedia.exceptions import PageError
 
+import config
 from . import dateutils
 from . import viaggiatreno
 
+api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
+bot = botogram.create(config.BOT_TOKEN)
 
 wikipedia.set_lang("it")
 
@@ -35,7 +40,42 @@ ELEMENTS_FOR_PAGE = 5
 
 
 def generateTrainCallbackQuery(raw: dict):
-    return "train@" + raw['idOrigine'] + "_" + str(raw['numeroTreno'])
+    if raw.get('idOrigine'):
+        return "train@" + raw['idOrigine'] + "_" + str(raw['numeroTreno'])
+
+    elif raw.get('codOrigine'):
+        return "train@" + raw['codOrigine'] + "_" + str(raw['numeroTreno'])
+
+    else:
+        train_number = raw['numeroTreno']
+        stop_station = raw['origine']
+
+        results = api.call("cercaNumeroTrenoTrenoAutocomplete", train_number)
+        if len(results) == 1:
+            return "train@" + results[0][1] + "_" + str(raw['numeroTreno'])
+
+        if len(results) > 1:
+            for result in results:
+                train = api.call("andamentoTreno", result[1], train_number)
+                for stop in train['fermate']:
+                    if stop['stazione'].lower() == stop_station:
+                        return "train@" + train['idOrigine'] + "_" + str(raw['numeroTreno'])
+            return "train@" + results[0]['id'] + "_" + str(raw['numeroTreno'])
+
+
+def generateStationCallbackQuery(raw: dict):
+    return "station@" + raw['id']
+
+
+def generateDeepLinkingHREF(query: str, text: str = "più informazioni"):
+    url = "https://t.me/{username}?start={query}".format(username=bot.itself.username,
+                                                         query=base64.b64encode(bytes(query, "utf-8")).decode("utf-8"))
+    href = "<a href=\"{url}\">{text}</a>".format(url=url, text=text)
+    return href
+
+gTCQ = generateTrainCallbackQuery
+gSCQ = generateStationCallbackQuery
+gDLHREF = generateDeepLinkingHREF
 
 
 def formatTrain(raw: dict):
@@ -105,7 +145,7 @@ def getPagesCount(raw: dict):
     return {'first': 0, 'last': x}
 
 
-def generateStationPagesInlineKeyboard(current_range: list, pages_count: dict, station: str, kind: str, ):
+def generateStationPagesInlineKeyboard(current_range: list, pages_count: dict, station: str, kind: str):
     start = current_range[0]
     first = pages_count['first']
     end = current_range[1]
@@ -170,13 +210,14 @@ def formatDepartures(raw: dict, station: str, xrange: int):
             binary = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b>"
+            "\n\n➖➖ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Destinazione</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di partenza</b>: {dt}"
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
-            .format(n=train['compNumeroTreno'], d=train['destinazione'], b=binary, dt=train['compOrarioPartenza'],
+            .format(n=train['compNumeroTreno'], href=gDLHREF(gTCQ(train)),
+                    d=train['destinazione'], b=binary, dt=train['compOrarioPartenza'],
                     r=train['ritardo'], st='in partenza' if train['inStazione'] else 'partito')
         )
         x += 1
@@ -189,7 +230,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
 def formatArrivals(raw: dict, station: str, xrange: int):
     last = getPagesCount(raw)['last']
     text = "🚦 <b>Arrivi nella stazione di {station}</b>".format(station=utils.station_from_ID(station))
-    text += "\n<i>Pagina {x}</i>)".format(x=(xrange // ELEMENTS_FOR_PAGE))
+    text += "\n<i>Pagina {x}</i>".format(x=(xrange // ELEMENTS_FOR_PAGE))
     x = 0
     for train in raw:
         if x > last:
@@ -220,13 +261,14 @@ def formatArrivals(raw: dict, station: str, xrange: int):
             binary = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b>"
+            "\n\n➖➖ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Origine</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di arrivo</b>: {dt}"
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
-            .format(n=train['compNumeroTreno'], d=train['origine'], b=binary, dt=train['compOrarioArrivo'],
+            .format(n=train['compNumeroTreno'], href=gDLHREF(gTCQ(train)),
+                    d=train['origine'], b=binary, dt=train['compOrarioArrivo'],
                     r=train['ritardo'], st='in arrivo' if not train['inStazione'] else 'arrivato')
         )
         x += 1
@@ -250,12 +292,12 @@ def formatItinerary(raw: dict):
 
         x += 1
         text += "\n\n➖➖ <b>Soluzione {n}</b>".format(n=x)
-        text += "\n🕑 <b>Durata</b>: {t}".format(t=solution['durata'])
+        text += "\n🕑 <b>Durata</b>: {t}".format(t=solution.get('durata', '<i>sconosciuta</i>'))
         for vehicle in solution['vehicles']:
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
 
-            text += "\n➖ <b>Treno {n}</b>".format(n=vehicle['numeroTreno'])
+            text += "\n➖ <b>Treno {n}</b> ({href})".format(n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
             text += "\n🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
             text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
 
@@ -369,13 +411,13 @@ def formatTrainStop(raw: dict, stop_number: int):
                 departure = "<b>{p}</b>".format(p=dateutils.format_timestamp(stop['partenza_teorica'], "%H:%M"))
 
         text = (
-            "🚉 <b>Informazioni del treno {train} rispetto alla fermata {station}</b>"
+            "🚉 <b>Informazioni del treno {train} rispetto alla fermata {station}</b> ({href})"
             "{arrival}"
             "{departure}"
             "\n🛤 <b>Binario</b>: {rail}"
             .format(
                 train=raw['compNumeroTreno'],
-                station=stop['stazione'],
+                station=stop['stazione'], href=gDLHREF(gSCQ(stop), "più informazioni sulla stazione"),
                 arrival="\n🚥 <b>Arrivo</b>: {arrival}".format(arrival=arrival) if arrival else "",
                 departure="\n🚥 <b>Partenza</b>: {departure}".format(departure=departure) if departure else "",
                 rail=rail
@@ -399,29 +441,25 @@ def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
         if current == first:
             inline_keyboard = [[
                 {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
-                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+                 "callback_data": gTCQ(raw) + "@stop@" + str(x + 1)}
             ]]
 
         elif current == last:
             inline_keyboard = [[
                 {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
-                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)}
+                 "callback_data": gTCQ(raw) + "@stop@" + str(x - 1)}
             ]]
 
         else:
             inline_keyboard = [[
                 {"text": "◀️ " + raw['fermate'][x - 1]['stazione'],
-                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x - 1)},
+                 "callback_data": gTCQ(raw) + "@stop@" + str(x - 1)},
                 {"text": "▶️ " + raw['fermate'][x + 1]['stazione'],
-                 "callback_data": generateTrainCallbackQuery(raw) + "@stop@" + str(x + 1)}
+                 "callback_data": gTCQ(raw) + "@stop@" + str(x + 1)}
             ]]
 
         inline_keyboard.append(
-            [{"text": "🔍 Stazione di " + raw['fermate'][x]['stazione'],
-              "callback_data": "station@" + raw['fermate'][x]['id'] + "@send"}]
-        )
-        inline_keyboard.append(
-            [{"text": "⬅️ Torna indietro", "callback_data": generateTrainCallbackQuery(raw) + "@stops"}]
+            [{"text": "⬅️ Torna indietro", "callback_data": gTCQ(raw) + "@stops"}]
         )
 
     return inline_keyboard

@@ -244,7 +244,8 @@ def process_messages(bot, message, u):
         raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
         text = format.formatItinerary(raw)
         bot.api.call('sendMessage', {
-            'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+            'chat_id': chat.id, 'text': text,
+            'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]

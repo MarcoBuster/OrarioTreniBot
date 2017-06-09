@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import base64
 import json
 
 from ..objects.user import User
@@ -25,7 +26,7 @@ from ..viaggiatreno import viaggiatreno, format
 
 
 def process_deeplinking(bot, message, args):
-    args = "".join(args)
+    args = base64.b64decode(bytes("".join(args), "utf-8")).decode("utf-8")
 
     if "@" not in args:
         return
@@ -48,9 +49,9 @@ def process_deeplinking(bot, message, args):
             json.dumps(
                 {"inline_keyboard": [
                     [{"text": "🔄 Aggiorna le informazioni",
-                      "callback_data": format.generateTrainCallbackQuery(raw) + "@update"}],
-                    [{"text": "🚉 Fermate", "callback_data": format.generateTrainCallbackQuery(raw) + "@stops"}],
-                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                      "callback_data": format.gTCQ(raw) + "@update"}],
+                    [{"text": "🚉 Fermate", "callback_data": format.gTCQ(raw) + "@stops"}],
+                    [{"text": "⬅️ Menù principale", "callback_data": "home"}]
                 ]}
             )
         })
@@ -68,7 +69,7 @@ def process_deeplinking(bot, message, args):
                     {"inline_keyboard": [
                         [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
                          {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        [{"text": "⬅️ Menù principale", "callback_data": "home"}]
                     ]}
                 )
         })

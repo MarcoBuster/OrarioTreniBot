@@ -311,7 +311,7 @@ def process_callback(bot, update, u):
             inline_keyboard = format.generateTrainStopInlineKeyboard(raw, int(arguments[1]))
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
-                'parse_mode': 'HTML', 'reply_markup':
+                'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps({"inline_keyboard": inline_keyboard})
             })
             return
@@ -387,21 +387,6 @@ def process_callback(bot, update, u):
             return
 
         elif len(arguments) == 1:
-            if arguments[0] == "send":
-                text = format.formatStation(station_name)
-                bot.api.call('sendMessage', {
-                    'chat_id': cb.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
-                        json.dumps(
-                            {"inline_keyboard": [
-                                [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
-                                 {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
-                                [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                            ]}
-                        )
-                })
-                cb.notify("ℹ️ Informazioni della stazione di {s}".format(s=station_name))
-                return
-
             date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
@@ -411,7 +396,7 @@ def process_callback(bot, update, u):
                                                                         station, arguments[0])
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
-                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                'text': text, 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": inline_keyboard}
                     )
@@ -433,7 +418,7 @@ def process_callback(bot, update, u):
                                                                         station, arguments[0])
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
-                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                'text': text, 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": inline_keyboard}
                     )
@@ -471,7 +456,8 @@ def process_callback(bot, update, u):
         raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
         text = format.formatItinerary(raw)
         bot.api.call('editMessageText', {
-            'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+            'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
