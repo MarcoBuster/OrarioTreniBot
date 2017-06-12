@@ -50,7 +50,8 @@ def process_deeplinking(bot, message, args):
                 {"inline_keyboard": [
                     [{"text": "🔄 Aggiorna le informazioni",
                       "callback_data": format.gTCQ(raw) + "@update"}],
-                    [{"text": "🚉 Fermate", "callback_data": format.gTCQ(raw) + "@stops"}],
+                    [{"text": "🚉 Fermate", "callback_data": format.gTCQ(raw) + "@stops"},
+                     {"text": "📊 Grafico ritardo", "callback_data": format.gTCQ(raw) + "@graph"}],
                     [{"text": "⬅️ Menù principale", "callback_data": "home"}]
                 ]}
             )

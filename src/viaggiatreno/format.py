@@ -19,11 +19,18 @@
 # SOFTWARE.
 
 import base64
+import os
+import random
 import re
+import string
 from datetime import datetime
 
 import botogram
+import plotly
+import plotly.graph_objs as go
+import plotly.plotly as py
 import wikipedia
+from PIL import Image
 from wikipedia.exceptions import PageError
 
 import config
@@ -33,6 +40,7 @@ from . import viaggiatreno
 api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
+plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
 
 wikipedia.set_lang("it")
 
@@ -113,9 +121,9 @@ def formatTrain(raw: dict):
     )
 
 
-def cleanHTML(string: str):
+def cleanHTML(_string: str):
     cleaner = re.compile('<.*?>')
-    return re.sub(cleaner, '', string)
+    return re.sub(cleaner, '', _string)
 
 
 def getWikipediaSummary(station: str):
@@ -430,6 +438,8 @@ def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
     x = 0
     inline_keyboard = []
     for stop in raw['fermate']:
+        del stop
+
         if x != stop_number:
             x += 1
             continue
@@ -463,3 +473,51 @@ def generateTrainStopInlineKeyboard(raw: dict, stop_number: int):
         )
 
     return inline_keyboard
+
+
+def generateTrainGraph(raw: dict):
+    def apply(a, b):
+        base = Image.open(a)
+        logo = Image.open(b)
+        logo.thumbnail((120, 120), Image.ANTIALIAS)
+        base.paste(logo, (580, 5))
+        base.save(a)
+
+    stops = []
+    delays = []
+
+    for stop in raw['fermate']:
+        if stop['actualFermataType'] == 0:
+            break
+
+        stops += [stop['stazione']]
+        delays += [stop['ritardo']]
+
+    if len(stops) < 2 or len(delays) < 2:
+        return False
+
+    line = go.Scatter(
+        x=stops,
+        y=delays,
+        name='Ritardo',
+        line=dict(
+            color='rgb(205, 12, 24)',
+            width=2,
+        )
+    )
+
+    title = '<b>Ritardo del treno {train}</b>'.format(train=raw['compNumeroTreno'])
+    layout = dict(
+        title=title,
+        xaxis=dict(title='Fermata'),
+        yaxis=dict(title='Ritardo (minuti)')
+    )
+
+    filename = os.getcwd() + ''.join(
+        random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)) + '.png'
+
+    fig = dict(data=[line], layout=layout)
+    py.image.save_as(fig, filename=filename)
+
+    apply(filename, os.getcwd() + "/data/img/logo_white_with_name.png")
+    return filename

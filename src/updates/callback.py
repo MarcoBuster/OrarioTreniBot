@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 import json
+import os
 from datetime import datetime, timedelta
 
 import redis
@@ -263,7 +264,8 @@ def process_callback(bot, update, u):
                 json.dumps(
                     {"inline_keyboard": [
                         [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
-                        [{"text": "🚉 Fermate", "callback_data": cb.query + "@stops"}],
+                        [{"text": "🚉 Fermate", "callback_data": cb.query + "@stops"},
+                         {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
@@ -271,10 +273,10 @@ def process_callback(bot, update, u):
             cb.notify("🚅 Treno {n} da {d} a {a}".format(n=train, d=raw['origine'], a=raw['destinazione']))
             return
 
-        if not arguments[0]:
+        elif not arguments[0]:
             return
 
-        if arguments[0] == "update":
+        elif arguments[0] == "update":
             text = format.formatTrain(raw)
 
             try:
@@ -284,7 +286,8 @@ def process_callback(bot, update, u):
                     json.dumps(
                         {"inline_keyboard": [
                             [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
-                            [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"}],
+                            [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
+                             {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
@@ -294,7 +297,7 @@ def process_callback(bot, update, u):
                 cb.notify("❎ Informazioni invariate per il treno {n}".format(n=train), alert=True)
             return
 
-        if arguments[0] == "stops":
+        elif arguments[0] == "stops":
             inline_keyboard = format.getStopsInlineKeyboard(raw, cb.query)
             text = "<b>Lista fermate del treno {x}</b>".format(x=raw['compNumeroTreno'])
             bot.api.call('editMessageText', {
@@ -306,7 +309,7 @@ def process_callback(bot, update, u):
             })
             return
 
-        if arguments[0] == "stop":
+        elif arguments[0] == "stop":
             text = format.formatTrainStop(raw, int(arguments[1]))
             inline_keyboard = format.generateTrainStopInlineKeyboard(raw, int(arguments[1]))
             bot.api.call('editMessageText', {
@@ -314,6 +317,19 @@ def process_callback(bot, update, u):
                 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps({"inline_keyboard": inline_keyboard})
             })
+            return
+
+        elif arguments[0] == "graph":
+            filename = format.generateTrainGraph(raw)
+            if not filename:
+                cb.notify(
+                    "❌ Impossibile generare il grafico del ritardo: troppe poche informazioni. Riprova più tardi",
+                    alert=True
+                )
+                return
+
+            cb.message.reply_with_photo(filename)
+            os.remove(filename)
             return
 
     # STATIONS CALLBACK

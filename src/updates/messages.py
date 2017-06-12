@@ -71,6 +71,9 @@ def process_messages(bot, message, u):
                                     n=message.text)}],
                         [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
                           .format(d=results[0][1],
+                                  n=message.text)},
+                         {"text": "📊 Grafico ritardo", "callback_data": "train@{d}_{n}@graph"
+                          .format(d=results[0][1],
                                   n=message.text)}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}

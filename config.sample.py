@@ -26,5 +26,9 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_PASSWORD = None
 
-# Telegram Bot API token from t.me/BotFather
+# -- Telegram configuration --
 BOT_TOKEN = ''
+
+# -- Plotly configuration --
+PLOTLY_USERNAME = ''
+PLOTLY_API_KEY = ''
