@@ -21,6 +21,7 @@
 
 import json
 
+import config
 from ..objects.user import User
 
 
@@ -43,6 +44,24 @@ def process_start_command(bot, message):
                  {"text": "🚉 Cerca stazione", "callback_data": "station"}],
                 [{"text": "📰 News", "callback_data": "news"}],
                 [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
+            ]}
+        )
+    })
+
+
+def process_admin_command(bot, message):
+    if message.sender.id not in config.ADMINS:
+        return
+
+    text = (
+        "🔴 <b>Benvenuto nel pannello amministratore di Orario Treni</b>"
+        "\nSeleziona un opzione:"
+    )
+    bot.api.call('sendMessage', {
+        'chat_id': message.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
+        json.dumps(
+            {'inline_keyboard': [
+                [{"text": "➕🌐 Nuovo post globale", "callback_data": "admin@newpost"}]
             ]}
         )
     })

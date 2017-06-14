@@ -58,6 +58,11 @@ def start(message, args):
     commands.process_start_command(bot, message)
 
 
+@bot.command("admin")
+def admin(message):
+    commands.process_admin_command(bot, message)
+
+
 @bot.process_message
 def process_messages(message):
     u = User(message.sender)

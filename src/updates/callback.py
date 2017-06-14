@@ -26,6 +26,7 @@ import redis
 from botogram.api import APIError
 
 import config
+from . import global_messages
 from ..objects.callback import Callback
 from ..viaggiatreno import viaggiatreno, format
 from ..viaggiatreno.dateutils import is_DST
@@ -481,3 +482,55 @@ def process_callback(bot, update, u):
                 )
         })
         u.state("home")
+
+    elif cb.query == "admin":
+        if cb.sender.id not in config.ADMINS:
+            return
+
+        text = (
+            "🔴 <b>Benvenuto nel pannello amministratore di Orario Treni</b>"
+            "\nSeleziona un opzione:"
+        )
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {'inline_keyboard': [
+                        [{"text": "➕🌐 Nuovo post globale", "callback_data": "admin@newpost"}]
+                    ]}
+                )
+        })
+
+    elif "admin@" in cb.query:
+        if cb.sender.id not in config.ADMINS:
+            return
+
+        arguments = cb.query.split('@')
+        del(arguments[0])
+
+        if arguments[0] == "newpost" and len(arguments) == 1:
+            text = (
+                "➕🌐 <b>Nuovo post globale</b>"
+                "\nInvia il testo <b>formattato in HTML</b> del <b>post globale</b>"
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⬅️ Annulla", "callback_data": "admin"}]
+                        ]}
+                    )
+            })
+            u.state("admin_newpost")
+            return
+
+        elif arguments[0] == "newpost" and arguments[1] == "send":
+            text = u.getRedis("admin_newpost_text").decode('utf-8')
+            inline_keyboard = json.loads(u.getRedis("admin_newpost_keyboard").decode('utf-8'))
+
+            global_messages.post(
+                text=text,
+                reply_markup={"inline_keyboard": inline_keyboard},
+                parse_mode="HTML",
+                message=cb.message)

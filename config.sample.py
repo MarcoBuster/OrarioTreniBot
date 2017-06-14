@@ -28,6 +28,7 @@ REDIS_PASSWORD = None
 
 # -- Telegram configuration --
 BOT_TOKEN = ''
+ADMINS = []
 
 # -- Plotly configuration --
 PLOTLY_USERNAME = ''

@@ -22,6 +22,7 @@ import json
 from datetime import datetime
 from urllib.error import HTTPError
 
+import botogram
 from dateutil.parser import parse
 
 from ..viaggiatreno import viaggiatreno, format
@@ -307,3 +308,39 @@ def process_messages(bot, message, u):
                     )
             })
             u.state("home")
+
+    elif state == "admin_newpost":
+        chat.send("Ecco il tuo messaggio:")
+        try:
+            chat.send(message.text, syntax="HTML")
+        except botogram.api.APIError:
+            chat.send("Formattazione HTML errata, riprova.")
+            return
+
+        chat.send("Ora invia il JSON della tastiera inline o \"NO\" per inviare senza tastiera")
+        u.setRedis("admin_newpost_text", message.text)
+        u.state("admin_newpost_2")
+
+    elif state == "admin_newpost_2":
+        chat.send("Ecco il tuo messaggio:")
+        try:
+            bot.api.call('sendMessage', {
+                'chat_id': chat.id, 'message_id': message.message_id,
+                'text': u.getRedis('admin_newpost_text').decode('utf-8'), 'parse_mode': 'HTML',
+                'reply_markup':
+                    json.dumps({"inline_keyboard": json.loads(message.text)}) if message.text != "NO" else ""
+            })
+        except (botogram.api.APIError, json.decoder.JSONDecodeError):
+            chat.send("Inline keyboard errata, riprova.")
+            return
+
+        bot.api.call('sendMessage', {
+            'chat_id': chat.id, 'text': 'Invio?', 'reply_markup': json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "📤 Sì", "callback_data": "admin@newpost@send"}],
+                    [{"text": "❌ No", "callback_data": "admin"}]
+                ]}
+            )
+        })
+        u.setRedis("admin_newpost_keyboard", message.text if message.text != "NO" else "[]")
+        u.state("home")

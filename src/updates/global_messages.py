@@ -31,13 +31,27 @@ r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.
 bot = botogram.create(config.BOT_TOKEN)
 
 
-def post(text, parse_mode="HTML", reply_markup=None, disable_web_page_preview=True):
+def post(text, parse_mode="HTML", reply_markup=None, disable_web_page_preview=True, message=None):
     users = []
     for user in r.keys("user:*"):
         users.append(int(user[5:]))
 
+    print("Sending global message...")
+    print("> Text", text, sep=": ")
+    print("> Reply Markup", reply_markup, sep=": ")
+    print("> Parse mode", parse_mode, sep=": ")
+    print("> Disable web page preview", disable_web_page_preview, sep=": ")
+
     bar = progressbar.ProgressBar()
     for user in bar(users):
+        if message:
+            message.edit(
+                "<b>Sending global message...</b>"
+                "\n<b>{value}/{max_value}</b> ({percentage}%)"
+                .format(value=bar.value, max_value=bar.max_value, percentage=round(bar.percentage, 1))
+            )
+            time.sleep(0.1)
+
         user_hash = "user:" + str(user)
         try:
             bot.chat(user)
@@ -59,4 +73,12 @@ def post(text, parse_mode="HTML", reply_markup=None, disable_web_page_preview=Tr
             r.hset(user_hash, "active", False)
 
         finally:
-            time.sleep(0.2)
+            time.sleep(0.5)
+
+    if message:
+        message.edit(
+            "<b>Sending global message...</b>"
+            "\n<b>{value}/{max_value}</b> ({percentage}%)"
+            .format(value=bar.value, max_value=bar.max_value, percentage=round(bar.percentage, 1))
+        )
+        time.sleep(0.1)
