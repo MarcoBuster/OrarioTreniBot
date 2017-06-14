@@ -18,15 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import json
-
 import botogram
 import botogram.objects.base
 
 import config
 from .objects.callback import Callback
 from .objects.user import User
-from .updates import callback, messages, deeplinking
+from .updates import commands, callback, messages, deeplinking
 
 
 class CallbackQuery(botogram.objects.base.BaseObject):
@@ -52,32 +50,12 @@ bot = botogram.create(config.BOT_TOKEN)
 
 
 @bot.command("start")
-def start(chat, message, args):
+def start(message, args):
     if args:
         deeplinking.process_deeplinking(bot, message, args)
         return
 
-    u = User(message.sender)
-    u.state("home")
-    u.increaseStat('stats_command_start')
-
-    text = (
-        "<b>Benvenuto in Orario Treni Bot!</b>"
-        "\nCon questo bot potrai cercare 🚅 <b>treni</b>, 🚉 <b>stazioni</b> e 🚊 <b>itinerari</b> "
-        "anche ☑️ <b>inline</b>!"
-        "\nPremi uno dei <b>tasti qui sotto</b> per iniziare"
-    )
-    bot.api.call('sendMessage', {
-        'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
-        json.dumps(
-            {'inline_keyboard': [
-                [{"text": "🚅 Cerca treno", "callback_data": "train"},
-                 {"text": "🚉 Cerca stazione", "callback_data": "station"}],
-                [{"text": "📰 News", "callback_data": "news"}],
-                [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
-            ]}
-        )
-    })
+    commands.process_start_command(bot, message)
 
 
 @bot.process_message
