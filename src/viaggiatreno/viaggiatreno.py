@@ -34,7 +34,7 @@ except ImportError:
 
 
 class Utils:
-    __path = os.path.join(os.path.dirname(__file__), 'data', 'stationIDs.json')
+    __path = os.getcwd() + '/'.join(['', 'data', 'viaggiatreno', 'stationIDs.json'])
     with open(__path, 'r') as fp:
         __stationsIDs = json.load(fp)
 
