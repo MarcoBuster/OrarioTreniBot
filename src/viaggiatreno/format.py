@@ -480,7 +480,7 @@ def generateTrainGraph(raw: dict):
         base = Image.open(a)
         logo = Image.open(b)
         logo.thumbnail((120, 120), Image.ANTIALIAS)
-        base.paste(logo, (580, 5))
+        base.paste(logo, (580, 5), mask=logo)
         base.save(a)
 
     stops = []
