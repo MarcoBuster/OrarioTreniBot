@@ -23,8 +23,9 @@ import botogram.objects.base
 
 import config
 from .objects.callback import Callback
+from .objects.inline import Inline
 from .objects.user import User
-from .updates import commands, callback, messages, deeplinking
+from .updates import commands, callback, messages, deeplinking, inline
 
 
 class CallbackQuery(botogram.objects.base.BaseObject):
@@ -97,3 +98,14 @@ def process_callback(__bot, __chains, update):
     callback.process_callback(bot, update, u)
 
 bot.register_update_processor("callback_query", process_callback)
+
+
+def process_inline_query(__bot, __chains, update):
+    del (__bot, __chains)  # Useless arguments from botogram
+    iq = Inline(update)
+    u = User(iq.sender)
+    u.increaseStat('stats_inline_count')
+
+    inline.process_inline_query(bot, update, u)
+
+bot.register_update_processor("inline_query", process_inline_query)
