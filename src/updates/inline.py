@@ -18,12 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from ..objects.inline import Inline as InlineQuery
 
-
-def process_inline_query(bot, update, u):
-    iq = InlineQuery(update)
-    print(update.__dict__)
+def process_inline_query(bot, iq, u):
+    print(iq.__dict__)
 
     iq.answer(
         results=[

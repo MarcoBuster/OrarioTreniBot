@@ -95,7 +95,7 @@ def process_callback(__bot, __chains, update):
     u = User(cb.sender)
     u.increaseStat('stats_callback_count')
 
-    callback.process_callback(bot, update, u)
+    callback.process_callback(bot, cb, u)
 
 bot.register_update_processor("callback_query", process_callback)
 
@@ -106,6 +106,6 @@ def process_inline_query(__bot, __chains, update):
     u = User(iq.sender)
     u.increaseStat('stats_inline_count')
 
-    inline.process_inline_query(bot, update, u)
+    inline.process_inline_query(bot, iq, u)
 
 bot.register_update_processor("inline_query", process_inline_query)

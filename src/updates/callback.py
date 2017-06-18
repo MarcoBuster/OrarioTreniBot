@@ -27,15 +27,13 @@ from botogram.api import APIError
 
 import config
 from . import global_messages
-from ..objects.callback import Callback
 from ..viaggiatreno import viaggiatreno, format
 from ..viaggiatreno.dateutils import is_DST
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
 
 
-def process_callback(bot, update, u):
-    cb = Callback(update)
+def process_callback(bot, cb, u):
     api = viaggiatreno.API()
     utils = viaggiatreno.Utils()
 
