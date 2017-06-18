@@ -38,6 +38,11 @@ class Callback:
         self.chat = self.message.chat
         self._api = main.bot.api
 
+        if self.chat is None:
+            self.isInline = True
+        else:
+            self.isInline = False
+
     def notify(self, text, alert=False, cache_time=0):
         self._api.call("answerCallbackQuery", {
             "callback_query_id": self.id,

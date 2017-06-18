@@ -37,6 +37,9 @@ def process_callback(bot, cb, u):
     api = viaggiatreno.API()
     utils = viaggiatreno.Utils()
 
+    if cb.isInline:
+        return
+
     if cb.query == "home":
         u.state("home")
         text = (
