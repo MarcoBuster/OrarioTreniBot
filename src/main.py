@@ -44,7 +44,26 @@ class CallbackQuery(botogram.objects.base.BaseObject):
         "from": "sender"
     }
 
+
+class InlineQuery(botogram.objects.base.BaseObject):
+    def __init__(self, update):
+        super().__init__(update)
+
+    required = {
+        "id": str,
+        "from": botogram.User,
+        "query": str,
+        "offset": str,
+    }
+    optional = {
+        "location": botogram.Location,
+    }
+    replace_keys = {
+        "from": "sender"
+    }
+
 botogram.Update.optional["callback_query"] = CallbackQuery
+botogram.Update.optional["inline_query"] = InlineQuery
 
 bot = botogram.create(config.BOT_TOKEN)
 

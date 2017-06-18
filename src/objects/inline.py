@@ -18,30 +18,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
+
 from .. import main
 
 
-class Callback:
+class Inline:
     """
-    Callback base object
+    Inline query base object
     """
     def __init__(self, update):
-        """
-        Create a callback object
-        :param update: Telegram's update object
-        """
-        self.update = update.callback_query
+        self.update = update.inline_query
         self.id = self.update.id
-        self.query = self.update.data
+        self.location = self.update.location
         self.sender = self.update.sender
-        self.message = self.update.message
-        self.chat = self.message.chat
+        self.query = self.update.query
+        self.offset = self.update.offset
         self._api = main.bot.api
 
-    def notify(self, text, alert=False, cache_time=0):
-        self._api.call("answerCallbackQuery", {
-            "callback_query_id": self.id,
-            "text": text,
-            "show_alert": alert,
-            "cache_time": cache_time
+    def answer(self,
+               results,
+               cache_time=300,
+               is_personal=True,
+               next_offset=None,
+               switch_pm_text=None,
+               switch_pm_parameter=None):
+        self._api.call("answerInlineQuery", {
+            "inline_query_id": self.id,
+            "results": json.dumps(results),
+            "cache_time": cache_time,
+            "is_personal": is_personal,
+            "next_offset": next_offset,
+            "switch_pm_text": switch_pm_text,
+            "swtich_pm_parameter": switch_pm_parameter
         })
