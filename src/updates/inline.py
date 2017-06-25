@@ -80,8 +80,12 @@ def process_inline_query(bot, iq, u):
             ]
         )
 
+    if not iq.query:
+        return default_answer()
+
+    api = viaggiatreno.API()
+
     if iq.query.isnumeric():  # Search train
-        api = viaggiatreno.API()
         try:
             results = api.call('cercaNumeroTrenoTrenoAutocomplete', iq.query)
         except HTTPError:
@@ -121,4 +125,48 @@ def process_inline_query(bot, iq, u):
                 ]
             )
     else:
-        return default_answer()
+        if "-" in iq.query:  # Search itinerary
+            return default_answer()
+
+        else:  # Search station
+            results = api.call('cercaStazione', iq.query)
+            if len(results) == 0:
+                return not_found_answer()
+
+            elif len(results) > 0:
+                inline_results = []
+                x = 0
+                for station in results:
+                    if x > 49:
+                        break
+
+                    inline_results.append(
+                        {
+                            "type": "article",
+                            "id": iq.query + str(x),
+                            "title": "🚉 Stazione di {station}".format(station=station['nomeLungo']),
+                            "description": "👉 Informazioni sulla stazione di {station}".format(station=station['nomeLungo']),
+                            "input_message_content": {
+                                "message_text": (
+                                    "🚉 <b>Stazione di {name}</b>"
+                                    "\n<i>Premi il tasto sotto per mostrare le informazioni da Wikipedia</i>"
+                                    .format(name=station['nomeLungo'].title())
+                                ),
+                                "parse_mode": "HTML",
+                                "disable_web_page_preview": True
+                            },
+                            "reply_markup": {
+                                "inline_keyboard": [
+                                    [{"text": "🔘 Mostra le informazioni da Wikipedia", "callback_data":
+                                        "station@" + station["id"] + "@wiki"}],
+                                    [{"text": "🚦 Arrivi",
+                                      "callback_data": "station@" + station["id"] + "@arrivals"},
+                                     {"text": "🚦 Partenze",
+                                      "callback_data": "station@" + station["id"] + "@departures"}],
+                                ]},
+                            "thumb_url": "http://i.imgur.com/hp9QUXx.png",
+                        }
+                    )
+                    x += 1
+
+                iq.answer(results=inline_results)
