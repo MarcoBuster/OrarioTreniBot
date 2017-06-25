@@ -96,6 +96,7 @@ def process_callback(__bot, __chains, update):
     u.increaseStat('stats_callback_count')
 
     callback.process_callback(bot, cb, u)
+    callback.process_inline_callback(bot, cb, u)
 
 bot.register_update_processor("callback_query", process_callback)
 

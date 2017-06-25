@@ -34,11 +34,11 @@ r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.
 
 
 def process_callback(bot, cb, u):
-    api = viaggiatreno.API()
-    utils = viaggiatreno.Utils()
-
     if cb.isInline:
         return
+
+    api = viaggiatreno.API()
+    utils = viaggiatreno.Utils()
 
     if cb.query == "home":
         u.state("home")
@@ -535,3 +535,10 @@ def process_callback(bot, cb, u):
                 reply_markup={"inline_keyboard": inline_keyboard},
                 parse_mode="HTML",
                 message=cb.message)
+
+
+def process_inline_callback(bot, cb, u):
+    if not cb.isInline:
+        return
+
+    cb.notify("501 - Not Implemented", alert=True)

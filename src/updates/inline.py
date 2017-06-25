@@ -24,9 +24,6 @@ from ..viaggiatreno import viaggiatreno, format
 
 
 def process_inline_query(bot, iq, u):
-    print(iq.__dict__)
-    print(iq.update.__dict__)
-
     def default_answer():
         iq.answer(
             results=[

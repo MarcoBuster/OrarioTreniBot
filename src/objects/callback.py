@@ -35,13 +35,11 @@ class Callback:
         self.query = self.update.data
         self.sender = self.update.sender
         self.message = self.update.message
-        self.chat = self.message.chat
         self._api = main.bot.api
 
-        if self.chat is None:
-            self.isInline = True
-        else:
-            self.isInline = False
+        self.isInline = (True if not self.message else False)
+        self.inline_message_id = (self.update.inline_message_id if self.isInline else None)
+        self.chat = (self.message.chat if not self.isInline else None)
 
     def notify(self, text, alert=False, cache_time=0):
         self._api.call("answerCallbackQuery", {
