@@ -395,6 +395,24 @@ def process_callback(bot, cb, u):
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
+                            [{"text": "🔘 Mostra le informazioni da Wikipedia",
+                              "callback_data": "station@" + station + "@wiki"}],
+                            [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
+                             {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
+                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                        ]}
+                    )
+            })
+            cb.notify("ℹ️ Informazioni della stazione di {s}".format(s=station_name))
+            return
+
+        elif len(arguments) == 1 and arguments[0] == "wiki":
+            text = format.formatStation(station_name, withWikiSummary=True)
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
                             [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
                              {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]

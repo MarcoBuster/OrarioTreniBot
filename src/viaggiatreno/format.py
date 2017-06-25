@@ -134,14 +134,21 @@ def getWikipediaSummary(station: str):
     return cleanHTML(result) + " (da Wikipedia, l'enciclopedia libera)"
 
 
-def formatStation(station: str):
-    text = (
-        "🚉 <b>Stazione di {name}</b>"
-        "\nℹ️ <i>{wikipedia}</i>"
-        .format(name=station.title(),
-                wikipedia=getWikipediaSummary(station))
-    )
-    return text
+def formatStation(station: str, withWikiSummary=False):
+    if withWikiSummary:
+        text = (
+            "🚉 <b>Stazione di {name}</b>"
+            "\nℹ️ <i>{wikipedia}</i>"
+            .format(name=station.title(),
+                    wikipedia=getWikipediaSummary(station))
+        )
+        return text
+    else:
+        text = (
+            "🚉 <b>Stazione di {name}</b>"
+            .format(name=station.title())
+        )
+        return text
 
 
 def getPagesCount(raw: dict):
