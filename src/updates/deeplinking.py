@@ -52,7 +52,7 @@ def process_deeplinking(bot, message, args):
                       "callback_data": format.gTCQ(raw) + "@update"}],
                     [{"text": "🚉 Fermate", "callback_data": format.gTCQ(raw) + "@stops"},
                      {"text": "📊 Grafico ritardo", "callback_data": format.gTCQ(raw) + "@graph"}],
-                    [{"text": "⬅️ Menù principale", "callback_data": "home"}]
+                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                 ]}
             )
         })
@@ -68,9 +68,11 @@ def process_deeplinking(bot, message, args):
             'chat_id': message.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
+                        [{"text": "🔘 Mostra le informazioni da Wikipedia",
+                          "callback_data": "station@" + station + "@wiki"}],
                         [{"text": "🚦 Arrivi", "callback_data": "station@" + station + "@arrivals"},
                          {"text": "🚦 Partenze", "callback_data": "station@" + station + "@departures"}],
-                        [{"text": "⬅️ Menù principale", "callback_data": "home"}]
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
         })

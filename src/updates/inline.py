@@ -115,9 +115,6 @@ def process_inline_query(bot, iq, u):
                                             n=iq.query)}],
                                 [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
                                   .format(d=results[0][1],
-                                          n=iq.query)},
-                                 {"text": "📊 Grafico ritardo", "callback_data": "train@{d}_{n}@graph"
-                                  .format(d=results[0][1],
                                           n=iq.query)}]
                             ]},
                         "thumb_url": "http://i.imgur.com/hp9QUXx.png",
@@ -147,11 +144,7 @@ def process_inline_query(bot, iq, u):
                             "title": "🚉 Stazione di {station}".format(station=station['nomeLungo']),
                             "description": "👉 Informazioni sulla stazione di {station}".format(station=station['nomeLungo']),
                             "input_message_content": {
-                                "message_text": (
-                                    "🚉 <b>Stazione di {name}</b>"
-                                    "\n<i>Premi il tasto sotto per mostrare le informazioni da Wikipedia</i>"
-                                    .format(name=station['nomeLungo'].title())
-                                ),
+                                "message_text": format.formatStation(station),
                                 "parse_mode": "HTML",
                                 "disable_web_page_preview": True
                             },

@@ -146,6 +146,7 @@ def formatStation(station: str, withWikiSummary=False):
     else:
         text = (
             "🚉 <b>Stazione di {name}</b>"
+            "\n<i>Premi il tasto sotto per mostrare le informazioni da Wikipedia</i>"
             .format(name=station.title())
         )
         return text
