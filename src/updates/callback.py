@@ -100,6 +100,7 @@ def process_callback(bot, cb, u):
         total_users = 0
         start_command = 0
         callbacks_count = 0
+        inline_queries = 0
         trains_bynum = 0
         trains_byiti = 0
         stations = 0
@@ -112,6 +113,8 @@ def process_callback(bot, cb, u):
                 if r.hget(user_hash, 'stats_command_start') else 0
             callbacks_count += int(r.hget(user_hash, 'stats_callback_count')) \
                 if r.hget(user_hash, 'stats_callback_count') else 0
+            inline_queries += int(r.hget(user_hash, 'stats_inline_queries')) \
+                if r.hget(user_hash, 'stats_inline_queries') else 0
             trains_bynum += int(r.hget(user_hash, 'stats_trains_bynum')) \
                 if r.hget(user_hash, 'stats_trains_bynum') else 0
             trains_byiti += int(r.hget(user_hash, 'stats_trains_byiti')) \
@@ -123,6 +126,8 @@ def process_callback(bot, cb, u):
             if r.hget(u.rhash, 'stats_command_start') else 0
         personal_callback_count = int(r.hget(u.rhash, 'stats_callback_count')) \
             if r.hget(u.rhash, 'stats_callback_count') else 0
+        personal_inline_queries = int(r.hget(u.rhash, 'stats_inline_queries')) \
+            if r.hget(u.rhash, 'stats_inline_queries') else 0
         personal_trains_bynum = int(r.hget(u.rhash, 'stats_trains_bynum')) \
             if r.hget(u.rhash, 'stats_trains_bynum') else 0
         personal_trains_byiti = int(r.hget(u.rhash, 'stats_trains_byiti')) \
@@ -139,12 +144,13 @@ def process_callback(bot, cb, u):
             "\n➖➖ 💬 <i>Comandi</i>"
             "\n<b>Comando /start</b>: {sc} <i>(tu {psc})</i>"
             "\n<b>Tastiere inline</b>: {cc} <i>(tu {pcc})</i>"
+            "\n<b>Richieste inline</b>: {iq} <i>(tu {piq})</i>"
             "\n➖➖ 👁‍🗨 <i>Query</i>"
             "\n<b>Treni cercati</b> per numero: {tr_bynum} <i>(tu {ptr_bynum})</i>"
             "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
             "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
-            .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count,
-                    psc=personal_start_command, pcc=personal_callback_count,
+            .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count, iq=inline_queries,
+                    psc=personal_start_command, pcc=personal_callback_count, piq=personal_inline_queries,
                     tr_bynum=trains_bynum, ptr_bynum=personal_trains_bynum,
                     tr_byiti=trains_byiti, ptr_byiti=personal_trains_byiti,
                     st=stations, pst=personal_stations)

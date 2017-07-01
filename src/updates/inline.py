@@ -27,12 +27,12 @@ from ..viaggiatreno import viaggiatreno, format
 def process_inline_query(bot, iq, u):
     def minifyStation(__str):
         __str = __str[1:]
-        x = 0
+        n = 0
         for i in __str:
             if i != "0":
-                __str = __str[x:]
+                __str = __str[n:]
                 break
-            x += 1
+            n += 1
         return __str
 
     def default_answer():
@@ -104,6 +104,9 @@ def process_inline_query(bot, iq, u):
         if len(results) == 0:
             return not_found_answer()
 
+        u.increaseStat("stats_inline_queries")
+        u.increaseStat("stats_trains_bynum")
+
         if len(results) == 1:
             raw = api.call('andamentoTreno', results[0][1], iq.query)
             text = format.formatTrain(raw)
@@ -145,6 +148,9 @@ def process_inline_query(bot, iq, u):
             except (KeyError, IndexError, HTTPError):
                 return not_found_answer()
 
+            u.increaseStat("stats_inline_queries")
+            u.increaseStat("stats_trains_byiti")
+
             text = format.formatItinerary(raw)
 
             iq.answer(
@@ -173,6 +179,9 @@ def process_inline_query(bot, iq, u):
                 return not_found_answer()
 
             elif len(results) > 0:
+                u.increaseStat("stats_inline_queries")
+                u.increaseStat("stats_stations")
+
                 inline_results = []
                 x = 0
                 for station in results:
