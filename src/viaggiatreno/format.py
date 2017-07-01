@@ -102,7 +102,7 @@ def formatTrain(raw: dict):
 
     last_detection = raw['stazioneUltimoRilevamento']
     if last_detection in ['--', None] or last_detection == raw.get('origine'):
-        status += ' a {o} (in partenza)'.format(o=raw.get('origine'))
+        status = '\n🕒 <b>Non ancora partito</b>'
     elif last_detection == raw.get('destinazione'):
         status += ' a {d} (arrivato a destinazione)'.format(d=last_detection)
     else:
