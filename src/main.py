@@ -71,6 +71,7 @@ bot = botogram.create(config.BOT_TOKEN)
 
 @bot.command("start")
 def start(message, args):
+    """Avvia il bot"""
     if args:
         deeplinking.process_deeplinking(bot, message, args)
         return
@@ -78,7 +79,7 @@ def start(message, args):
     commands.process_start_command(bot, message)
 
 
-@bot.command("admin")
+@bot.command("admin", hidden=True)
 def admin(message):
     commands.process_admin_command(bot, message)
 
@@ -110,3 +111,7 @@ def process_inline_query(__bot, __chains, update):
     inline.process_inline_query(bot, iq, u)
 
 bot.register_update_processor("inline_query", process_inline_query)
+
+# Bot configuration
+bot.lang = "it"
+bot.process_backlog = True
