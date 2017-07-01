@@ -80,6 +80,7 @@ def process_callback(bot, cb, u):
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {'inline_keyboard': [
+                    [{"text": "⤴️ Prova l'inline mode", "switch_inline_query": ""}],
                     [{"text": "👤 Contatta lo sviluppatore", "url": "https://t.me/MarcoBuster"},
                      {"text": "📢 Canale ufficiale", "url": "https://t.me/OrarioTreni"}],
                     [{"text": "💰 Dona", "url": "https://paypal.me/marcoaceti"},
