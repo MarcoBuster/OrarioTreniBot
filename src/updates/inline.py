@@ -41,14 +41,22 @@ def process_inline_query(bot, iq, u):
                 {
                     "type": "article",
                     "id": "0",
-                    "title": "❇️ Orario Treni in ogni chat!",
-                    "description": "👉 Clicca qui per scoprire come usare Orario Treni in ogni chat!",
+                    "title": "❇️ Orario Treni in tutte le chat!",
+                    "description": "👉 Clicca qui per scoprire come usare Orario Treni in qualsiasi chat!",
                     "input_message_content": {
                         "message_text": (
-                            "❇️ <b>Usa Orario Treni in ogni chat!</b>"
+                            "❇️ <b>Usa Orario Treni in tutte le chat!</b>"
                             "\n⏺ <i>Cerca treni, stazioni e itinerari in qualsiasi chat</i>"
+                            "\nPer usare questa funzione basta che scrivi <code>@{username} query</code> in qualsiasi chat: "
+                            "si aprirà un pop-up da dove potrai selezionare il risultato desiderato."
                             "\n➖➖️ <b>Cerca treni e stazioni</b>"
-                            "\nScrivi semplicemente <b>il numero del treno</b> o <b>il nome della stazione</b>"
+                            "\nScrivi il <b>numero del treno</b> o il <b>nome della stazione</b>, "
+                            "per esempio <code>@{username} 9650</code> o <code>@{username} Roma Termini</code>"
+                            "\n➖➖️ <b>Cerca itinerari</b>"
+                            "\nScrivi la <b>stazione di partenza</b>, un <b>trattino -</b> e la <b>stazione di arrivo</b>: "
+                            "per esempio <code>@{username} Milano Centrale - Roma Termini</code>"
+                            "\n<i>Gli itinerari cercati inline sono basati sull'orario attuale</i>"
+                            .format(username=bot.itself.username)
                         ),
                         "parse_mode": "HTML",
                         "disable_web_page_preview": True,
@@ -70,13 +78,21 @@ def process_inline_query(bot, iq, u):
                     "type": "article",
                     "id": iq.query,
                     "title": "❌ Non trovato",
-                    "description": "👉 Clicca qui per scoprire come usare Orario Treni in ogni chat!",
+                    "description": "👉 Clicca qui per scoprire come usare Orario Treni in qualsiasi chat!",
                     "input_message_content": {
                         "message_text": (
-                            "❇️ <b>Usa Orario Treni in ogni chat!</b>"
+                            "❇️ <b>Usa Orario Treni in tutte le chat!</b>"
                             "\n⏺ <i>Cerca treni, stazioni e itinerari in qualsiasi chat</i>"
+                            "\nPer usare questa funzione basta che scrivi <code>@{username} query</code> in qualsiasi chat: "
+                            "si aprirà un pop-up da dove potrai selezionare il risultato desiderato."
                             "\n➖➖️ <b>Cerca treni e stazioni</b>"
-                            "\nScrivi semplicemente <b>il numero del treno</b> o <b>il nome della stazione</b>"
+                            "\nScrivi il <b>numero del treno</b> o il <b>nome della stazione</b>, "
+                            "per esempio <code>@{username} 9650</code> o <code>@{username} Roma Termini</code>"
+                            "\n➖➖️ <b>Cerca itinerari</b>"
+                            "\nScrivi la <b>stazione di partenza</b>, un <b>trattino -</b> e la <b>stazione di arrivo</b>: "
+                            "per esempio <code>@{username} Milano Centrale - Roma Termini</code>"
+                            "\n<i>Gli itinerari cercati inline sono basati sull'orario attuale</i>"
+                            .format(username=bot.itself.username)
                         ),
                         "parse_mode": "HTML",
                         "disable_web_page_preview": True,
