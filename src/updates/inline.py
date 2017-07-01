@@ -18,12 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from datetime import datetime
 from urllib.error import HTTPError
 
 from ..viaggiatreno import viaggiatreno, format
 
 
 def process_inline_query(bot, iq, u):
+    def minifyStation(__str):
+        __str = __str[1:]
+        x = 0
+        for i in __str:
+            if i != "0":
+                __str = __str[x:]
+                break
+            x += 1
+        return __str
+
     def default_answer():
         iq.answer(
             results=[
@@ -123,7 +134,38 @@ def process_inline_query(bot, iq, u):
             )
     else:
         if "-" in iq.query:  # Search itinerary
-            return default_answer()
+            print(api.call('cercaStazione', iq.query.split("-")[0]))
+            print(api.call('cercaStazione', iq.query.split("-")[1]))
+            try:
+                station_a = minifyStation(api.call('cercaStazione', iq.query.split("-")[0])[0]['id'])
+                station_b = minifyStation(api.call('cercaStazione', iq.query.split("-")[1])[0]['id'])
+                date = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
+
+                raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
+            except (KeyError, IndexError, HTTPError):
+                return not_found_answer()
+
+            text = format.formatItinerary(raw)
+
+            iq.answer(
+                results=[
+                    {
+                        "type": "article",
+                        "id": iq.query,
+                        "title": "🛤 Itinerari da {a} a {b}".format(
+                            a=iq.query.split("-")[0].upper(),
+                            b=iq.query.split("-")[1].upper()),
+                        "description": "{x} soluzioni trovate".format(
+                            x=len(raw['soluzioni']) if len(raw['soluzioni']) < 5 else 5),
+                        "input_message_content": {
+                            "message_text": text,
+                            "parse_mode": "HTML",
+                            "disable_web_page_preview": True
+                        },
+                        "thumb_url": "http://i.imgur.com/hp9QUXx.png",
+                    }
+                ]
+            )
 
         else:  # Search station
             results = api.call('cercaStazione', iq.query)

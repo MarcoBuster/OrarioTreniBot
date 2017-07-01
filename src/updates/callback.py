@@ -566,6 +566,9 @@ def process_callback(bot, cb, u):
                 parse_mode="HTML",
                 message=cb.message)
 
+    else:
+        cb.notify("501 - not implemented", alert=True)
+
 
 def process_inline_callback(bot, cb, u):
     if not cb.isInline:
