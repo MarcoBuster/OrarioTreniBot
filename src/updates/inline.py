@@ -195,7 +195,7 @@ def process_inline_query(bot, iq, u):
                             "title": "🚉 Stazione di {station}".format(station=station['nomeLungo']),
                             "description": "👉 Informazioni sulla stazione di {station}".format(station=station['nomeLungo']),
                             "input_message_content": {
-                                "message_text": format.formatStation(station),
+                                "message_text": format.formatStation(station['nomeLungo']),
                                 "parse_mode": "HTML",
                                 "disable_web_page_preview": True
                             },
