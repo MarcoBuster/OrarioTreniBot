@@ -138,7 +138,6 @@ def process_callback(bot, cb, u):
 
         text = (
             "<b>Statistiche</b>"
-            "\n<i>Le informazioni</i>"
             "\n➖➖ 👤 <i>Utenti</i>"
             "\n<b>Utenti attivi</b>: {au}"
             "\n<b>Utenti totali</b>: {tu}"
