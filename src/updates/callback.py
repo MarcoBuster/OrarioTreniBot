@@ -310,7 +310,10 @@ def process_callback(bot, cb, u):
                             [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
                             [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
                              {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
-                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                            [{"text": "⚠ Segui", "callback_data": "train@{d}_{n}@follow"
+                             .format(d=departure_station,
+                                     n=train)},
+                             {"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
                 })
@@ -329,6 +332,26 @@ def process_callback(bot, cb, u):
                     {"inline_keyboard": inline_keyboard}
                 )
             })
+            return
+
+        elif arguments[0] == "follow":
+            cb.notify("⚠ Inseguimento per il treno {d} {n} attivato".format(d=departure_station, n=train))
+            # Inserisci dentro REDIS
+            with r.pipeline() as pipe:
+                while True:
+                    try:
+                        k = "follow_{d}_{n}".format(d=departure_station, n=train)
+                        pipe.watch(k)
+                        cur = pipe.get(k)
+                        if cur is None:
+                            cur = []
+                        else:
+                            cur = json.loads(cur)
+                        cur.append(cb.chat.id)
+                        pipe.set(k, json.dumps(cur))
+                        break
+                    except WatchError:
+                        continue
             return
 
         elif arguments[0] == "stop":

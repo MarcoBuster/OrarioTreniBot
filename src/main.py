@@ -26,6 +26,7 @@ from .objects.callback import Callback
 from .objects.inline import Inline
 from .objects.user import User
 from .updates import commands, callback, messages, deeplinking, inline
+from .viaggiatreno.follower import trainfollower
 
 
 class CallbackQuery(botogram.objects.base.BaseObject):
@@ -88,6 +89,11 @@ def admin(message):
 def process_messages(message):
     u = User(message.sender)
     messages.process_messages(bot, message, u)
+
+
+@bot.timer(10)
+def timer_follower(bot, shared):
+    trainfollower(bot)
 
 
 def process_callback(__bot, __chains, update):
