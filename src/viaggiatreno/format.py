@@ -242,7 +242,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
         x += 1
 
     if x == 0:
-        text += "\n<i>Nessun treno in arrivo</i>"
+        text += "\n<i>Nessun treno in partenza</i>"
     return text
 
 
