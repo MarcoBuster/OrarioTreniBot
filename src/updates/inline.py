@@ -153,11 +153,9 @@ def process_inline_query(bot, iq, u):
             )
     else:
         if "-" in iq.query:  # Search itinerary
-            print(api.call('cercaStazione', iq.query.split("-")[0]))
-            print(api.call('cercaStazione', iq.query.split("-")[1]))
             try:
-                station_a = minifyStation(api.call('cercaStazione', iq.query.split("-")[0])[0]['id'])
-                station_b = minifyStation(api.call('cercaStazione', iq.query.split("-")[1])[0]['id'])
+                station_a = minifyStation(api.call('cercaStazione', iq.query.split("-")[0].strip())[0]['id'])
+                station_b = minifyStation(api.call('cercaStazione', iq.query.split("-")[1].strip())[0]['id'])
                 date = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 
                 raw = api.call('soluzioniViaggioNew', station_a, station_b, date)

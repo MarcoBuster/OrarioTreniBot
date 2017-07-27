@@ -208,22 +208,25 @@ def formatDepartures(raw: dict, station: str, xrange: int):
         if x == xrange:
             break
 
-        if train['binarioProgrammatoPartenzaDescrizione'] != train['binarioEffettivoPartenzaDescrizione'] and \
-                train['binarioProgrammatoPartenzaDescrizione'] and train['binarioEffettivoPartenzaDescrizione']:
-            binary = "{x} (invece di binario {y})".format(x=train['binarioEffettivoPartenzaDescrizione'].strip(),
-                                                          y=train['binarioProgrammatoPartenzaDescrizione'].strip())
+        platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
-        elif (train['binarioProgrammatoPartenzaDescrizione'] == train['binarioEffettivoPartenzaDescrizione'] and
-                train['binarioProgrammatoPartenzaDescrizione'] and train['binarioEffettivoPartenzaDescrizione']) or \
-                (train['binarioProgrammatoPartenzaDescrizione'] and not train['binarioEffettivoPartenzaDescrizione']):
-            binary = train['binarioProgrammatoPartenzaDescrizione'].strip()
+        if train['binarioProgrammatoPartenzaDescrizione'] and train['binarioEffettivoPartenzaDescrizione']:
+            if train['binarioProgrammatoPartenzaDescrizione'].strip() != train['binarioEffettivoPartenzaDescrizione'].strip():
+                platform = "{x} (invece di binario {y})".format(x=train['binarioEffettivoPartenzaDescrizione'].strip(),
+                                                                y=train['binarioProgrammatoPartenzaDescrizione'].strip())
+
+            elif train['binarioProgrammatoPartenzaDescrizione'].strip() == train['binarioEffettivoPartenzaDescrizione'].strip():
+                platform = train['binarioProgrammatoPartenzaDescrizione'].strip()
+
+        elif train['binarioProgrammatoPartenzaDescrizione'] and not train['binarioEffettivoPartenzaDescrizione']:
+            platform = train['binarioProgrammatoPartenzaDescrizione'].strip()
 
         elif not (train['binarioProgrammatoPartenzaDescrizione'] and train['binarioEffettivoPartenzaDescrizione'] and
                   train['inStazione']):
-            binary = "<i>sconosciuto</i>"
+            platform = "<i>sconosciuto</i>"
 
         else:
-            binary = "<i>sconosciuto</i> (errore Trenitalia)"
+            platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
             "\n\n➖➖ <b>Treno {n}</b> ({href})"
@@ -233,7 +236,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
             .format(n=train['compNumeroTreno'], href=gDLHREF(gTCQ(train)),
-                    d=train['destinazione'], b=binary, dt=train['compOrarioPartenza'],
+                    d=train['destinazione'], b=platform, dt=train['compOrarioPartenza'],
                     r=train['ritardo'], st='in partenza' if train['inStazione'] else 'partito')
         )
         x += 1
@@ -259,22 +262,25 @@ def formatArrivals(raw: dict, station: str, xrange: int):
         if x == xrange:
             break
 
-        if train['binarioProgrammatoArrivoDescrizione'] != train['binarioEffettivoArrivoDescrizione'] and \
-                train['binarioProgrammatoArrivoDescrizione'] and train['binarioEffettivoArrivoDescrizione']:
-            binary = "{x} (invece di binario {y})".format(x=train['binarioEffettivoArrivoDescrizione'].strip(),
-                                                          y=train['binarioProgrammatoArrivoDescrizione'].strip())
+        platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
-        elif (train['binarioProgrammatoArrivoDescrizione'] == train['binarioEffettivoArrivoDescrizione'] and
-                train['binarioProgrammatoArrivoDescrizione'] and train['binarioEffettivoArrivoDescrizione']) or \
-                (train['binarioProgrammatoArrivoDescrizione'] and not train['binarioEffettivoArrivoDescrizione']):
-            binary = train['binarioProgrammatoArrivoDescrizione'].strip()
+        if train['binarioProgrammatoArrivoDescrizione'] and train['binarioEffettivoArrivoDescrizione']:
+            if train['binarioProgrammatoArrivoDescrizione'].strip() != train['binarioEffettivoArrivoDescrizione'].strip():
+                platform = "{x} (invece di binario {y})".format(x=train['binarioEffettivoArrivoDescrizione'].strip(),
+                                                                y=train['binarioProgrammatoArrivoDescrizione'].strip())
+
+            elif train['binarioProgrammatoArrivoDescrizione'].strip() == train['binarioEffettivoArrivoDescrizione'].strip():
+                platform = train['binarioProgrammatoArrivoDescrizione'].strip()
+
+        elif train['binarioProgrammatoArrivoDescrizione'] and not train['binarioEffettivoArrivoDescrizione']:
+            platform = train['binarioProgrammatoArrivoDescrizione'].strip()
 
         elif not (train['binarioProgrammatoArrivoDescrizione'] and train['binarioEffettivoArrivoDescrizione'] and
                   train['inStazione']):
-            binary = "<i>sconosciuto</i>"
+            platform = "<i>sconosciuto</i>"
 
         else:
-            binary = "<i>sconosciuto</i> (errore Trenitalia)"
+            platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
             "\n\n➖➖ <b>Treno {n}</b> ({href})"
@@ -284,7 +290,7 @@ def formatArrivals(raw: dict, station: str, xrange: int):
             "\n🕘 <b>Ritardo</b>: {r}m"
             "\n⏺ <b>Stato</b>: {st}"
             .format(n=train['compNumeroTreno'], href=gDLHREF(gTCQ(train)),
-                    d=train['origine'], b=binary, dt=train['compOrarioArrivo'],
+                    d=train['origine'], b=platform, dt=train['compOrarioArrivo'],
                     r=train['ritardo'], st='in arrivo' if not train['inStazione'] else 'arrivato')
         )
         x += 1
