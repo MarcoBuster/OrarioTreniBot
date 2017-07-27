@@ -68,7 +68,7 @@ def generateTrainCallbackQuery(raw: dict):
                 for stop in train['fermate']:
                     if stop['stazione'].lower() == stop_station:
                         return "train@" + train['idOrigine'] + "_" + str(raw['numeroTreno'])
-            return "train@" + results[0]['id'] + "_" + str(raw['numeroTreno'])
+            return "train@" + results[0][1] + "_" + str(raw['numeroTreno'])
 
 
 def generateStationCallbackQuery(raw: dict):
