@@ -22,10 +22,10 @@ import json
 import os
 from datetime import datetime, timedelta
 
+import config
 import redis
 from botogram.api import APIError
 
-import config
 from . import global_messages
 from ..viaggiatreno import viaggiatreno, format
 from ..viaggiatreno.dateutils import is_DST
@@ -385,7 +385,7 @@ def process_callback(bot, cb, u):
 
         elif state == "train_byiti_2":
             u.setRedis('iti_station2', station)
-            u.state('train_byiti _3')
+            u.state('train_byiti_3')
             text = (
                 "<b>🛤 Cerca treno</b> per itinerario"
                 "\nInserisci ora <b>la data</b> e/o <b>l'orario di partenza</b> desiderati "
