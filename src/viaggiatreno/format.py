@@ -242,7 +242,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
         x += 1
 
     if x == 0:
-        text += "\n<i>Nessun treno in arrivo</i>"
+        text += "\n<i>Nessun treno in partenza</i>"
     return text
 
 
@@ -306,6 +306,10 @@ def formatItinerary(raw: dict):
         "\n<i>Soluzioni di viaggio da {p} a {a}</i>"
         .format(p=raw['origine'], a=raw['destinazione'])
     )
+
+    if not raw['soluzioni']:
+        text += "\n<i>Nessuna soluzione trovata</i>"
+        return text
 
     x = 0
     for solution in raw['soluzioni']:
