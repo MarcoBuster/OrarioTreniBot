@@ -1,28 +1,20 @@
-# Orario Treni Bot [![Bot](https://img.shields.io/badge/Telegram-@OrarioTreniBot-red.svg?style=flat)][Bot] [![News channel](https://img.shields.io/badge/News-@OrarioTreni-0d86d7.svg?style=flat)][Channel]
-> <b>Repository in riscrittura!</b> Guarda il [branch rewrite](https://github.com/MarcoBuster/OrarioTreniBot/tree/rewrite). <i>Tutte le Pull Request in questo branch saranno ignorate.</i>
+# Orario Treni Bot [![Bot](https://img.shields.io/badge/Telegram-@OrarioTreniBot-red.svg?style=flat)][Bot] [![News channel](https://img.shields.io/badge/News-@OrarioTreni-orange.svg?style=flat)][Channel] [![Group](https://img.shields.io/badge/Telegram%20Group-@MarcoBusterGroup-blue.svg?style=flat)][Group] [![Travis](https://travis-ci.org/MarcoBuster/OrarioTreniBot.svg?branch=rewrite)][Travis]
+A Telegram bot for italian trains
 
-Orario treni è un **bot Telegram** per le ferrovie italiane programmato in Python con numerose funzioni
+## Features
+- [x] Efficent **menu** with all features by hand
+- [x] Search a **train** **by number** or **by itinerary** 
+- [x] Search a **station** **by name** with small Wikipedia summary
+- [x] **Departures** and **arrivals** of a station with pages
+- [x] Update **train's informations** and get **real-time results**
+- [x] **Search** a train, station or itinerary **fast** with **inline mode**!
+- [ ] Track a **train** and get **intelligent notifications**
 
-### Funzionalità e utilizzo
-Il bot è raggiungibile da **Telegram** cercando `@OrarioTreniBot` nella barra di ricerca.
-Permette di cercare **treni**, **stazioni**, **itinerari**, **statistiche**, anche **inline**. Tutto con delle comode tastiere.
+## Credits and license
+See <code>AUTHORS</code> and <code>LICENSE</code> files.
 
-### Installazione
-Per installare questo bot sulla tua VPS Linux Ubuntu, devi:
-
-    $ python3 -m pip install botogram
-    $ git clone https://www.github.com/MarcoBuster/OrarioTreniBot.git && cd OrarioTreniBot
-    $ python3 "Bot.py"
-
-> Attenzione! Inserire il TOKEN del bot nel codice sorgente prima di avviare il bot!
-
-### Licenza e crediti
-Il bot è stato programmato da [MarcoBuster][Marco] e rilasciato sotto licenza [MIT][MIT], raggiungibile su Telegram tramite [questo indirizzo][Bot].
-
-*Si ringrazia [Pietro Albini][Pietro] per la sua preziosa collaborazione agli albori del bot. Senza di te e la tua pazienza non avrei mai continuato, forse nemmeno iniziato il progetto :3*
-
-[Marco]: https://www.github.com/MarcoBuster
-[MIT]: https://opensource.org/licenses/MIT
-[Bot]: https://telegram.me/OrarioTreniBot
-[Pietro]: https://www.github.com/PietroAlbini
-[Channel]: https://www.telegram.me/OrarioTreni
+<!-- URLS -->
+[Bot]: https://t.me/OrarioTreniBot
+[Channel]: https://t.me/OrarioTreni
+[Group]: https://t.me/MarcoBusterGroup
+[Travis]: https://travis-ci.org/MarcoBuster/OrarioTreniBot

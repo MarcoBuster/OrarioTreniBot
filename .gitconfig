@@ -1,0 +1,6 @@
+[user]
+	name = Marco Aceti
+	email = personale@marcoaceti.it
+	signingkey = 97EC65FCF63B73DA
+[commit]
+    gpgsign = true
