@@ -22,10 +22,10 @@ import json
 import os
 from datetime import datetime, timedelta
 
-import config
 import redis
 from botogram.api import APIError
 
+import config
 from . import global_messages
 from ..viaggiatreno import viaggiatreno, format
 from ..viaggiatreno.dateutils import is_DST
@@ -502,8 +502,6 @@ def process_callback(bot, cb, u):
 
         station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
         station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
-        u.delRedis('iti_station1')
-        u.delRedis('iti_station2')
 
         u.increaseStat('stats_trains_byiti')
 
