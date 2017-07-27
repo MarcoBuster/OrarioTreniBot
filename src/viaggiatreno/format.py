@@ -307,6 +307,10 @@ def formatItinerary(raw: dict):
         .format(p=raw['origine'], a=raw['destinazione'])
     )
 
+    if not raw['soluzioni']:
+        text += "\n<i>Nessuna soluzione trovata</i>"
+        return text
+
     x = 0
     for solution in raw['soluzioni']:
         if x == 5:
