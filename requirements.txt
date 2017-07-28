@@ -5,3 +5,4 @@ dateutils
 progressbar2
 plotly
 image
+pyowm
