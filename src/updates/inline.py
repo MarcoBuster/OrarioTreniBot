@@ -26,6 +26,10 @@ from urllib.error import HTTPError
 from ..viaggiatreno import viaggiatreno, format
 
 
+def _gen_ran_string(string_len: int = 16):
+    return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(string_len))
+
+
 def process_inline_query(bot, iq, u):
     def minifyStation(__str):
         __str = __str[1:]
@@ -42,7 +46,7 @@ def process_inline_query(bot, iq, u):
             results=[
                 {
                     "type": "article",
-                    "id": "0",
+                    "id": _gen_ran_string(),
                     "title": "❇️ Orario Treni in tutte le chat!",
                     "description": "👉 Clicca qui per scoprire come usare Orario Treni in qualsiasi chat!",
                     "input_message_content": {
@@ -78,7 +82,7 @@ def process_inline_query(bot, iq, u):
             results=[
                 {
                     "type": "article",
-                    "id": iq.query,
+                    "id": _gen_ran_string(),
                     "title": "❌ Non trovato",
                     "description": "👉 Clicca qui per scoprire come usare Orario Treni in qualsiasi chat!",
                     "input_message_content": {
@@ -132,7 +136,7 @@ def process_inline_query(bot, iq, u):
             inline_results.append(
                 {
                         "type": "article",
-                        "id": ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(8)),
+                        "id": _gen_ran_string(),
                         "title": "🚅 Treno {train}".format(train=raw['compNumeroTreno']),
                         "description": "👉 Informazioni del treno {train} da {o}".format(
                             train=raw['compNumeroTreno'],
@@ -178,7 +182,7 @@ def process_inline_query(bot, iq, u):
                 results=[
                     {
                         "type": "article",
-                        "id": iq.query,
+                        "id": _gen_ran_string(),
                         "title": "🛤 Itinerari da {a} a {b}".format(
                             a=iq.query.split("-")[0].upper(),
                             b=iq.query.split("-")[1].upper()),
@@ -212,7 +216,7 @@ def process_inline_query(bot, iq, u):
                     inline_results.append(
                         {
                             "type": "article",
-                            "id": iq.query + str(x),
+                            "id": _gen_ran_string(),
                             "title": "🚉 Stazione di {station}".format(station=station['nomeLungo']),
                             "description": "👉 Informazioni sulla stazione di {station}".format(station=station['nomeLungo']),
                             "input_message_content": {
