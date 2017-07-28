@@ -93,6 +93,8 @@ def process_callback(bot, cb, u):
         cb.notify("ℹ️ Altre informazioni")
 
     elif cb.query == "stats":
+        cb.notify("📈 Sto generando le statistiche, attendere...")
+
         users = []
         for user in r.keys("user:*"):
             users.append(int(user[5:]))
@@ -165,7 +167,6 @@ def process_callback(bot, cb, u):
                 ]}
             )
         })
-        cb.notify("📈 Statistiche")
 
     elif cb.query == "train":
         text = (
