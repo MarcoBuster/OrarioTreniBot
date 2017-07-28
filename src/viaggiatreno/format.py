@@ -62,6 +62,9 @@ def generateTrainCallbackQuery(raw: dict):
         stop_station = raw['origine']
 
         results = api.call("cercaNumeroTrenoTrenoAutocomplete", train_number)
+        if len(results) == 0:
+            return False
+
         if len(results) == 1:
             return "train@" + results[0][1] + "_" + str(raw['numeroTreno'])
 
@@ -79,6 +82,9 @@ def generateStationCallbackQuery(raw: dict):
 
 
 def generateDeepLinkingHREF(query: str, text: str = "più informazioni"):
+    if not query:
+        return "<i>altre informazioni non disponibili</i>"
+
     url = "https://t.me/{username}?start={query}".format(username=bot.itself.username,
                                                          query=base64.b64encode(bytes(query, "utf-8")).decode("utf-8"))
     href = "<a href=\"{url}\">{text}</a>".format(url=url, text=text)
@@ -342,7 +348,8 @@ def formatItinerary(raw: dict):
 
         x += 1
         text += "\n\n➖➖ <b>Soluzione {n}</b>".format(n=x)
-        text += "\n🕑 <b>Durata</b>: {t}".format(t=solution.get('durata', '<i>sconosciuta</i>'))
+        duration = solution.get('durata', '<i>sconosciuta</i>')
+        text += "\n🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
         for vehicle in solution['vehicles']:
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
