@@ -413,9 +413,9 @@ def formatTrainStop(raw: dict, stop_number: int):
         arrival = ""
         departure = ""
 
-        rail = stop['binarioEffettivoArrivoDescrizione'] or stop['binarioEffettivoPartenzaDescrizione'] \
+        platform = stop['binarioEffettivoArrivoDescrizione'] or stop['binarioEffettivoPartenzaDescrizione'] \
             or stop['binarioProgrammatoArrivoDescrizione'] or stop['binarioProgrammatoPartenzaDescrizione'] \
-            or "errore Trenitalia"
+            or "<i>sconosciuto</i>"
 
         if format_arrival:
             if stop['arrivoReale']:
@@ -440,13 +440,13 @@ def formatTrainStop(raw: dict, stop_number: int):
             "🚉 <b>Informazioni del treno {train} rispetto alla fermata {station}</b> ({href})"
             "{arrival}"
             "{departure}"
-            "\n🛤 <b>Binario</b>: {rail}"
+            "\n🛤 <b>Binario</b>: {platform}"
             .format(
                 train=raw['compNumeroTreno'],
                 station=stop['stazione'], href=gDLHREF(gSCQ(stop), "più informazioni sulla stazione"),
                 arrival="\n🚥 <b>Arrivo</b>: {arrival}".format(arrival=arrival) if arrival else "",
                 departure="\n🚥 <b>Partenza</b>: {departure}".format(departure=departure) if departure else "",
-                rail=rail
+                platform=platform
             )
         )
         return text
