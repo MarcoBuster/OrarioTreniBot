@@ -160,7 +160,7 @@ def formatStation(station: str, station_id: str, withWikiSummary=False):
         text = (
             "🚉 <b>Stazione di {name}</b>"
             "\nℹ️ <i>{wikipedia}</i>"
-            "\n\noqm{weather}"
+            "\n\n{weather}"
             .format(name=station.title(),
                     wikipedia=getWikipediaSummary(station),
                     weather=getWeather(station_id=station_id))
