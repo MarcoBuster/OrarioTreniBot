@@ -107,7 +107,7 @@ def process_callback(bot, cb, u):
         stations = 0
         for user in users:
             user_hash = "user:" + str(user)
-            active_users += 1 if bool(r.hget(user_hash, "active")) else 0
+            active_users += 1 if r.hget(user_hash, "active").decode('utf-8') == "True" else 0
             total_users += 1
 
             start_command += int(r.hget(user_hash, 'stats_command_start')) \
