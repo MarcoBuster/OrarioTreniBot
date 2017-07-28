@@ -155,20 +155,23 @@ def getWikipediaSummary(station: str):
     return cleanHTML(result) + " (da Wikipedia, l'enciclopedia libera)"
 
 
-def formatStation(station: str, withWikiSummary=False):
+def formatStation(station: str, station_id: str, withWikiSummary=False):
     if withWikiSummary:
         text = (
             "🚉 <b>Stazione di {name}</b>"
             "\nℹ️ <i>{wikipedia}</i>"
+            "\n\noqm{weather}"
             .format(name=station.title(),
-                    wikipedia=getWikipediaSummary(station))
+                    wikipedia=getWikipediaSummary(station),
+                    weather=getWeather(station_id=station_id))
         )
         return text
     else:
         text = (
             "🚉 <b>Stazione di {name}</b>"
             "\n<i>Premi il tasto sotto per mostrare le informazioni da Wikipedia</i>"
-            .format(name=station.title())
+            "\n\n{weather}"
+            .format(name=station.title(), weather=getWeather(station_id=station_id))
         )
         return text
 
@@ -462,12 +465,14 @@ def formatTrainStop(raw: dict, stop_number: int):
             "{arrival}"
             "{departure}"
             "\n🛤 <b>Binario</b>: {platform}"
+            "\n{weather}"
             .format(
                 train=raw['compNumeroTreno'],
                 station=stop['stazione'], href=gDLHREF(gSCQ(stop), "più informazioni sulla stazione"),
                 arrival="\n🚥 <b>Arrivo</b>: {arrival}".format(arrival=arrival) if arrival else "",
                 departure="\n🚥 <b>Partenza</b>: {departure}".format(departure=departure) if departure else "",
-                platform=platform
+                platform=platform,
+                weather=getWeather(stop['id']),
             )
         )
         return text

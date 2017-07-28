@@ -63,7 +63,7 @@ def process_deeplinking(bot, message, args):
 
         u.increaseStat('stats_stations')
 
-        text = format.formatStation(station_name)
+        text = format.formatStation(station_name, station)
         bot.api.call('sendMessage', {
             'chat_id': message.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(

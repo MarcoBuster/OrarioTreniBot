@@ -277,7 +277,7 @@ def process_messages(bot, message, u):
         elif len(results) == 1:
             u.increaseStat('stats_stations')
 
-            text = format.formatStation(results[0]['nomeLungo'])
+            text = format.formatStation(results[0]['nomeLungo'], results[0]['id'])
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(

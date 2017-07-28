@@ -409,7 +409,7 @@ def process_callback(bot, cb, u):
 
         elif not arguments:
             u.increaseStat('stats_stations')
-            text = format.formatStation(station_name)
+            text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
@@ -427,7 +427,7 @@ def process_callback(bot, cb, u):
             return
 
         elif len(arguments) == 1 and arguments[0] == "wiki":
-            text = format.formatStation(station_name, withWikiSummary=True)
+            text = format.formatStation(station_name, station, withWikiSummary=True)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
@@ -672,7 +672,7 @@ def process_inline_callback(bot, cb, u):
 
         if not arguments:
             u.increaseStat('stats_stations')
-            text = format.formatStation(station_name)
+            text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
                 'inline_message_id': cb.inline_message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
@@ -689,7 +689,7 @@ def process_inline_callback(bot, cb, u):
             return
 
         elif len(arguments) == 1 and arguments[0] == "wiki":
-            text = format.formatStation(station_name, withWikiSummary=True)
+            text = format.formatStation(station_name, station, withWikiSummary=True)
             bot.api.call('editMessageText', {
                 'inline_message_id': cb.inline_message_id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
