@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import random
+import string
 from datetime import datetime
 from urllib.error import HTTPError
 
@@ -123,16 +125,19 @@ def process_inline_query(bot, iq, u):
         u.increaseStat("stats_inline_queries")
         u.increaseStat("stats_trains_bynum")
 
-        if len(results) == 1:
-            raw = api.call('andamentoTreno', results[0][1], iq.query)
+        inline_results = []
+        for result in results:
+            raw = api.call('andamentoTreno', result[1], iq.query)
             text = format.formatTrain(raw)
-            iq.answer(
-                results=[
-                    {
+            inline_results.append(
+                {
                         "type": "article",
-                        "id": iq.query,
+                        "id": ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase) for _ in range(8)),
                         "title": "🚅 Treno {train}".format(train=raw['compNumeroTreno']),
-                        "description": "👉 Informazioni del treno {train}".format(train=raw['compNumeroTreno']),
+                        "description": "👉 Informazioni del treno {train} da {o}".format(
+                            train=raw['compNumeroTreno'],
+                            o=raw['origine']
+                        ),
                         "input_message_content": {
                             "message_text": text,
                             "parse_mode": "HTML",
@@ -141,16 +146,18 @@ def process_inline_query(bot, iq, u):
                         "reply_markup": {
                             "inline_keyboard": [
                                 [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
-                                    .format(d=results[0][1],
+                                    .format(d=result[1],
                                             n=iq.query)}],
                                 [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
-                                  .format(d=results[0][1],
+                                  .format(d=result[1],
                                           n=iq.query)}]
                             ]},
-                        "thumb_url": "http://i.imgur.com/hp9QUXx.png",
-                    }
-                ]
+                        "thumb_url": "http://i.imgur.com/hp9QUXx.png"
+                }
             )
+
+        iq.answer(results=inline_results)
+
     else:
         if "-" in iq.query:  # Search itinerary
             try:
