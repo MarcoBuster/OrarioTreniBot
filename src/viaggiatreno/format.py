@@ -19,6 +19,7 @@
 # SOFTWARE.
 
 import base64
+import json
 import os
 import random
 import re
@@ -29,6 +30,7 @@ import botogram
 import plotly
 import plotly.graph_objs as go
 import plotly.plotly as py
+import pyowm
 import wikipedia
 from PIL import Image
 from wikipedia.exceptions import PageError
@@ -40,6 +42,7 @@ from . import viaggiatreno
 api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
+owm = pyowm.OWM(config.OWM_API_KEY)
 plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
 
 wikipedia.set_lang("it")
@@ -84,6 +87,24 @@ def generateDeepLinkingHREF(query: str, text: str = "più informazioni"):
 gTCQ = generateTrainCallbackQuery
 gSCQ = generateStationCallbackQuery
 gDLHREF = generateDeepLinkingHREF
+
+
+def getWeather(station_id: str):
+    path = os.getcwd() + '/'.join(['', 'data', 'viaggiatreno', 'stations_coords.json'])
+    with open(path, 'r') as fp:
+        station_coords = json.load(fp)
+
+    if station_id not in station_coords:
+        return ""
+
+    code = owm.weather_at_coords(station_coords[station_id]["lat"], station_coords[station_id]["lon"])\
+        .get_weather().get_weather_code()
+
+    path = os.getcwd() + '/'.join(['', 'data', 'owm', 'weather_codes_it.json'])
+    with open(path, 'r') as fp:
+        weather_codes = json.load(fp)
+
+    return weather_codes[str(code)]
 
 
 def formatTrain(raw: dict):
@@ -134,20 +155,23 @@ def getWikipediaSummary(station: str):
     return cleanHTML(result) + " (da Wikipedia, l'enciclopedia libera)"
 
 
-def formatStation(station: str, withWikiSummary=False):
+def formatStation(station: str, station_id: str, withWikiSummary=False):
     if withWikiSummary:
         text = (
             "🚉 <b>Stazione di {name}</b>"
             "\nℹ️ <i>{wikipedia}</i>"
+            "\n\noqm{weather}"
             .format(name=station.title(),
-                    wikipedia=getWikipediaSummary(station))
+                    wikipedia=getWikipediaSummary(station),
+                    weather=getWeather(station_id=station_id))
         )
         return text
     else:
         text = (
             "🚉 <b>Stazione di {name}</b>"
             "\n<i>Premi il tasto sotto per mostrare le informazioni da Wikipedia</i>"
-            .format(name=station.title())
+            "\n\n{weather}"
+            .format(name=station.title(), weather=getWeather(station_id=station_id))
         )
         return text
 
@@ -441,12 +465,14 @@ def formatTrainStop(raw: dict, stop_number: int):
             "{arrival}"
             "{departure}"
             "\n🛤 <b>Binario</b>: {platform}"
+            "\n{weather}"
             .format(
                 train=raw['compNumeroTreno'],
                 station=stop['stazione'], href=gDLHREF(gSCQ(stop), "più informazioni sulla stazione"),
                 arrival="\n🚥 <b>Arrivo</b>: {arrival}".format(arrival=arrival) if arrival else "",
                 departure="\n🚥 <b>Partenza</b>: {departure}".format(departure=departure) if departure else "",
-                platform=platform
+                platform=platform,
+                weather=getWeather(stop['id']),
             )
         )
         return text

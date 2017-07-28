@@ -33,3 +33,6 @@ ADMINS = []
 # -- Plotly configuration --
 PLOTLY_USERNAME = ''
 PLOTLY_API_KEY = ''
+
+# -- Open Weather Map configuration --
+OWM_API_KEY = ''

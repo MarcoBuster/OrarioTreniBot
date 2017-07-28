@@ -135,28 +135,28 @@ def process_inline_query(bot, iq, u):
             text = format.formatTrain(raw)
             inline_results.append(
                 {
-                        "type": "article",
-                        "id": _gen_ran_string(),
-                        "title": "🚅 Treno {train}".format(train=raw['compNumeroTreno']),
-                        "description": "👉 Informazioni del treno {train} da {o}".format(
-                            train=raw['compNumeroTreno'],
-                            o=raw['origine']
-                        ),
-                        "input_message_content": {
-                            "message_text": text,
-                            "parse_mode": "HTML",
-                            "disable_web_page_preview": True,
-                        },
-                        "reply_markup": {
-                            "inline_keyboard": [
-                                [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
-                                    .format(d=result[1],
-                                            n=iq.query)}],
-                                [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
-                                  .format(d=result[1],
-                                          n=iq.query)}]
-                            ]},
-                        "thumb_url": "http://i.imgur.com/hp9QUXx.png"
+                    "type": "article",
+                    "id": _gen_ran_string(),
+                    "title": "🚅 Treno {train}".format(train=raw['compNumeroTreno']),
+                    "description": "👉 Informazioni del treno {train} da {o}".format(
+                        train=raw['compNumeroTreno'],
+                        o=raw['origine']
+                    ),
+                    "input_message_content": {
+                        "message_text": text,
+                        "parse_mode": "HTML",
+                        "disable_web_page_preview": True,
+                    },
+                    "reply_markup": {
+                        "inline_keyboard": [
+                            [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
+                                .format(d=result[1],
+                                        n=iq.query)}],
+                            [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
+                                .format(d=result[1],
+                                        n=iq.query)}]
+                        ]},
+                    "thumb_url": "http://i.imgur.com/hp9QUXx.png"
                 }
             )
 
@@ -220,7 +220,7 @@ def process_inline_query(bot, iq, u):
                             "title": "🚉 Stazione di {station}".format(station=station['nomeLungo']),
                             "description": "👉 Informazioni sulla stazione di {station}".format(station=station['nomeLungo']),
                             "input_message_content": {
-                                "message_text": format.formatStation(station['nomeLungo']),
+                                "message_text": format.formatStation(station['nomeLungo'], station['id']),
                                 "parse_mode": "HTML",
                                 "disable_web_page_preview": True
                             },
