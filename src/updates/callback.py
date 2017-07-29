@@ -305,6 +305,7 @@ def process_callback(bot, cb, u):
                         ]}
                     )
             })
+            return
 
         elif arguments[0] == "update":
             text = format.formatTrain(raw)
@@ -317,7 +318,7 @@ def process_callback(bot, cb, u):
                         {"inline_keyboard": [
                             [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
                             [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
-                             {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
+                             {"text": "📊 Grafico ritardo", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@graph"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                         ]}
                     )
@@ -627,6 +628,7 @@ def process_inline_callback(bot, cb, u):
                         ]}
                     )
             })
+            return
 
         elif arguments[0] == "update":
             text = format.formatTrain(raw)
