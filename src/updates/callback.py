@@ -359,6 +359,7 @@ def process_callback(bot, cb, u):
                 )
                 return
 
+            cb.notify("📊 Grafico per il treno {n} generato con successo".format(n=train))
             cb.message.reply_with_photo(filename)
             os.remove(filename)
             return
