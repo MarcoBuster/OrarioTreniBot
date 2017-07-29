@@ -205,15 +205,14 @@ def process_messages(bot, message, u):
 
     elif state == "train_byiti_3":
         try:
-            date = parse(message.text)
+            date = parse(message.text, dayfirst=True)
         except ValueError:
             text = (
                 "<b>🛤 Cerca treno</b> per itinerario"
                 "\nL'orario inserito <b>non è valido</b>."
-                "\n<b>Esempi</b>: <code>{a}</code>; <code>{b}</code>; <code>{c}</code>"
-                .format(a=datetime.now().strftime('%d/%m %H:%M'),
-                        b=datetime.now().strftime("%H:%M %d/%m/%y"),
-                        c=datetime.now().strftime("%H:%M"))
+                "\n<b>Esempi</b>: <code>{a}</code>; <code>{b}</code>"
+                .format(a=datetime.now().strftime("%H:%M %d/%m/%y"),
+                        b=datetime.now().strftime("%H:%M"))
             )
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
