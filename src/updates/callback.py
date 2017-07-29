@@ -28,7 +28,7 @@ from botogram.api import APIError
 import config
 from . import global_messages
 from ..viaggiatreno import viaggiatreno, format
-from ..viaggiatreno.dateutils import is_DST
+from ..viaggiatreno.dateutils import is_DST, format_timestamp
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
 
@@ -95,6 +95,8 @@ def process_callback(bot, cb, u):
     elif cb.query == "stats":
         cb.notify("📈 Sto generando le statistiche, attendere...")
 
+        viaggiatreno_stats = json.loads(api.call("statistiche", 0))
+
         users = []
         for user in r.keys("user:*"):
             users.append(int(user[5:]))
@@ -139,7 +141,7 @@ def process_callback(bot, cb, u):
             if r.hget(u.rhash, 'stats_stations') else 0
 
         text = (
-            "<b>Statistiche</b>"
+            "📈 <b>Statistiche</b>"
             "\n➖➖ 👤 <i>Utenti</i>"
             "\n<b>Utenti attivi</b>: {au}"
             "\n<b>Utenti totali</b>: {tu}"
@@ -152,11 +154,17 @@ def process_callback(bot, cb, u):
             "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
             "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
             "\n<i>Le statistiche sono aggiornate a partire dal 27/07/2017</i>"
+            "\n➖➖ 🚅 <i>Circolazione ferroviaria</i>"
+            "\n<b>Treni di oggi</b>: {tt}"
+            "\n<b>Treni circolanti</b>: {ct}"
+            "\n<b>Ultimo aggiornamento</b>: {lu}"
             .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count, iq=inline_queries,
                     psc=personal_start_command, pcc=personal_callback_count, piq=personal_inline_queries,
                     tr_bynum=trains_bynum, ptr_bynum=personal_trains_bynum,
                     tr_byiti=trains_byiti, ptr_byiti=personal_trains_byiti,
-                    st=stations, pst=personal_stations)
+                    st=stations, pst=personal_stations,
+                    tt=viaggiatreno_stats['treniGiorno'], ct=viaggiatreno_stats['treniCircolanti'],
+                    lu=format_timestamp(viaggiatreno_stats['ultimoAggiornamento'], "%H:%M"))
         )
         bot.api.call("editMessageText", {
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "parse_mode": "HTML",
