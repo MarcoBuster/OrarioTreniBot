@@ -153,11 +153,11 @@ def process_callback(bot, cb, u):
             "\n<b>Treni cercati</b> per numero: {tr_bynum} <i>(tu {ptr_bynum})</i>"
             "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
             "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
-            "\n<i>Le statistiche sono aggiornate a partire dal 27/07/2017</i>"
             "\n➖➖ 🚅 <i>Circolazione ferroviaria</i>"
             "\n<b>Treni di oggi</b>: {tt}"
             "\n<b>Treni circolanti</b>: {ct}"
             "\n<b>Ultimo aggiornamento</b>: {lu}"
+            "\n<i>Le statistiche sono aggiornate a partire dal 27/07/2017</i>"
             .format(au=active_users, tu=total_users, sc=start_command, cc=callbacks_count, iq=inline_queries,
                     psc=personal_start_command, pcc=personal_callback_count, piq=personal_inline_queries,
                     tr_bynum=trains_bynum, ptr_bynum=personal_trains_bynum,
