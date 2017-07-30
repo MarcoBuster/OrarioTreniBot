@@ -81,9 +81,9 @@ def run():
                     status = '\n🕒 <b>In perfetto orario</b>'
 
                 if delay > last_delay:
-                    delay_info = "(+{diff}m)".format(diff=delay-last_delay)
+                    delay_info = "(+{diff}m)".format(diff=delay - last_delay)
                 elif delay < last_delay:
-                    delay_info = "(-{diff}m)".format(diff=last_delay-delay)
+                    delay_info = "(-{diff}m)".format(diff=last_delay - delay)
                 else:
                     delay_info = ""
 
