@@ -366,6 +366,87 @@ def process_callback(bot, cb, u):
             os.remove(filename)
             return
 
+        elif arguments[0] == "track":
+            if len(arguments) == 1:
+                u.setRedis('track_train', train + "_" + departure_station)
+                text = (
+                    "🚅 <b>Tracciamento del treno {train}</b>"
+                    "\n<i>Modalità di tracciamento</i>"
+                    "\nCon quale <b>modalità</b> vuoi tracciare il treno? Scegli fra:"
+                    "\n➖ <b>Completa</b>, ricevi una notifica ogni volta che il treno viene rilevato"
+                    "\n➖ <b>Solo fermate</b>, ricevi una notifica ogni volta che il treno si ferma a una fermata"
+                    "\n➖ <b>Intelligente</b>, scegli un itinerario e ricevi notifiche intelligenti"
+                    .format(train=raw['compNumeroTreno'])
+                )
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "🚥 Completa", "callback_data": cb.query + "@complete"},
+                             {"text": "🚉 Solo fermate", "callback_data": cb.query + "@stops_only"}],
+                            [{"text": "❇️ Intelligente (🆕)", "callback_data": "todo"}],  # TODO: Intelligent mode
+                            [{"text": "🔙 Torna indietro", "callback_data": "@".join(cb.query.split("@")[:-1])}]
+                        ]}
+                    )
+                })
+                return
+
+            elif arguments[1] in ["complete", "stops_only"]:
+                u.setRedis('track_mode', arguments[1])
+                text = (
+                    "🚅 <b>Tracciamento del treno {train}</b>"
+                    "\n<i>Durata del tracciamento</i>"
+                    "\n<b>Per quanto</b> vuoi tracciare il treno? Scegli fra:"
+                    "\n➖ <b>Solo oggi</b>"
+                    "\n➖ <b>Tutti i giorni</b>"
+                    "\nRicorda che puoi eliminare o modificare un tracciamento quando vuoi dal <b>menù principale</b>"
+                    .format(train=raw['compNumeroTreno'])
+                )
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "⚪️ Solo oggi", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@today"},
+                             {"text": "🔴 Tutti i giorni", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@forever"}],
+                            [{"text": "🔙 Torna indietro", "callback_data": "@".join(cb.query.split("@")[:-1])}]
+                        ]})
+                })
+                return
+
+            elif arguments[1] in ["today", "forever"]:
+                u.setRedis('track_duration', arguments[1])
+                raw_mode = u.getRedis('track_mode').decode('utf-8')
+                raw_when = u.getRedis('track_duration').decode('utf-8')
+
+                text = (
+                    "🚅 <b>Tracciamento del treno {train}</b>"
+                    "\n<i>Conferma impostazioni</i>"
+                    "\nVuoi <b>confermare le impostazioni</b> e <b>iniziare il tracciamento</b>?"
+                    "\n🚊 <b>Treno</b>: {train} (da {departure})"
+                    "\n🔆 <b>Modalità</b>: {mode}"
+                    "\n🕒 <b>Per</b>: {when}"
+                    .format(train=raw['compNumeroTreno'], departure=raw['origine'],
+                            mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                            when="⚪️ Solo oggi" if raw_when == "today" else "🔴 Tutti i giorni")
+                )
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "✅ Conferma", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@confirm"}],
+                            [{"text": "❌ Annulla", "callback_data": "@".join(cb.query.split("@")[:-2])}],
+                            [{"text": "🔙 Cambia le impostazioni", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@" + raw_mode}],
+                        ]}
+                    )
+                })
+
+            elif arguments[1] == "confirm":
+                # TODO: Add tracking to tracks
+                pass
+
     # STATIONS CALLBACK
     elif 'station@' in cb.query:
         arguments = cb.query.split('@')
