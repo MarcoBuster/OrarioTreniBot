@@ -282,6 +282,7 @@ def process_callback(bot, cb, u):
                 json.dumps(
                     {"inline_keyboard": [
                         [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query + "@update"}],
+                        [{"text": "🚅 Traccia il treno", "callback_data": cb.query + "@track"}],
                         [{"text": "🚉 Fermate", "callback_data": cb.query + "@stops"},
                          {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
@@ -299,6 +300,7 @@ def process_callback(bot, cb, u):
                     json.dumps(
                         {"inline_keyboard": [
                             [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
+                            [{"text": "🚅 Traccia il treno", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@track"}],
                             [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
                              {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
                             [{"text": "⬅️ Torna indietro", "callback_data": "home"}]

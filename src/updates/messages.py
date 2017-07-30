@@ -70,6 +70,9 @@ def process_messages(bot, message, u):
                         [{"text": "🔄 Aggiorna le informazioni", "callback_data": "train@{d}_{n}@update"
                             .format(d=results[0][1],
                                     n=message.text)}],
+                        [{"text": "🚅 Traccia il treno", "callback_data": "train@{d}_{n}@track"
+                          .format(d=results[0][1],
+                                  n=message.text)}],
                         [{"text": "🚉 Fermate", "callback_data": "train@{d}_{n}@stops"
                           .format(d=results[0][1],
                                   n=message.text)},
