@@ -26,7 +26,7 @@ import redis
 import config
 from .dateutils import format_timestamp
 from .viaggiatreno import API, Utils
-from ..main import bot
+from .. import main
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
 api = API()
@@ -45,17 +45,26 @@ def newTrack(train, departure_station, u):
     rhash = 'train_track:{x}'.format(x=int(r.get('train_track_last_id').decode('utf-8')) + 1)
     r.hset(rhash, 'train', train)
     r.hset(rhash, 'departure_station', departure_station)
+    r.hset(rhash, 'mode', u.getRedis('track_mode'))
+    r.hset(rhash, 'duration', u.getRedis('track_duration'))
     r.hset(rhash, 'by', u.id)
     r.hset(rhash, 'last_detected', raw['stazioneUltimoRilevamento'])
     r.hset(rhash, 'last_delay', raw['ritardo'])
     r.hset(rhash, 'last_update', int(time.time()))
+    r.hset(rhash, 'status', 'active')
+
+    u.setRedis(rhash, 'active')
     return True
 
 
 def run():
+    bot = main.bot
     while True:
         tracks = r.keys('train_track:*')
         for track in tracks:
+            if r.hget(track, 'status').decode('utf-8') is not 'active':
+                continue
+
             train = r.hget(track, 'train').decode('utf-8')
             departure_station = r.hget(track, 'departure_station').decode('utf-8')
             user = int(r.hget(track, 'by').decode('utf-8'))

@@ -27,7 +27,7 @@ from botogram.api import APIError
 
 import config
 from . import global_messages
-from ..viaggiatreno import viaggiatreno, format
+from ..viaggiatreno import viaggiatreno, format, tracking
 from ..viaggiatreno.dateutils import is_DST, format_timestamp
 
 r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
@@ -444,8 +444,22 @@ def process_callback(bot, cb, u):
                 })
 
             elif arguments[1] == "confirm":
-                # TODO: Add tracking to tracks
-                pass
+                tracking.newTrack(train, departure_station, u)
+                text = (
+                    "🚅 <b>Tracciamento del treno {train}</b>"
+                    "\nIl treno è stato aggiunto alla <b>lista dei tracciamenti</b> con successo"
+                    .format(train=raw['compNumeroTreno'])
+                )
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+                    json.dumps(
+                        {"inline_keyboard": [
+                            [{"text": "ℹ️ Torna alle informazioni del treno", "callback_data": "@".join(cb.query.split("@")[:-2])}],
+                            [{"text": "🔙 Torna al menù principale", "callback_data": "home"}]
+                        ]}
+                    )
+                })
 
     # STATIONS CALLBACK
     elif 'station@' in cb.query:
