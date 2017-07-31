@@ -42,7 +42,8 @@ def process_start_command(bot, message):
             {'inline_keyboard': [
                 [{"text": "🚅 Cerca treno", "callback_data": "train"},
                  {"text": "🚉 Cerca stazione", "callback_data": "station"}],
-                [{"text": "📰 News", "callback_data": "news"}],
+                [{"text": "📰 News", "callback_data": "news"},
+                 {"text": "🛤 Treni in tracciamento", "callback_data": "tracks"}],
                 [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
             ]}
         )

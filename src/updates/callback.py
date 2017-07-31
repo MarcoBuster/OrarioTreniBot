@@ -18,6 +18,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import base64
 import json
 import os
 from datetime import datetime, timedelta
@@ -55,7 +56,8 @@ def process_callback(bot, cb, u):
                 {'inline_keyboard': [
                     [{"text": "🚅 Cerca treno", "callback_data": "train"},
                      {"text": "🚉 Cerca stazione", "callback_data": "station"}],
-                    [{"text": "📰 News", "callback_data": "news"}],
+                    [{"text": "📰 News", "callback_data": "news"},
+                     {"text": "🛤 Treni in tracciamento", "callback_data": "tracks"}],
                     [{"text": "ℹ️ Altre informazioni", "callback_data": "info"}]
                 ]}
             )
@@ -262,6 +264,53 @@ def process_callback(bot, cb, u):
                 )
         })
         cb.notify("📰 News")
+
+    elif cb.query == "tracks":
+        keys = r.hgetall(u.rhash)
+        user_tracks = []
+        for key in keys:
+            if not key.decode('utf-8').startswith('train_track:'):
+                continue
+
+            track = key.decode('utf-8')
+            if r.hget(track, 'status').decode('utf-8') != 'active':
+                continue
+
+            user_tracks.append(track)
+
+        if len(user_tracks) == 0:
+            text = "<i>Non stai tracciando nessun treno</i>"
+
+        else:
+            text = "🛤 <b>Treni in tracciamento</b>"
+            for track in user_tracks:
+                train = r.hget(track, 'train').decode('utf-8')
+                raw_mode = r.hget(track, 'mode').decode('utf-8')
+                raw_duration = r.hget(track, 'duration').decode('utf-8')
+                text += (
+                    "\n➖➖ <b>Treno {train}</b> (<a href=\"{url}\">modifica</a>)"
+                    "\n🔆 <b>Modalità</b>: {mode}"
+                    "\n🕒 <b>Durata</b>: {duration}\n"
+                    .format(
+                        train=train,
+                        url="https://t.me/{username}?start={query}".format(
+                            username=bot.itself.username,
+                            query=base64.b64encode(bytes(track, "utf-8")).decode("utf-8")
+                        ),
+                        mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                        duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni"
+                    )
+                )
+
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+            'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
+            json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                ]}
+            )
+        })
 
     # TRAINS CALLBACK
     elif 'train@' in cb.query:
