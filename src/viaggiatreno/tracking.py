@@ -52,6 +52,7 @@ def newTrack(train, departure_station, u):
     r.hset(rhash, 'last_delay', raw['ritardo'])
     r.hset(rhash, 'last_update', int(time.time()))
     r.hset(rhash, 'status', 'active')
+    r.set('train_track_last_id', int(r.get('train_track_last_id').decode('utf-8')) + 1)
 
     u.setRedis(rhash, 'active')
     return True
