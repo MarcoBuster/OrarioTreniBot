@@ -21,8 +21,13 @@
 import base64
 import json
 
+import redis
+
+import config
 from ..objects.user import User
-from ..viaggiatreno import viaggiatreno, format
+from ..viaggiatreno import viaggiatreno, format, dateutils
+
+r = redis.StrictRedis(host=config.REDIS_HOST, port=config.REDIS_PORT, db=config.REDIS_DB, password=config.REDIS_PASSWORD)
 
 
 def process_deeplinking(bot, message, args):
@@ -76,4 +81,34 @@ def process_deeplinking(bot, message, args):
                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
                     ]}
                 )
+        })
+
+    elif arguments[0] == "train_track":
+        rhash = "train_track:" + arguments[1]
+        train = r.hget(rhash, 'train').decode('utf-8')
+        raw_mode = r.hget(rhash, 'mode').decode('utf-8')
+        raw_duration = r.hget(rhash, 'duration').decode('utf-8')
+        last_detected = r.hget(rhash, 'last_detected').decode('utf-8')
+        last_update = dateutils.format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M %d/%m")
+        text = (
+            "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
+            "\n🔆 <b>Modalità</b>: {mode}"
+            "\n🕒 <b>Durata</b>: {duration}"
+            "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
+            "\n"
+            .format(
+                id=arguments[1], train=train,
+                mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni",
+                last_detected=last_detected, last_update=last_update
+            )
+        )
+        bot.api.call('sendMessage', {
+            'chat_id': message.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup': json.dumps(
+                {"inline_keyboard": [
+                    [{"text": "Modifica", "callback_data": "track@" + train + "@edit"},
+                     {"text": "Cancella", "callback_data": "track@" + train + "@delete"}]
+
+                ]}
+            )
         })

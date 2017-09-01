@@ -295,7 +295,7 @@ def process_callback(bot, cb, u):
                         train=train,
                         url="https://t.me/{username}?start={query}".format(
                             username=bot.itself.username,
-                            query=base64.b64encode(bytes(track, "utf-8")).decode("utf-8")
+                            query=base64.b64encode(bytes(track.replace(':', '@'), "utf-8")).decode("utf-8")
                         ),
                         mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
                         duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni"
