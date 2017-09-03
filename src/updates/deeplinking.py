@@ -95,7 +95,6 @@ def process_deeplinking(bot, message, args):
             "\n🔆 <b>Modalità</b>: {mode}"
             "\n🕒 <b>Durata</b>: {duration}"
             "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
-            "\n"
             .format(
                 id=arguments[1], train=train,
                 mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
@@ -106,9 +105,8 @@ def process_deeplinking(bot, message, args):
         bot.api.call('sendMessage', {
             'chat_id': message.chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup': json.dumps(
                 {"inline_keyboard": [
-                    [{"text": "Modifica", "callback_data": "track@" + train + "@edit"},
-                     {"text": "Cancella", "callback_data": "track@" + train + "@delete"}]
-
+                    [{"text": "✍️ Modifica", "callback_data": "track@" + arguments[1] + "@edit"},
+                     {"text": "🗑 Cancella", "callback_data": "track@" + arguments[1] + "@delete"}]
                 ]}
             )
         })

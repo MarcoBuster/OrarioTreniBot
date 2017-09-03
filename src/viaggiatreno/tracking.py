@@ -58,6 +58,10 @@ def newTrack(train, departure_station, u):
     return True
 
 
+def deleteTrack(track_id):
+    return r.delete('train_track:' + str(track_id))
+
+
 def run():
     bot = main.bot
     while True:

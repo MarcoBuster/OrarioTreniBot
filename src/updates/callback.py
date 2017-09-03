@@ -266,10 +266,10 @@ def process_callback(bot, cb, u):
         cb.notify("📰 News")
 
     elif cb.query == "tracks":
-        keys = r.hgetall(u.rhash)
+        keys = r.keys('train_track:*')
         user_tracks = []
         for key in keys:
-            if not key.decode('utf-8').startswith('train_track:'):
+            if int(r.hget(key, 'by').decode('utf-8')) != u.id:
                 continue
 
             track = key.decode('utf-8')
@@ -313,7 +313,7 @@ def process_callback(bot, cb, u):
         })
 
     # TRAINS CALLBACK
-    elif 'train@' in cb.query:
+    elif cb.query.startswith('train@'):
         arguments = cb.query.split('@')
         del(arguments[0])
         departure_station, train = arguments[0].split('_')[0:2]
@@ -511,8 +511,85 @@ def process_callback(bot, cb, u):
                     )
                 })
 
+    # TRACKS CALLBACK
+    elif cb.query.startswith('track@'):
+        arguments = cb.query.split('@')
+        del(arguments[0])
+        track = arguments[0]
+        del(arguments[0])
+        rhash = "train_track:" + track
+        train = r.hget(rhash, 'train').decode('utf-8')
+        raw_mode = r.hget(rhash, 'mode').decode('utf-8')
+        raw_duration = r.hget(rhash, 'duration').decode('utf-8')
+        last_detected = r.hget(rhash, 'last_detected').decode('utf-8')
+        last_update = format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M %d/%m")
+
+        if not arguments:
+            text = (
+                "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
+                "\n🔆 <b>Modalità</b>: {mode}"
+                "\n🕒 <b>Durata</b>: {duration}"
+                "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
+                .format(
+                    id=track, train=train,
+                    mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                    duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni",
+                    last_detected=last_detected, last_update=last_update
+                )
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'text': text, 'parse_mode': 'HTML', 'reply_markup': json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "✍️ Modifica", "callback_data": "track@" + track + "@edit"},
+                         {"text": "🗑 Cancella", "callback_data": "track@" + track + "@delete"}]
+                    ]}
+                )
+            })
+            return
+
+        elif arguments[0] == "delete":
+            text = (
+                "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
+                "\n🔆 <b>Modalità</b>: {mode}"
+                "\n🕒 <b>Durata</b>: {duration}"
+                "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
+                "\n\n<i>Sei sicuro di voler cancellare questo tracciamento?</i>"
+                .format(
+                    id=track, train=train,
+                    mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                    duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni",
+                    last_detected=last_detected, last_update=last_update
+                )
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML',
+                'reply_markup': json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🗑 Sì", "callback_data": cb.query + "_confirm"},
+                         {"text": "🔙 Annulla", "callback_data": "@".join(cb.query.split("@")[:-1])}]
+                    ]}
+                )
+            })
+            return
+
+        elif arguments[0] == "delete_confirm":
+            tracking.deleteTrack(track_id=track)
+            text = (
+                "\n🗑 <b>Fatto!</b>"
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML',
+                'reply_markup': json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🔙 Torna indietro", "callback_data": "tracks"}]
+                    ]}
+                )
+            })
+            return
+
     # STATIONS CALLBACK
-    elif 'station@' in cb.query:
+    elif cb.query.startswith('station@'):
         arguments = cb.query.split('@')
         del(arguments[0])
         station = arguments[0]
@@ -739,7 +816,7 @@ def process_inline_callback(bot, cb, u):
     api = viaggiatreno.API()
     utils = viaggiatreno.Utils()
 
-    if 'train@' in cb.query:
+    if cb.query.startswith('train@'):
         arguments = cb.query.split('@')
         del(arguments[0])
         departure_station, train = arguments[0].split('_')[0:2]
@@ -820,7 +897,7 @@ def process_inline_callback(bot, cb, u):
             return
 
     # STATIONS CALLBACK
-    elif 'station@' in cb.query:
+    elif cb.query.startswith('station@'):
         arguments = cb.query.split('@')
         del(arguments[0])
         station = arguments[0]
