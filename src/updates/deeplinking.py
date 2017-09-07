@@ -89,7 +89,7 @@ def process_deeplinking(bot, message, args):
         raw_mode = r.hget(rhash, 'mode').decode('utf-8')
         raw_duration = r.hget(rhash, 'duration').decode('utf-8')
         last_detected = r.hget(rhash, 'last_detected').decode('utf-8')
-        last_update = dateutils.format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M %d/%m")
+        last_update = dateutils.format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M")
         text = (
             "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
             "\n🔆 <b>Modalità</b>: {mode}"

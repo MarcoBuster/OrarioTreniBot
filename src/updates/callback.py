@@ -522,7 +522,7 @@ def process_callback(bot, cb, u):
         raw_mode = r.hget(rhash, 'mode').decode('utf-8')
         raw_duration = r.hget(rhash, 'duration').decode('utf-8')
         last_detected = r.hget(rhash, 'last_detected').decode('utf-8')
-        last_update = format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M %d/%m")
+        last_update = format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M")
 
         if not arguments:
             text = (
@@ -587,6 +587,70 @@ def process_callback(bot, cb, u):
                 )
             })
             return
+
+        elif arguments[0] == "edit":
+            text = (
+                "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
+                "\n🔆 <b>Modalità</b>: {mode}"
+                "\n🕒 <b>Durata</b>: {duration}"
+                "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
+                "\n\n<i>Quale opzione vuoi modificare?</i>"
+                .format(
+                    id=track, train=train,
+                    mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                    duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni",
+                    last_detected=last_detected, last_update=last_update
+                )
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML',
+                'reply_markup': json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🔆 Modalità: " + ("🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate"),
+                          "callback_data": cb.query + "_mode"}],
+                        [{"text": "🕒 Durata" + ("⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni"),
+                          "callback_data": cb.query + "_duration"}],
+                        [{"text": "🔙 Annulla", "callback_data": "@".join(cb.query.split("@")[:-1])}]
+                    ]}
+                )
+            })
+            return
+
+        elif arguments[0].startswith("edit_"):
+            key = arguments[0].replace("edit_", "")
+            tracking.editTrack(track, key)
+
+            train = r.hget(rhash, 'train').decode('utf-8')
+            raw_mode = r.hget(rhash, 'mode').decode('utf-8')
+            raw_duration = r.hget(rhash, 'duration').decode('utf-8')
+            last_detected = r.hget(rhash, 'last_detected').decode('utf-8')
+            last_update = format_timestamp(int(r.hget(rhash, 'last_update').decode('utf-8')), "%H:%M")
+
+            text = (
+                "\n➖➖ <b>Treno {train}</b> (ID <code>#{id}</code>)"
+                "\n🔆 <b>Modalità</b>: {mode}"
+                "\n🕒 <b>Durata</b>: {duration}"
+                "\n🚉 <b>Stazione ultimo rilevamento</b>: {last_detected} (alle {last_update})"
+                "\n\n<i>Quale opzione vuoi modificare?</i>"
+                .format(
+                    id=track, train=train,
+                    mode="🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate",
+                    duration="⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni",
+                    last_detected=last_detected, last_update=last_update
+                )
+            )
+            bot.api.call('editMessageText', {
+                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text, 'parse_mode': 'HTML',
+                'reply_markup': json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🔆 Modalità: " + ("🚥 Completa" if raw_mode == "complete" else "🚉 Solo fermate"),
+                          "callback_data": "_".join(cb.query.split("_")[:-1]) + "_mode"}],
+                        [{"text": "🕒 Durata: " + ("⚪️ Solo oggi" if raw_duration == "today" else "🔴 Tutti i giorni"),
+                          "callback_data": "_".join(cb.query.split("_")[:-1]) + "_duration"}],
+                        [{"text": "🔙 Annulla", "callback_data": "@".join(cb.query.split("@")[:-1])}]
+                    ]}
+                )
+            })
 
     # STATIONS CALLBACK
     elif cb.query.startswith('station@'):

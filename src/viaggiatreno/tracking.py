@@ -59,7 +59,22 @@ def newTrack(train, departure_station, u):
 
 
 def deleteTrack(track_id):
-    return r.delete('train_track:' + str(track_id))
+    return r.delete('train_track:' + format(track_id))
+
+
+def editTrack(track_id, key, value=None):
+    rhash = 'train_track:' + format(track_id)
+
+    if value is None:
+        if key == 'mode':
+            current_mode = r.hget(rhash, 'mode').decode('utf-8')
+            value = 'complete' if current_mode == 'stops_only' else 'stops_only'
+
+        if key == 'duration':
+            current_duration = r.hget(rhash, 'duration').decode('utf-8')
+            value = 'forever' if current_duration == 'today' else 'today'
+
+    return r.hset(rhash, key, value)
 
 
 def run():
