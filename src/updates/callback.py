@@ -452,7 +452,7 @@ def process_callback(bot, cb, u):
             return
 
         elif len(arguments) == 1:
-            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - timedelta(hours=(1 if is_DST() else 0))).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, format.ELEMENTS_FOR_PAGE)
@@ -473,7 +473,7 @@ def process_callback(bot, cb, u):
             )
 
         elif len(arguments) == 2:
-            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - timedelta(hours=(1 if is_DST() else 0))).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, int(arguments[1])) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, int(arguments[1]))
@@ -714,7 +714,7 @@ def process_inline_callback(bot, cb, u):
             return
 
         elif len(arguments) == 1:
-            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - timedelta(hours=(1 if is_DST() else 0))).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, format.ELEMENTS_FOR_PAGE) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, format.ELEMENTS_FOR_PAGE)
@@ -735,7 +735,7 @@ def process_inline_callback(bot, cb, u):
             )
 
         elif len(arguments) == 2:
-            date = (datetime.now() - (timedelta(hours=1) if is_DST() else 0)).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
+            date = (datetime.now() - timedelta(hours=(1 if is_DST() else 0))).strftime("%a %b %d %Y %H:%M:%S GMT+0100")
             raw = api.call('partenze' if arguments[0] == 'departures' else 'arrivi', station, date)
             text = format.formatDepartures(raw, station, int(arguments[1])) if arguments[0] == 'departures' \
                 else format.formatArrivals(raw, station, int(arguments[1]))
