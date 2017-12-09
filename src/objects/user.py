@@ -96,5 +96,62 @@ class User:
         response = r.hincrby(self.rhash, stat)
         return response
 
+    def _getRecentStations(self):
+        """
+        Get recent stations
+        :return: Recent stations in raw format
+        """
+        return sorted(r.smembers(self.rhash + ':recent:stations'))
+
+    def removeRecentStation(self, index=0):
+        """
+        Remove a recent station
+        :param index: index of redis result
+        :return: None
+        """
+        names = self._getRecentStations()
+        r.srem(self.rhash + ':recent:stations', names[index])
+
+    def addRecentStation(self, station_name, station_id):
+        """
+        Add a recent searched station
+        :param station_name: Station name
+        :param station_id: Station id
+        :return: None
+        """
+        names = self._getRecentStations()
+        index = 0
+        is_duplicate = False
+        for name in names:
+            if station_id in name.decode('utf-8'):
+                self.removeRecentStation(index)
+                del(names[index])
+                is_duplicate = True
+                break
+            index += 1
+
+        if len(names) >= 5 and not is_duplicate:
+            self.removeRecentStation(index=0)
+
+        names.reverse()
+        r.sadd(self.rhash + ':recent:stations',
+               format((int(names[0].decode('utf-8').split("@")[0], 2) + 1) if names else 0, '016b') +
+               '@' + station_name + '@' + station_id)
+
+    def formatRecentStationsKeyboard(self):
+        """
+        Format recents stations keyboard
+        :return: dict
+        """
+        names = sorted(self._getRecentStations(), reverse=True)
+
+        keyboard = []
+        for name in names:
+            keyboard.append([{"text": "🕒 {name}"
+                            .format(name=name.decode('utf-8').split("@")[1]),
+                             "callback_data": "station@{station_id}"
+                            .format(station_id=name.decode('utf-8').split("@")[2])}])
+        return keyboard
+
     def isActive(self):
         return bool(r.hget(self.rhash, "active")) or False

@@ -275,6 +275,7 @@ def process_messages(bot, message, u):
 
         elif len(results) == 1:
             u.increaseStat('stats_stations')
+            u.addRecentStation(results[0]['nomeLungo'], results[0]['id'])
 
             text = format.formatStation(results[0]['nomeLungo'], results[0]['id'])
             bot.api.call('sendMessage', {

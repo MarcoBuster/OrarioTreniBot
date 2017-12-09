@@ -234,6 +234,7 @@ def process_callback(bot, cb, u):
 
     elif cb.query == "station":
         u.state("station")
+        last_stations = u.formatRecentStationsKeyboard()
         text = (
             "<b>🚉 Cerca stazione</b>"
             "\nInserisci il <b>nome</b> della stazione che vuoi cercare"
@@ -242,9 +243,9 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
-                    {"inline_keyboard": [
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                    ]}
+                    {"inline_keyboard":
+                        last_stations + [[{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                     }
                 )
         })
         cb.notify("🚉 Cerca stazione")
@@ -418,6 +419,8 @@ def process_callback(bot, cb, u):
 
         elif not arguments:
             u.increaseStat('stats_stations')
+            u.addRecentStation(station_name, station)
+
             text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
