@@ -96,60 +96,69 @@ class User:
         response = r.hincrby(self.rhash, stat)
         return response
 
-    def _getRecentStations(self):
+    def _getRecentElements(self, element_type):
         """
-        Get recent stations
-        :return: Recent stations in raw format
+        Get recent elements
+        :param element_type: element type
+        :return: Recent elements in raw format
         """
-        return sorted(r.smembers(self.rhash + ':recent:stations'))
+        return sorted(r.smembers(self.rhash + ':recent:' + element_type))
 
-    def removeRecentStation(self, index=0):
+    def removeRecentElement(self, element_type, index=0):
         """
-        Remove a recent station
+        Remove a recent element
+        :param element_type: element type
         :param index: index of redis result
         :return: None
         """
-        names = self._getRecentStations()
-        r.srem(self.rhash + ':recent:stations', names[index])
+        names = self._getRecentElements(element_type)
+        r.srem(self.rhash + ':recent:' + element_type, names[index])
 
-    def addRecentStation(self, station_name, station_id):
+    def addRecentElement(self, element_type, element_hash):
         """
-        Add a recent searched station
-        :param station_name: Station name
-        :param station_id: Station id
+        Add a recent searched element
+        :param element_type: element type
+        :param element_hash: element hash
         :return: None
         """
-        names = self._getRecentStations()
+        names = self._getRecentElements(element_type)
         index = 0
         is_duplicate = False
+        duplicate_check = None
+        if element_type == "stations":
+            duplicate_check = element_hash.split("@")[0]
         for name in names:
-            if station_id in name.decode('utf-8'):
-                self.removeRecentStation(index)
-                del(names[index])
+            if duplicate_check in name.decode('utf-8'):
+                self.removeRecentElement(element_type, index)
+                del (names[index])
                 is_duplicate = True
                 break
             index += 1
 
         if len(names) >= 5 and not is_duplicate:
-            self.removeRecentStation(index=0)
+            self.removeRecentElement(element_type, 0)
 
         names.reverse()
-        r.sadd(self.rhash + ':recent:stations',
-               format((int(names[0].decode('utf-8').split("@")[0], 2) + 1) if names else 0, '016b') +
-               '@' + station_name + '@' + station_id)
+        r.sadd(self.rhash + ':recent:' + element_type,
+               format((int(names[0].decode('utf-8').split("@")[0], 2) + 1) if names else 0, '016b') + "@" +
+               element_hash)
+
+    @staticmethod
+    def formatRecentStationHash(station_name, station_id):
+        return station_name + "@" + station_id
 
     def formatRecentStationsKeyboard(self):
         """
         Format recents stations keyboard
         :return: dict
         """
-        names = sorted(self._getRecentStations(), reverse=True)
+        names = sorted(self._getRecentElements('stations'), reverse=True)
 
         keyboard = []
         for name in names:
             keyboard.append([{"text": "🕒 {name}"
                             .format(name=name.decode('utf-8').split("@")[1]),
-                             "callback_data": "station@{station_id}"
+                              "callback_data": "station@{station_id}"
                             .format(station_id=name.decode('utf-8').split("@")[2])}])
         return keyboard
 

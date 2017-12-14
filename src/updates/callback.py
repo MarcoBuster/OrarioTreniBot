@@ -419,7 +419,7 @@ def process_callback(bot, cb, u):
 
         elif not arguments:
             u.increaseStat('stats_stations')
-            u.addRecentStation(station_name, station)
+            u.addRecentElement("stations", u.formatRecentStationHash(station_name, station))
 
             text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
