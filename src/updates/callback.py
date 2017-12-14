@@ -198,6 +198,7 @@ def process_callback(bot, cb, u):
 
     elif cb.query == "train_bynum":
         u.state("train_bynum")
+        last_trains = u.formatRecentTrainsKeyboard()
         text = (
             "<b>🚅 Cerca treno</b> per numero"
             "\nInserisci il <b>numero di treno</b> (senza nessuna sigla prima, per esempio <code>9650</code>)"
@@ -206,10 +207,10 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
-                {"inline_keyboard": [
-                    [{"text": "🛤 Cerca invece per itinerario", "callback_data": "train_byiti"}],
-                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                ]}
+                {"inline_keyboard":
+                    last_trains + [[{"text": "🛤 Cerca invece per itinerario", "callback_data": "train_byiti"}],
+                                   [{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                 }
             )
         })
         cb.notify("1️⃣ Cerca treno per numero")
@@ -275,6 +276,7 @@ def process_callback(bot, cb, u):
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')
+            u.addRecentElement('trains', cb.query.split("@")[1] + "@" + raw['compNumeroTreno'])
 
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {
@@ -605,6 +607,7 @@ def process_inline_callback(bot, cb, u):
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')
+            u.addRecentElement('trains', cb.query.split("@")[1] + "@" + raw['compNumeroTreno'])
 
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {

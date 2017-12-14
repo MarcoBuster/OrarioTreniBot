@@ -62,6 +62,7 @@ def process_messages(bot, message, u):
             u.increaseStat('stats_trains_bynum')
 
             raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
+            u.addRecentElement('trains', results[0][1] + "_" + message.text + "@" + raw['compNumeroTreno'])
             text = format.formatTrain(raw)
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':

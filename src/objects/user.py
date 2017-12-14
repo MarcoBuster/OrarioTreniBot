@@ -127,6 +127,8 @@ class User:
         duplicate_check = None
         if element_type == "stations":
             duplicate_check = element_hash.split("@")[0]
+        if element_type == "trains":
+            duplicate_check = element_hash.split("@")[0]
         for name in names:
             if duplicate_check in name.decode('utf-8'):
                 self.removeRecentElement(element_type, index)
@@ -160,6 +162,21 @@ class User:
                             .format(name=name.decode('utf-8').split("@")[1]),
                               "callback_data": "station@{station_id}"
                             .format(station_id=name.decode('utf-8').split("@")[2])}])
+        return keyboard
+
+    def formatRecentTrainsKeyboard(self):
+        """
+        Format recent trains keyboard
+        :return: dict
+        """
+        names = sorted(self._getRecentElements('trains'), reverse=True)
+
+        keyboard = []
+        for name in names:
+            keyboard.append([{"text": "🕒 {name}"
+                            .format(name=name.decode('utf-8').split("@")[2]),
+                              "callback_data": "train@{train_id}"
+                            .format(train_id=name.decode('utf-8').split("@")[1])}])
         return keyboard
 
     def isActive(self):
