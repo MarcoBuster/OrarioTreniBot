@@ -217,6 +217,7 @@ def process_callback(bot, cb, u):
 
     elif cb.query == "train_byiti":
         u.state("train_byiti")
+        last_itineraries = u.formatRecentItinerariesKeyboard()
         text = (
             "<b>🛤 Cerca treno</b> per itinerario"
             "\nInserisci, come prima cosa, la <b>stazione di partenza</b>"
@@ -225,10 +226,11 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
-                    {"inline_keyboard": [
-                        [{"text": "1️⃣ Cerca invece per numero", "callback_data": "train_bynum"}],
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                    ]}
+                    {"inline_keyboard":
+                        last_itineraries +
+                        [[{"text": "1️⃣ Cerca invece per numero", "callback_data": "train_bynum"}],
+                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                     }
                 )
         })
         cb.notify("🛤 Cerca treno per itinerario")
@@ -501,6 +503,34 @@ def process_callback(bot, cb, u):
             )
 
     # ITINERARY CALLBACK
+    elif "itinerary@" in cb.query:
+        arguments = cb.query.split('@')
+        del(arguments[0])
+        station_a, station_b = arguments[0].split("_")
+        u.state('train_byiti_3')
+        u.setRedis('iti_station1', station_a)
+        u.setRedis('iti_station2', station_b)
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+
+        text = (
+            "<b>🛤 Cerca treno</b> per itinerario"
+            "\nInserisci ora <b>la data</b> e/o <b>l'orario di partenza</b> desiderati "
+            "(per esempio: <code>{a}</code>; <code>{b}</code>"
+            .format(a=datetime.now().strftime("%H:%M %d/%m/%y"),
+                    b=datetime.now().strftime("%H:%M"))
+        )
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🕒 Orario attuale", "callback_data": "train_byiti@now"}],
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+        return
+
     elif cb.query == "train_byiti@now":
         def minifyStation(__str):
             __str = __str[1:]
@@ -514,8 +544,10 @@ def process_callback(bot, cb, u):
 
         date = datetime.now()
 
-        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
-        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
+        station_a = u.getRedis('iti_station1').decode('utf-8')
+        station_b = u.getRedis('iti_station2').decode('utf-8')
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+        station_a, station_b = minifyStation(station_a), minifyStation(station_b)
 
         u.increaseStat('stats_trains_byiti')
 

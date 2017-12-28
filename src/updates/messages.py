@@ -235,10 +235,10 @@ def process_messages(bot, message, u):
                 x += 1
             return __str
 
-        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
-        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
-        u.delRedis('iti_station1')
-        u.delRedis('iti_station2')
+        station_a = u.getRedis('iti_station1').decode('utf-8')
+        station_b = u.getRedis('iti_station2').decode('utf-8')
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+        station_a, station_b = minifyStation(station_a), minifyStation(station_b)
 
         u.increaseStat('stats_trains_byiti')
 
