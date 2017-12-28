@@ -62,6 +62,7 @@ def process_messages(bot, message, u):
             u.increaseStat('stats_trains_bynum')
 
             raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
+            u.addRecentElement('trains', results[0][1] + "_" + message.text + "@" + raw['compNumeroTreno'])
             text = format.formatTrain(raw)
             bot.api.call('sendMessage', {
                 'chat_id': chat.id, 'text': text, 'parse_mode': 'HTML', 'reply_markup':
@@ -234,10 +235,10 @@ def process_messages(bot, message, u):
                 x += 1
             return __str
 
-        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
-        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
-        u.delRedis('iti_station1')
-        u.delRedis('iti_station2')
+        station_a = u.getRedis('iti_station1').decode('utf-8')
+        station_b = u.getRedis('iti_station2').decode('utf-8')
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+        station_a, station_b = minifyStation(station_a), minifyStation(station_b)
 
         u.increaseStat('stats_trains_byiti')
 
@@ -275,6 +276,7 @@ def process_messages(bot, message, u):
 
         elif len(results) == 1:
             u.increaseStat('stats_stations')
+            u.addRecentElement("stations", u.formatRecentStationHash(results[0]['nomeLungo'], results[0]['id']))
 
             text = format.formatStation(results[0]['nomeLungo'], results[0]['id'])
             bot.api.call('sendMessage', {

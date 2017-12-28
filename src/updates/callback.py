@@ -198,6 +198,7 @@ def process_callback(bot, cb, u):
 
     elif cb.query == "train_bynum":
         u.state("train_bynum")
+        last_trains = u.formatRecentTrainsKeyboard()
         text = (
             "<b>🚅 Cerca treno</b> per numero"
             "\nInserisci il <b>numero di treno</b> (senza nessuna sigla prima, per esempio <code>9650</code>)"
@@ -206,16 +207,17 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
-                {"inline_keyboard": [
-                    [{"text": "🛤 Cerca invece per itinerario", "callback_data": "train_byiti"}],
-                    [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                ]}
+                {"inline_keyboard":
+                    last_trains + [[{"text": "🛤 Cerca invece per itinerario", "callback_data": "train_byiti"}],
+                                   [{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                 }
             )
         })
         cb.notify("1️⃣ Cerca treno per numero")
 
     elif cb.query == "train_byiti":
         u.state("train_byiti")
+        last_itineraries = u.formatRecentItinerariesKeyboard()
         text = (
             "<b>🛤 Cerca treno</b> per itinerario"
             "\nInserisci, come prima cosa, la <b>stazione di partenza</b>"
@@ -224,16 +226,18 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
-                    {"inline_keyboard": [
-                        [{"text": "1️⃣ Cerca invece per numero", "callback_data": "train_bynum"}],
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                    ]}
+                    {"inline_keyboard":
+                        last_itineraries +
+                        [[{"text": "1️⃣ Cerca invece per numero", "callback_data": "train_bynum"}],
+                         [{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                     }
                 )
         })
         cb.notify("🛤 Cerca treno per itinerario")
 
     elif cb.query == "station":
         u.state("station")
+        last_stations = u.formatRecentStationsKeyboard()
         text = (
             "<b>🚉 Cerca stazione</b>"
             "\nInserisci il <b>nome</b> della stazione che vuoi cercare"
@@ -242,9 +246,9 @@ def process_callback(bot, cb, u):
             "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
-                    {"inline_keyboard": [
-                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                    ]}
+                    {"inline_keyboard":
+                        last_stations + [[{"text": "⬅️ Torna indietro", "callback_data": "home"}]]
+                     }
                 )
         })
         cb.notify("🚉 Cerca stazione")
@@ -274,6 +278,7 @@ def process_callback(bot, cb, u):
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')
+            u.addRecentElement('trains', cb.query.split("@")[1] + "@" + raw['compNumeroTreno'])
 
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {
@@ -418,6 +423,8 @@ def process_callback(bot, cb, u):
 
         elif not arguments:
             u.increaseStat('stats_stations')
+            u.addRecentElement("stations", u.formatRecentStationHash(station_name, station))
+
             text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
                 'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
@@ -496,6 +503,34 @@ def process_callback(bot, cb, u):
             )
 
     # ITINERARY CALLBACK
+    elif "itinerary@" in cb.query:
+        arguments = cb.query.split('@')
+        del(arguments[0])
+        station_a, station_b = arguments[0].split("_")
+        u.state('train_byiti_3')
+        u.setRedis('iti_station1', station_a)
+        u.setRedis('iti_station2', station_b)
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+
+        text = (
+            "<b>🛤 Cerca treno</b> per itinerario"
+            "\nInserisci ora <b>la data</b> e/o <b>l'orario di partenza</b> desiderati "
+            "(per esempio: <code>{a}</code>; <code>{b}</code>"
+            .format(a=datetime.now().strftime("%H:%M %d/%m/%y"),
+                    b=datetime.now().strftime("%H:%M"))
+        )
+        bot.api.call('editMessageText', {
+            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'text': text, 'parse_mode': 'HTML', 'reply_markup':
+                json.dumps(
+                    {"inline_keyboard": [
+                        [{"text": "🕒 Orario attuale", "callback_data": "train_byiti@now"}],
+                        [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                    ]}
+                )
+        })
+        return
+
     elif cb.query == "train_byiti@now":
         def minifyStation(__str):
             __str = __str[1:]
@@ -509,8 +544,10 @@ def process_callback(bot, cb, u):
 
         date = datetime.now()
 
-        station_a = minifyStation(u.getRedis('iti_station1').decode('utf-8'))
-        station_b = minifyStation(u.getRedis('iti_station2').decode('utf-8'))
+        station_a = u.getRedis('iti_station1').decode('utf-8')
+        station_b = u.getRedis('iti_station2').decode('utf-8')
+        u.addRecentElement('itineraries', u.formatRecentItineraryHash(station_a, station_b))
+        station_a, station_b = minifyStation(station_a), minifyStation(station_b)
 
         u.increaseStat('stats_trains_byiti')
 
@@ -602,6 +639,7 @@ def process_inline_callback(bot, cb, u):
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')
+            u.addRecentElement('trains', cb.query.split("@")[1] + "@" + raw['compNumeroTreno'])
 
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {
