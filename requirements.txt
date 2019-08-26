@@ -1,8 +1,8 @@
-redis
-botogram
+redis==2.10.6
+botogram2
 wikipedia
 dateutils
 progressbar2
-plotly
+plotly==2.0.8
 image
 pyowm
