@@ -1,0 +1,16 @@
+version: '3'
+services:
+        redis:
+                image: redis
+                container_name: orariotreni_redis
+                volumes: 
+                        - ./redis-data:/data
+                expose:
+                        - "6379"
+       
+        bot:
+                build: .
+                container_name: orariotreni_bot
+                links:
+                        - redis
+
