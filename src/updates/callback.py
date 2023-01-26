@@ -102,7 +102,10 @@ def process_callback(bot, cb, u):
 
         users = []
         for user in r.keys("user:*"):
-            users.append(int(user[5:]))
+            try:
+                users.append(int(user[5:]))
+            except:
+                pass
 
         active_users = 0
         total_users = 0
