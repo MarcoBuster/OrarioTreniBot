@@ -27,9 +27,9 @@ import string
 from datetime import datetime
 
 import botogram
-import plotly
-import plotly.graph_objs as go
-import plotly.plotly as py
+#import plotly
+#import plotly.graph_objs as go
+#import plotly.plotly as py
 import pyowm
 import wikipedia
 from PIL import Image
@@ -43,7 +43,7 @@ api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
 owm = pyowm.OWM(config.OWM_API_KEY).weather_manager()
-plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
+#plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
 
 wikipedia.set_lang("it")
 
@@ -358,7 +358,7 @@ def formatItinerary(raw: dict):
             text += "\n┃ 🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
             text += "\n┃ 🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
         text +="\n┗"
-        
+
     return text
 
 
