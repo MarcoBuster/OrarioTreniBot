@@ -42,7 +42,7 @@ from . import viaggiatreno
 api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
-owm = pyowm.OWM(config.OWM_API_KEY)
+owm = pyowm.OWM(config.OWM_API_KEY).weather_manager()
 plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
 
 wikipedia.set_lang("it")
@@ -104,7 +104,7 @@ def getWeather(station_id: str):
         return ""
 
     code = owm.weather_at_coords(station_coords[station_id]["lat"], station_coords[station_id]["lon"])\
-        .get_weather().get_weather_code()
+        .weather.weather_code
 
     path = os.getcwd() + '/'.join(['', 'data', 'owm', 'weather_codes_it.json'])
     with open(path, 'r') as fp:
@@ -354,7 +354,7 @@ def formatItinerary(raw: dict):
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
 
-            text += "\n➖ <b>Treno {n}</b> ({href})".format(n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
+            text += "\n➖ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
             text += "\n🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
             text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
 

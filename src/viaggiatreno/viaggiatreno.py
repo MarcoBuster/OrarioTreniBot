@@ -100,7 +100,7 @@ def _decode_lines(s, linefunc):
 
 def _decode_cercaNumeroTrenoTrenoAutocomplete(s):
     def linefunc(line):
-        r = re.search('^(\d+)\s-\s(.+)\|(\d+)-(.+)$', line)
+        r = re.search('^(\d+)\s-\s(.+)\|(\d+)-(\w+)-(\d+)', line)
         if r is not None:
             return r.group(2, 4)
 
@@ -128,6 +128,7 @@ class API:
             'partenze': _decode_json,
             'arrivi': _decode_json,
             'news': _decode_json,
+            'cercaNumeroTreno': _decode_json,
         }
         self.__default_decoder = lambda x: x
 
@@ -139,7 +140,7 @@ class API:
         plain = options.get('plainoutput', self.__plainoutput)
         verbose = options.get('verbose', self.__verbose)
 
-        base = 'http://www.viaggiatreno.it/viaggiatrenonew/resteasy/viaggiatreno/'
+        base = 'http://www.viaggiatreno.it/infomobilita/resteasy/viaggiatreno/'
         path = '/'.join(quote(str(p)) for p in params)
         url = base + function + '/' + path
 
@@ -156,3 +157,12 @@ class API:
             return data
         else:
             return self.__checkAndDecode(function, data)
+
+    def cercaNumeroTreno(self, numeroTreno):
+        return self.call('cercaNumeroTreno', numeroTreno)
+
+    def andamentoTreno(self, codOrigine, numeroTreno, dataPartenza=None):
+        if dataPartenza is None:
+            dataPartenza = self.cercaNumeroTreno(numeroTreno).get('dataPartenza')
+
+        return self.call('andamentoTreno', codOrigine, numeroTreno, dataPartenza)

@@ -39,7 +39,7 @@ def process_deeplinking(bot, message, args):
 
     if arguments[0] == "train":
         departure_station, train = arguments[1].split('_')[0:2]
-        raw = api.call('andamentoTreno', departure_station, train)
+        raw = api.andamentoTreno(departure_station, train)
 
         u.increaseStat('stats_trains_bynum')
 

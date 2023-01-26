@@ -131,7 +131,7 @@ def process_inline_query(bot, iq, u):
 
         inline_results = []
         for result in results:
-            raw = api.call('andamentoTreno', result[1], iq.query)
+            raw = api.andamentoTreno(result[1], iq.query)
             text = format.formatTrain(raw)
             inline_results.append(
                 {
