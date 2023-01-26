@@ -347,17 +347,18 @@ def formatItinerary(raw: dict):
             break
 
         x += 1
-        text += "\n\n➖➖ <b>Soluzione {n}</b>".format(n=x)
+        text += "\n┏➖➖ <b>Soluzione {n}</b>".format(n=x)
         duration = solution.get('durata', '<i>sconosciuta</i>')
-        text += "\n🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
+        text += "\n┃🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
         for vehicle in solution['vehicles']:
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
 
-            text += "\n➖ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
-            text += "\n🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
-            text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
-
+            text += "\n┣➖ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
+            text += "\n┃ 🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
+            text += "\n┃ 🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
+        text +="\n┗"
+        
     return text
 
 
