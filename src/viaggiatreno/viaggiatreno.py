@@ -102,7 +102,7 @@ def _decode_cercaNumeroTrenoTrenoAutocomplete(s):
     def linefunc(line):
         r = re.search('^(\d+)\s-\s(.+)\|(\d+)-(\w+)-(\d+)', line)
         if r is not None:
-            return r.group(2, 4)
+            return r.group(2, 4, 5)
 
     return _decode_lines(s, linefunc)
 
@@ -162,7 +162,11 @@ class API:
         return self.call('cercaNumeroTreno', numeroTreno)
 
     def andamentoTreno(self, codOrigine, numeroTreno, dataPartenza=None):
-        if dataPartenza is None:
-            dataPartenza = self.cercaNumeroTreno(numeroTreno).get('dataPartenza')
+        infoTreni = self.call('cercaNumeroTrenoTrenoAutocomplete', numeroTreno)
+
+        for infoTreno in infoTreni:
+            if codOrigine == infoTreno[1]:
+                dataPartenza = infoTreno[2]
+                break
 
         return self.call('andamentoTreno', codOrigine, numeroTreno, dataPartenza)
