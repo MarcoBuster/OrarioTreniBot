@@ -27,13 +27,11 @@ import string
 from datetime import datetime
 
 import botogram
-#import plotly
-#import plotly.graph_objs as go
-#import plotly.plotly as py
 import pyowm
 import wikipedia
 from PIL import Image
 from wikipedia.exceptions import PageError
+import matplotlib.pyplot as plt
 
 import config
 from . import dateutils
@@ -43,7 +41,6 @@ api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
 owm = pyowm.OWM(config.OWM_API_KEY).weather_manager()
-#plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
 
 wikipedia.set_lang("it")
 
@@ -531,8 +528,9 @@ def generateTrainGraph(raw: dict):
     def apply(a, b):
         base = Image.open(a)
         logo = Image.open(b)
-        logo.thumbnail((120, 120), Image.ANTIALIAS)
-        base.paste(logo, (580, 5), mask=logo)
+        logo.thumbnail((100, 100), Image.ANTIALIAS)
+        img_width, img_height = base.size
+        base.paste(logo, (img_width-100, 0), mask=logo)
         base.save(a)
 
     stops = []
@@ -548,28 +546,16 @@ def generateTrainGraph(raw: dict):
     if len(stops) < 2 or len(delays) < 2:
         return False
 
-    line = go.Scatter(
-        x=stops,
-        y=delays,
-        name='Ritardo',
-        line=dict(
-            color='rgb(205, 12, 24)',
-            width=2,
-        )
-    )
+    title = 'Ritardo del treno {train}'.format(train=raw['compNumeroTreno'])
+    fig, ax = plt.subplots()
+    ax.plot(stops, delays, marker='o', linestyle='dashed')
+    ax.set_title(title)
+    ax.set_xticks(stops, stops, rotation=45, ha='right')
+    ax.set_ylabel('Ritardo (minuti)')
 
-    title = '<b>Ritardo del treno {train}</b>'.format(train=raw['compNumeroTreno'])
-    layout = dict(
-        title=title,
-        xaxis=dict(title='Fermata'),
-        yaxis=dict(title='Ritardo (minuti)')
-    )
-
+    fig.tight_layout()
     filename = os.getcwd() + ''.join(
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)) + '.png'
-
-    fig = dict(data=[line], layout=layout)
-    py.image.save_as(fig, filename=filename)
-
-    apply(filename, os.getcwd() + "/data/img/logo_white_with_name.png")
+    fig.savefig(filename)
+    apply(filename, os.getcwd() + "/data/img/logo_white_with_name_transparent.png")
     return filename

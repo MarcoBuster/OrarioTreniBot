@@ -3,6 +3,6 @@ botogram2
 wikipedia
 dateutils
 progressbar2
-plotly==2.0.8
+matplotlib
 image
 pyowm

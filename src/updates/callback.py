@@ -367,8 +367,6 @@ def process_callback(bot, cb, u):
             return
 
         elif arguments[0] == "graph":
-            cb.notify('Comando grafici temporaneamente non disponibile', True, 300)
-            return
             filename = format.generateTrainGraph(raw)
             if not filename:
                 cb.notify(
