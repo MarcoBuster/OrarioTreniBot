@@ -61,7 +61,7 @@ def process_messages(bot, message, u):
         elif len(results) == 1:
             u.increaseStat('stats_trains_bynum')
 
-            raw = api.call('andamentoTreno', results[0][1], message.text)  # andamentoTreno; departure station; number
+            raw = api.andamentoTreno(results[0][1], message.text)  # andamentoTreno; departure station; number
             u.addRecentElement('trains', results[0][1] + "_" + message.text + "@" + raw['compNumeroTreno'])
             text = format.formatTrain(raw)
             bot.api.call('sendMessage', {

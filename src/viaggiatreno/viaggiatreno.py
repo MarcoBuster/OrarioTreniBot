@@ -162,11 +162,12 @@ class API:
         return self.call('cercaNumeroTreno', numeroTreno)
 
     def andamentoTreno(self, codOrigine, numeroTreno, dataPartenza=None):
-        infoTreni = self.call('cercaNumeroTrenoTrenoAutocomplete', numeroTreno)
+        if dataPartenza is None:
+            infoTreni = self.call('cercaNumeroTrenoTrenoAutocomplete', numeroTreno)
 
-        for infoTreno in infoTreni:
-            if codOrigine == infoTreno[1]:
-                dataPartenza = infoTreno[2]
-                break
+            for infoTreno in infoTreni:
+                if codOrigine == infoTreno[1]:
+                    dataPartenza = infoTreno[2]
+                    break
 
         return self.call('andamentoTreno', codOrigine, numeroTreno, dataPartenza)
