@@ -40,6 +40,9 @@ def process_callback(bot, cb, u):
     api = viaggiatreno.API()
     utils = viaggiatreno.Utils()
 
+    if cb.query[-1] == '@':
+        cb.query = cb.query[0:-1]
+
     if cb.query == "home":
         u.state("home")
         text = (
@@ -49,7 +52,7 @@ def process_callback(bot, cb, u):
             "\nPremi uno dei <b>tasti qui sotto</b> per iniziare"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {'inline_keyboard': [
@@ -66,17 +69,17 @@ def process_callback(bot, cb, u):
         text = (
             "<b>Informazioni sul bot</b>"
             "\n<i>Link utili</i>"
-            "\n➖ <b>👤 Contatta lo sviluppatore</b> su Telegram per avere <b>assistenza gratuita</b> "
+            "\n━ <b>👤 Contatta lo sviluppatore</b> su Telegram per avere <b>assistenza gratuita</b> "
             "o per proporre <b>una nuova funzione</b>"
-            "\n➖ Entra nel <b>📢 Canale ufficiale</b> per ricevere <b>news</b> e <b>aggiornamenti</b> "
+            "\n━ Entra nel <b>📢 Canale ufficiale</b> per ricevere <b>news</b> e <b>aggiornamenti</b> "
             "in anteprima <b>sul bot</b>"
-            "\n➖ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
+            "\n━ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
             "<b>il lavoro dello sviluppatore</b>"
-            "\n➖ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
-            "\n➖ Visualizza le <b>📈 Statistiche</b> di utilizzo del bot!"
+            "\n━ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
+            "\n━ Visualizza le <b>📈 Statistiche</b> di utilizzo del bot!"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {'inline_keyboard': [
@@ -99,7 +102,10 @@ def process_callback(bot, cb, u):
 
         users = []
         for user in r.keys("user:*"):
-            users.append(int(user[5:]))
+            try:
+                users.append(int(user[5:]))
+            except:
+                pass
 
         active_users = 0
         total_users = 0
@@ -142,18 +148,18 @@ def process_callback(bot, cb, u):
 
         text = (
             "📈 <b>Statistiche</b>"
-            "\n➖➖ 👤 <i>Utenti</i>"
+            "\n━━ 👤 <i>Utenti</i>"
             "\n<b>Utenti attivi</b>: {au}"
             "\n<b>Utenti totali</b>: {tu}"
-            "\n➖➖ 💬 <i>Comandi</i>"
+            "\n━━ 💬 <i>Comandi</i>"
             "\n<b>Comando /start</b>: {sc} <i>(tu {psc})</i>"
             "\n<b>Tastiere inline</b>: {cc} <i>(tu {pcc})</i>"
             "\n<b>Richieste inline</b>: {iq} <i>(tu {piq})</i>"
-            "\n➖➖ 👁‍🗨 <i>Query</i>"
+            "\n━━ 👁‍🗨 <i>Query</i>"
             "\n<b>Treni cercati</b> per numero: {tr_bynum} <i>(tu {ptr_bynum})</i>"
             "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
             "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
-            "\n➖➖ 🚅 <i>Circolazione ferroviaria</i>"
+            "\n━━ 🚅 <i>Circolazione ferroviaria</i>"
             "\n<b>Treni di oggi</b>: {tt}"
             "\n<b>Treni circolanti</b>: {ct}"
             "\n<b>Ultimo aggiornamento</b>: {lu}"
@@ -167,7 +173,7 @@ def process_callback(bot, cb, u):
                     lu=format_timestamp(viaggiatreno_stats['ultimoAggiornamento'], "%H:%M"))
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "parse_mode": "HTML",
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "parse_mode": "HTML",
             "text": text, "reply_markup":
             json.dumps(
                 {"inline_keyboard": [
@@ -184,7 +190,7 @@ def process_callback(bot, cb, u):
             "\n\nVuoi cercare il treno 1️⃣ <b>per numero di treno</b> o 🛤 <b>per itinerario</b>?"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {"inline_keyboard": [
@@ -204,7 +210,7 @@ def process_callback(bot, cb, u):
             "\nInserisci il <b>numero di treno</b> (senza nessuna sigla prima, per esempio <code>9650</code>)"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
             json.dumps(
                 {"inline_keyboard":
@@ -223,7 +229,7 @@ def process_callback(bot, cb, u):
             "\nInserisci, come prima cosa, la <b>stazione di partenza</b>"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
                     {"inline_keyboard":
@@ -243,7 +249,7 @@ def process_callback(bot, cb, u):
             "\nInserisci il <b>nome</b> della stazione che vuoi cercare"
         )
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
                     {"inline_keyboard":
@@ -257,7 +263,7 @@ def process_callback(bot, cb, u):
         raw = api.call("news", 0, "it")
         text = format.formatNews(raw)
         bot.api.call("editMessageText", {
-            "chat_id": cb.chat.id, "message_id": cb.message.message_id, "text": text,
+            "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
             "parse_mode": "HTML", "reply_markup":
                 json.dumps(
                     {"inline_keyboard": [
@@ -274,7 +280,8 @@ def process_callback(bot, cb, u):
         departure_station, train = arguments[0].split('_')[0:2]
         del(arguments[0])
 
-        raw = api.call('andamentoTreno', departure_station, train)
+        departure_station = departure_station.split('-')[0]
+        raw = api.andamentoTreno(departure_station, train)
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')
@@ -282,7 +289,7 @@ def process_callback(bot, cb, u):
 
             text = format.formatTrain(raw)
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
                 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
@@ -298,18 +305,22 @@ def process_callback(bot, cb, u):
 
         elif not arguments[0]:
             text = format.formatTrain(raw)
-            bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
-                'parse_mode': 'HTML', 'reply_markup':
-                    json.dumps(
-                        {"inline_keyboard": [
-                            [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
-                            [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
-                             {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
-                            [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
-                        ]}
-                    )
-            })
+            try:
+                bot.api.call('editMessageText', {
+                    'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
+                    'parse_mode': 'HTML', 'reply_markup':
+                        json.dumps(
+                            {"inline_keyboard": [
+                                [{"text": "🔄 Aggiorna le informazioni", "callback_data": cb.query}],
+                                [{"text": "🚉 Fermate", "callback_data": "@".join(cb.query.split("@")[:-1]) + "@stops"},
+                                 {"text": "📊 Grafico ritardo", "callback_data": cb.query + "@graph"}],
+                                [{"text": "⬅️ Torna indietro", "callback_data": "home"}]
+                            ]}
+                        )
+                })
+            except APIError:
+                pass
+            cb.notify('')
             return
 
         elif arguments[0] == "update":
@@ -317,7 +328,7 @@ def process_callback(bot, cb, u):
 
             try:
                 bot.api.call('editMessageText', {
-                    'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                    'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
                     'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -337,7 +348,7 @@ def process_callback(bot, cb, u):
             inline_keyboard = format.getStopsInlineKeyboard(raw, cb.query)
             text = "<b>Lista fermate del treno {x}</b>".format(x=raw['compNumeroTreno'])
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
                 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": inline_keyboard}
@@ -349,7 +360,7 @@ def process_callback(bot, cb, u):
             text = format.formatTrainStop(raw, int(arguments[1]))
             inline_keyboard = format.generateTrainStopInlineKeyboard(raw, int(arguments[1]))
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
                 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps({"inline_keyboard": inline_keyboard})
             })
@@ -387,7 +398,7 @@ def process_callback(bot, cb, u):
                 "\nInserisci ora la <b>stazione di arrivo</b>"
             )
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -409,7 +420,7 @@ def process_callback(bot, cb, u):
                         b=datetime.now().strftime("%H:%M"))
             )
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -427,7 +438,7 @@ def process_callback(bot, cb, u):
 
             text = format.formatStation(station_name, station)
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -445,7 +456,7 @@ def process_callback(bot, cb, u):
         elif len(arguments) == 1 and arguments[0] == "wiki":
             text = format.formatStation(station_name, station, withWikiSummary=True)
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -467,7 +478,7 @@ def process_callback(bot, cb, u):
             inline_keyboard = format.generateStationPagesInlineKeyboard([0, format.ELEMENTS_FOR_PAGE], format.getPagesCount(raw),
                                                                         station, arguments[0])
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": inline_keyboard}
@@ -489,7 +500,7 @@ def process_callback(bot, cb, u):
                                                                          int(arguments[1])], format.getPagesCount(raw),
                                                                         station, arguments[0])
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id,
                 'text': text, 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": inline_keyboard}
@@ -520,7 +531,7 @@ def process_callback(bot, cb, u):
                     b=datetime.now().strftime("%H:%M"))
         )
         bot.api.call('editMessageText', {
-            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'chat_id': cb.chat.id, 'message_id': cb.message.id,
             'text': text, 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
@@ -556,7 +567,7 @@ def process_callback(bot, cb, u):
         raw = api.call('soluzioniViaggioNew', station_a, station_b, date)
         text = format.formatItinerary(raw)
         bot.api.call('editMessageText', {
-            'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+            'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
             'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                 json.dumps(
                     {"inline_keyboard": [
@@ -575,7 +586,7 @@ def process_callback(bot, cb, u):
             "\nSeleziona un opzione:"
         )
         bot.api.call('editMessageText', {
-            'chat_id': cb.chat.id, 'message_id': cb.message.message_id,
+            'chat_id': cb.chat.id, 'message_id': cb.message.id,
             'text': text, 'parse_mode': 'HTML', 'reply_markup':
                 json.dumps(
                     {'inline_keyboard': [
@@ -597,7 +608,7 @@ def process_callback(bot, cb, u):
                 "\nInvia il testo <b>formattato in HTML</b> del <b>post globale</b>"
             )
             bot.api.call('editMessageText', {
-                'chat_id': cb.chat.id, 'message_id': cb.message.message_id, 'text': text,
+                'chat_id': cb.chat.id, 'message_id': cb.message.id, 'text': text,
                 'parse_mode': 'HTML', 'disable_web_page_preview': True, 'reply_markup':
                     json.dumps(
                         {"inline_keyboard": [
@@ -635,7 +646,7 @@ def process_inline_callback(bot, cb, u):
         departure_station, train = arguments[0].split('_')[0:2]
         del(arguments[0])
 
-        raw = api.call('andamentoTreno', departure_station, train)
+        raw = api.andamentoTreno(departure_station, train)
 
         if not arguments:
             u.increaseStat('stats_trains_bynum')

@@ -55,10 +55,10 @@ def process_inline_query(bot, iq, u):
                             "\n⏺ <i>Cerca treni, stazioni e itinerari in qualsiasi chat</i>"
                             "\nPer usare questa funzione basta che scrivi <code>@{username} query</code> in qualsiasi chat: "
                             "si aprirà un pop-up da dove potrai selezionare il risultato desiderato."
-                            "\n➖➖️ <b>Cerca treni e stazioni</b>"
+                            "\n━━️ <b>Cerca treni e stazioni</b>"
                             "\nScrivi il <b>numero del treno</b> o il <b>nome della stazione</b>, "
                             "per esempio <code>@{username} 9650</code> o <code>@{username} Roma Termini</code>"
-                            "\n➖➖️ <b>Cerca itinerari</b>"
+                            "\n━━️ <b>Cerca itinerari</b>"
                             "\nScrivi la <b>stazione di partenza</b>, un <b>trattino -</b> e la <b>stazione di arrivo</b>: "
                             "per esempio <code>@{username} Milano Centrale - Roma Termini</code>"
                             "\n<i>Gli itinerari cercati inline sono basati sull'orario attuale</i>"
@@ -91,10 +91,10 @@ def process_inline_query(bot, iq, u):
                             "\n⏺ <i>Cerca treni, stazioni e itinerari in qualsiasi chat</i>"
                             "\nPer usare questa funzione basta che scrivi <code>@{username} query</code> in qualsiasi chat: "
                             "si aprirà un pop-up da dove potrai selezionare il risultato desiderato."
-                            "\n➖➖️ <b>Cerca treni e stazioni</b>"
+                            "\n━━️ <b>Cerca treni e stazioni</b>"
                             "\nScrivi il <b>numero del treno</b> o il <b>nome della stazione</b>, "
                             "per esempio <code>@{username} 9650</code> o <code>@{username} Roma Termini</code>"
-                            "\n➖➖️ <b>Cerca itinerari</b>"
+                            "\n━━️ <b>Cerca itinerari</b>"
                             "\nScrivi la <b>stazione di partenza</b>, un <b>trattino -</b> e la <b>stazione di arrivo</b>: "
                             "per esempio <code>@{username} Milano Centrale - Roma Termini</code>"
                             "\n<i>Gli itinerari cercati inline sono basati sull'orario attuale</i>"
@@ -131,7 +131,7 @@ def process_inline_query(bot, iq, u):
 
         inline_results = []
         for result in results:
-            raw = api.call('andamentoTreno', result[1], iq.query)
+            raw = api.andamentoTreno(result[1], iq.query)
             text = format.formatTrain(raw)
             inline_results.append(
                 {

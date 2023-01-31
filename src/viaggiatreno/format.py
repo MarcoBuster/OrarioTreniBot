@@ -27,13 +27,11 @@ import string
 from datetime import datetime
 
 import botogram
-import plotly
-import plotly.graph_objs as go
-import plotly.plotly as py
 import pyowm
 import wikipedia
 from PIL import Image
 from wikipedia.exceptions import PageError
+import matplotlib.pyplot as plt
 
 import config
 from . import dateutils
@@ -42,8 +40,7 @@ from . import viaggiatreno
 api = viaggiatreno.API()
 utils = viaggiatreno.Utils()
 bot = botogram.create(config.BOT_TOKEN)
-owm = pyowm.OWM(config.OWM_API_KEY)
-plotly.tools.set_credentials_file(username=config.PLOTLY_USERNAME, api_key=config.PLOTLY_API_KEY)
+owm = pyowm.OWM(config.OWM_API_KEY).weather_manager()
 
 wikipedia.set_lang("it")
 
@@ -104,7 +101,7 @@ def getWeather(station_id: str):
         return ""
 
     code = owm.weather_at_coords(station_coords[station_id]["lat"], station_coords[station_id]["lon"])\
-        .get_weather().get_weather_code()
+        .weather.weather_code
 
     path = os.getcwd() + '/'.join(['', 'data', 'owm', 'weather_codes_it.json'])
     with open(path, 'r') as fp:
@@ -259,7 +256,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
             platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b> ({href})"
+            "\n\n━━ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Destinazione</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di partenza</b>: {dt}"
@@ -313,7 +310,7 @@ def formatArrivals(raw: dict, station: str, xrange: int):
             platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b> ({href})"
+            "\n\n━━ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Origine</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di arrivo</b>: {dt}"
@@ -347,16 +344,17 @@ def formatItinerary(raw: dict):
             break
 
         x += 1
-        text += "\n\n➖➖ <b>Soluzione {n}</b>".format(n=x)
+        text += "\n┏━━ <b>Soluzione {n}</b>".format(n=x)
         duration = solution.get('durata', '<i>sconosciuta</i>')
-        text += "\n🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
+        text += "\n┃🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
         for vehicle in solution['vehicles']:
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
 
-            text += "\n➖ <b>Treno {n}</b> ({href})".format(n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
-            text += "\n🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
-            text += "\n🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
+            text += "\n┣━ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
+            text += "\n┃ 🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
+            text += "\n┃ 🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
+        text +="\n┗"
 
     return text
 
@@ -374,7 +372,7 @@ def formatNews(raw: dict):
         if not __toBool(news['primoPiano']):
             continue
         text += (
-            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n\n{pinned}━━ <b>{title}</b>"
             "\n<b>Data</b>: {date}"
             "\n{text}"
             .format(
@@ -390,7 +388,7 @@ def formatNews(raw: dict):
             continue
 
         text += (
-            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n\n{pinned}━━ <b>{title}</b>"
             "\n<b>Data</b>: {date}"
             "\n{text}"
             .format(
@@ -530,8 +528,9 @@ def generateTrainGraph(raw: dict):
     def apply(a, b):
         base = Image.open(a)
         logo = Image.open(b)
-        logo.thumbnail((120, 120), Image.ANTIALIAS)
-        base.paste(logo, (580, 5), mask=logo)
+        logo.thumbnail((150, 150), Image.ANTIALIAS)
+        img_width, img_height = base.size
+        base.paste(logo, (0, -15), mask=logo)
         base.save(a)
 
     stops = []
@@ -547,28 +546,21 @@ def generateTrainGraph(raw: dict):
     if len(stops) < 2 or len(delays) < 2:
         return False
 
-    line = go.Scatter(
-        x=stops,
-        y=delays,
-        name='Ritardo',
-        line=dict(
-            color='rgb(205, 12, 24)',
-            width=2,
-        )
-    )
+    title = 'Ritardo del treno {train}'.format(train=raw['compNumeroTreno'])
+    fig, ax = plt.subplots(dpi=200)
 
-    title = '<b>Ritardo del treno {train}</b>'.format(train=raw['compNumeroTreno'])
-    layout = dict(
-        title=title,
-        xaxis=dict(title='Fermata'),
-        yaxis=dict(title='Ritardo (minuti)')
-    )
+    ax.axhline(y=0, color='gray', linestyle='--')
+    if any(x >= 60 for x in delays):
+        ax.axhline(y=60, color='red', linestyle='--')
 
-    filename = os.getcwd() + ''.join(
+    ax.plot(stops, delays, marker='o')
+    ax.set_title(title)
+    ax.set_xticks(stops, stops, rotation=45, ha='right')
+    ax.set_ylabel('Ritardo (minuti)')
+
+    fig.tight_layout()
+    filename = os.getcwd() + '/' + ''.join(
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)) + '.png'
-
-    fig = dict(data=[line], layout=layout)
-    py.image.save_as(fig, filename=filename)
-
-    apply(filename, os.getcwd() + "/data/img/logo_white_with_name.png")
+    fig.savefig(filename)
+    apply(filename, os.getcwd() + "/data/img/logo_white_with_name_transparent.png")
     return filename
