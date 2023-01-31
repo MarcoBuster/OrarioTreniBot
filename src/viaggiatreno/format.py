@@ -528,9 +528,9 @@ def generateTrainGraph(raw: dict):
     def apply(a, b):
         base = Image.open(a)
         logo = Image.open(b)
-        logo.thumbnail((100, 100), Image.ANTIALIAS)
+        logo.thumbnail((150, 150), Image.ANTIALIAS)
         img_width, img_height = base.size
-        base.paste(logo, (img_width-100, 0), mask=logo)
+        base.paste(logo, (0, 0), mask=logo)
         base.save(a)
 
     stops = []
@@ -547,14 +547,19 @@ def generateTrainGraph(raw: dict):
         return False
 
     title = 'Ritardo del treno {train}'.format(train=raw['compNumeroTreno'])
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(dpi=200)
+
+    ax.axhline(y=0, color='gray', linestyle='--')
+    if any(x >= 60 for x in delays):
+        ax.axhline(y=60, color='red', linestyle='--')
+
     ax.plot(stops, delays, marker='o', linestyle='dashed')
     ax.set_title(title)
     ax.set_xticks(stops, stops, rotation=45, ha='right')
     ax.set_ylabel('Ritardo (minuti)')
 
     fig.tight_layout()
-    filename = os.getcwd() + ''.join(
+    filename = os.getcwd() + '/' + ''.join(
         random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10)) + '.png'
     fig.savefig(filename)
     apply(filename, os.getcwd() + "/data/img/logo_white_with_name_transparent.png")
