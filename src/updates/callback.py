@@ -69,14 +69,14 @@ def process_callback(bot, cb, u):
         text = (
             "<b>Informazioni sul bot</b>"
             "\n<i>Link utili</i>"
-            "\n➖ <b>👤 Contatta lo sviluppatore</b> su Telegram per avere <b>assistenza gratuita</b> "
+            "\n━ <b>👤 Contatta lo sviluppatore</b> su Telegram per avere <b>assistenza gratuita</b> "
             "o per proporre <b>una nuova funzione</b>"
-            "\n➖ Entra nel <b>📢 Canale ufficiale</b> per ricevere <b>news</b> e <b>aggiornamenti</b> "
+            "\n━ Entra nel <b>📢 Canale ufficiale</b> per ricevere <b>news</b> e <b>aggiornamenti</b> "
             "in anteprima <b>sul bot</b>"
-            "\n➖ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
+            "\n━ <b>💰 Dona</b> <i>quello che vuoi</i> per tenere <b>il bot online</b> e per supportare "
             "<b>il lavoro dello sviluppatore</b>"
-            "\n➖ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
-            "\n➖ Visualizza le <b>📈 Statistiche</b> di utilizzo del bot!"
+            "\n━ Dai un'occhiata o contribuisci al <i>codice sorgente</i> su <b>🔘 GitHub</b>"
+            "\n━ Visualizza le <b>📈 Statistiche</b> di utilizzo del bot!"
         )
         bot.api.call("editMessageText", {
             "chat_id": cb.chat.id, "message_id": cb.message.id, "text": text,
@@ -148,18 +148,18 @@ def process_callback(bot, cb, u):
 
         text = (
             "📈 <b>Statistiche</b>"
-            "\n➖➖ 👤 <i>Utenti</i>"
+            "\n━━ 👤 <i>Utenti</i>"
             "\n<b>Utenti attivi</b>: {au}"
             "\n<b>Utenti totali</b>: {tu}"
-            "\n➖➖ 💬 <i>Comandi</i>"
+            "\n━━ 💬 <i>Comandi</i>"
             "\n<b>Comando /start</b>: {sc} <i>(tu {psc})</i>"
             "\n<b>Tastiere inline</b>: {cc} <i>(tu {pcc})</i>"
             "\n<b>Richieste inline</b>: {iq} <i>(tu {piq})</i>"
-            "\n➖➖ 👁‍🗨 <i>Query</i>"
+            "\n━━ 👁‍🗨 <i>Query</i>"
             "\n<b>Treni cercati</b> per numero: {tr_bynum} <i>(tu {ptr_bynum})</i>"
             "\n<b>Treni cercati</b> per itinerario: {tr_byiti} <i>(tu {ptr_byiti})</i>"
             "\n<b>Stazioni cercate</b> per nome: {st} <i>(tu {pst})</i>"
-            "\n➖➖ 🚅 <i>Circolazione ferroviaria</i>"
+            "\n━━ 🚅 <i>Circolazione ferroviaria</i>"
             "\n<b>Treni di oggi</b>: {tt}"
             "\n<b>Treni circolanti</b>: {ct}"
             "\n<b>Ultimo aggiornamento</b>: {lu}"

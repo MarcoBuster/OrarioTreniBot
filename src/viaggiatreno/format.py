@@ -256,7 +256,7 @@ def formatDepartures(raw: dict, station: str, xrange: int):
             platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b> ({href})"
+            "\n\n━━ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Destinazione</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di partenza</b>: {dt}"
@@ -310,7 +310,7 @@ def formatArrivals(raw: dict, station: str, xrange: int):
             platform = "<i>sconosciuto</i> (errore Trenitalia)"
 
         text += (
-            "\n\n➖➖ <b>Treno {n}</b> ({href})"
+            "\n\n━━ <b>Treno {n}</b> ({href})"
             "\n🚉 <b>Origine</b>: {d}"
             "\n🛤 <b>Binario</b>: {b}"
             "\n🕒 <b>Orario di arrivo</b>: {dt}"
@@ -344,14 +344,14 @@ def formatItinerary(raw: dict):
             break
 
         x += 1
-        text += "\n┏➖➖ <b>Soluzione {n}</b>".format(n=x)
+        text += "\n┏━━ <b>Soluzione {n}</b>".format(n=x)
         duration = solution.get('durata', '<i>sconosciuta</i>')
         text += "\n┃🕑 <b>Durata</b>: {t}".format(t=duration if duration is not None else '<i>sconosciuta</i>')
         for vehicle in solution['vehicles']:
             start_time = datetime.strptime(vehicle['orarioPartenza'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
             end_time = datetime.strptime(vehicle['orarioArrivo'], '%Y-%m-%dT%H:%M:%S').strftime('%H:%M')
 
-            text += "\n┣➖ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
+            text += "\n┣━ <b>{t} {n}</b> ({href})".format(t=vehicle['categoriaDescrizione'], n=vehicle['numeroTreno'], href=gDLHREF(gTCQ(vehicle)))
             text += "\n┃ 🚉 <b>Stazione di partenza</b>: {d} ({dh})".format(d=vehicle['origine'], dh=start_time)
             text += "\n┃ 🚉 <b>Stazione di arrivo</b>: {a} ({ah})".format(a=vehicle['destinazione'], ah=end_time)
         text +="\n┗"
@@ -372,7 +372,7 @@ def formatNews(raw: dict):
         if not __toBool(news['primoPiano']):
             continue
         text += (
-            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n\n{pinned}━━ <b>{title}</b>"
             "\n<b>Data</b>: {date}"
             "\n{text}"
             .format(
@@ -388,7 +388,7 @@ def formatNews(raw: dict):
             continue
 
         text += (
-            "\n\n{pinned}➖➖ <b>{title}</b>"
+            "\n\n{pinned}━━ <b>{title}</b>"
             "\n<b>Data</b>: {date}"
             "\n{text}"
             .format(
