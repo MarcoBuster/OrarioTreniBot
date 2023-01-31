@@ -530,7 +530,7 @@ def generateTrainGraph(raw: dict):
         logo = Image.open(b)
         logo.thumbnail((150, 150), Image.ANTIALIAS)
         img_width, img_height = base.size
-        base.paste(logo, (0, 0), mask=logo)
+        base.paste(logo, (0, -15), mask=logo)
         base.save(a)
 
     stops = []
@@ -553,7 +553,7 @@ def generateTrainGraph(raw: dict):
     if any(x >= 60 for x in delays):
         ax.axhline(y=60, color='red', linestyle='--')
 
-    ax.plot(stops, delays, marker='o', linestyle='dashed')
+    ax.plot(stops, delays, marker='o')
     ax.set_title(title)
     ax.set_xticks(stops, stops, rotation=45, ha='right')
     ax.set_ylabel('Ritardo (minuti)')
