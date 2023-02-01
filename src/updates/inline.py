@@ -123,7 +123,7 @@ def process_inline_query(bot, iq, u):
             results = api.call('cercaNumeroTrenoTrenoAutocomplete', iq.query)
         except HTTPError:
             results = []
-        if len(results) == 0:
+        if results is None or len(results) == 0:
             return not_found_answer()
 
         u.increaseStat("stats_inline_queries")
@@ -200,7 +200,7 @@ def process_inline_query(bot, iq, u):
 
         else:  # Search station
             results = api.call('cercaStazione', iq.query)
-            if len(results) == 0:
+            if results is None or len(results) == 0:
                 return not_found_answer()
 
             elif len(results) > 0:
