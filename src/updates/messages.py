@@ -42,7 +42,7 @@ def process_messages(bot, message, u):
         except HTTPError:
             results = []
 
-        if len(results) == 0:
+        if results is None or len(results) == 0:
             u.state("home")
             text = (
                 "<b>🚅 Cerca treno</b> per numero"
@@ -102,7 +102,7 @@ def process_messages(bot, message, u):
 
     elif state == "train_byiti":
         results = api.call('cercaStazione', message.text)
-        if len(results) == 0:
+        if results is None or len(results) == 0:
             text = (
                 "<b>🚅 Cerca treno</b> per itinerario"
                 "\n❌ <b>Stazione di partenza non trovata</b>, riprovare o annullare?"
@@ -152,7 +152,7 @@ def process_messages(bot, message, u):
 
     elif state == "train_byiti_2":
         results = api.call('cercaStazione', message.text)
-        if len(results) == 0:
+        if results is None or len(results) == 0:
             text = (
                 "<b>🚅 Cerca treno</b> per itinerario"
                 "\n❌ <b>Stazione di arrivo non trovata</b>, riprovare o annullare?"
@@ -259,7 +259,7 @@ def process_messages(bot, message, u):
 
     elif state == "station":
         results = api.call('cercaStazione', message.text)
-        if len(results) == 0:
+        if results is None or len(results) == 0:
             text = (
                 "<b>🚉 Cerca stazione</b>"
                 "\n❌ <b>Stazione non trovata</b>, riprovare o annullare?"
